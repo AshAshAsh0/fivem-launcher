@@ -259,6 +259,7 @@
     closeModal();
     state.page = page;
     $$('.nav-btn').forEach((b) => b.classList.toggle('active', b.dataset.page === page));
+    $('#scroll').classList.toggle('split', page === 'home' || page === 'favorites');
     render(true);
     $('#scroll').scrollTop = 0;
   }
@@ -280,66 +281,61 @@
     return played[0] || state.servers[0];
   }
 
-  function heroHTML() {
-    const s = featured();
+  // เซิร์ฟที่เลือกในลิสต์ (ไม่ได้เลือก = เซิร์ฟที่เล่นล่าสุด)
+  function selected(list) {
+    const pool = list || state.servers;
+    return (state.sel && pool.find((s) => s.id === state.sel)) || (pool.includes(featured()) ? featured() : pool[0]) || null;
+  }
+  function statsLine() {
+    const online = state.servers.filter((s) => st(s).online).length;
+    const players = state.servers.reduce((a, s) => a + (st(s).online ? st(s).players : 0), 0);
+    return `<span class="lp-stat"><i class="dot on"></i><b id="statOnline">${online}<small>/${state.servers.length}</small></b> ออนไลน์</span><span class="lp-stat">${I.users}<b id="statPlayers">${fmtNum(players)}</b> ผู้เล่น</span>`;
+  }
+  function detailHTML(list) {
+    const s = selected(list);
     if (!s) {
-      return `<section class="hero">
-        <div>
-          <span class="badge">เริ่มกันเลย ✦</span>
-          <h2 class="hero-title" style="text-transform:none">ยังไม่มีเซิร์ฟเวอร์</h2>
-          <p class="hero-desc">เพิ่มเซิร์ฟเวอร์แรกของคุณ แล้วเข้าเกมได้ในคลิกเดียว</p>
-          <div class="hero-actions">
-            <button class="btn btn-dark btn-lg" data-act="add">${I.plus} เพิ่มเซิร์ฟเวอร์</button>
-            <button class="btn btn-lg" data-act="open-fivem">เปิด FiveM เฉย ๆ</button>
-          </div>
+      return `<aside class="detail empty-detail">
+        <div class="dt-welcome">
+          <div class="em-mark">${I.mark}</div>
+          <h2 class="dt-name" style="text-transform:none">ยังไม่มีเซิร์ฟเวอร์</h2>
+          <p class="dt-desc">เพิ่มเซิร์ฟเวอร์แรกของคุณ แล้วเข้าเกมได้ในคลิกเดียว</p>
+          <button class="btn btn-dark btn-lg dt-wide" data-act="add">${I.plus} เพิ่มเซิร์ฟเวอร์</button>
+          <button class="btn dt-wide" data-act="go-browse">${I.search} ค้นหาเซิร์ฟ</button>
+          <button class="dt-link" data-act="open-fivem">เปิด FiveM เฉย ๆ</button>
         </div>
-        <div class="hero-art"><div class="tilt-card"><span class="ph-mark">${I.mark.replace('<svg', '<svg style="width:74px;height:74px"')}</span></div></div>
-      </section>`;
+      </aside>`;
     }
     const t = toneOf(s), S = st(s), p = loadPct(s), logo = logoOf(s), banner = bannerOf(s);
-    return `<section class="hero" style="${toneStyle(t)}">
-      <div style="min-width:0">
-        <span class="badge soft">${s.lastPlayed ? 'เล่นล่าสุด ✦' : 'เซิร์ฟของคุณ ✦'}</span>
-        <h2 class="hero-title${[...String(s.name)].length > 34 ? ' xlong' : [...String(s.name)].length > 20 ? ' long' : ''}" data-no-i18n title="${esc(s.name)}">${esc(s.name)}</h2>
-        <div class="hero-chips">
-          <span class="js-st">${S.online ? '<span class="pill pill-ok">ออนไลน์</span>' : '<span class="pill pill-off">ออฟไลน์</span>'}</span>
-          <span class="js-ping">${S.ping != null ? `<span class="pill pill-mono">${I.signal} ${S.ping}ms</span>` : ''}</span>
-          ${s.category ? `<span class="pill pill-tone">${esc(s.category)}</span>` : ''}
+    const full = S.online && S.max && S.players >= S.max;
+    const tag = s.lastPlayed && s === featured() ? 'เล่นล่าสุด ✦' : s.category || 'เซิร์ฟของคุณ ✦';
+    return `<aside class="detail" style="${toneStyle(t)}" data-id="${s.id}">
+      <div class="dt-banner" style="background:linear-gradient(135deg, ${shade(t, 0.4)}, ${t})">
+        ${banner ? `<img src="${esc(banner)}" alt="">` : logo ? `<img src="${esc(logo)}" alt="" class="blur-logo">` : ''}
+        <span class="js-st">${S.online ? '<span class="pill pill-ok">ออนไลน์</span>' : '<span class="pill pill-off">ออฟไลน์</span>'}</span>
+        <button class="fav-btn ${s.fav ? 'on' : ''}" data-act="fav" data-id="${s.id}" title="เซิร์ฟโปรด">${I.heart}</button>
+      </div>
+      <div class="dt-head">
+        <div class="dt-logo" style="background:${t}">${logo ? `<img src="${esc(logo)}" alt="">` : `<span>${esc(initial(s.name))}</span>`}</div>
+        <div class="dt-title">
+          <span class="badge soft" ${s.category && tag === s.category ? 'data-no-i18n' : ''}>${esc(tag)}</span>
+          <h2 class="dt-name" title="${esc(s.name)}" data-no-i18n>${esc(s.name)}</h2>
+          <div class="dt-addr" data-no-i18n>${esc(s.display || s.address)}</div>
         </div>
-        <div class="players" style="margin:4px 0 8px"><span>${I.user}<b class="js-pl">${fmtNum(S.players)}</b> / <span class="js-max">${fmtNum(S.max)}</span> ผู้เล่น</span><span class="pct js-pct" style="color:${pctColor(p)}">${p}%</span></div>
-        <div class="bar" style="max-width:420px"><i class="js-bar" style="width:${p}%;--barc:${barColor(p)}"></i></div>
-        <div class="hero-actions">
-          <button class="btn btn-tone btn-lg" data-act="play" data-id="${s.id}">${I.play} เล่นเลย</button>
-          <button class="btn btn-lg" data-act="open-fivem">เปิด FiveM เฉย ๆ</button>
-        </div>
       </div>
-      <div class="hero-art">
-        <div class="tilt-card" style="background:linear-gradient(135deg, ${shade(t, 0.35)}, ${t})">
-          ${banner ? `<img class="bn" src="${esc(banner)}" alt="">` : logo ? `<img class="bn" src="${esc(logo)}" alt="" style="filter:blur(28px) saturate(1.4);transform:scale(1.6)">` : ''}
-        </div>
-        <div class="hero-logo" style="background:${t}">${logo ? `<img src="${esc(logo)}" alt="">` : `<div style="display:grid;place-items:center;height:100%;font:800 34px Prompt,'Segoe UI',sans-serif;color:var(--tone-ink)">${esc(initial(s.name))}</div>`}</div>
+      <div class="dt-stats">
+        <div class="dt-stat"><span class="lbl">ผู้เล่น</span><b><span class="js-pl">${fmtNum(S.players)}</span><small>/<span class="js-max">${fmtNum(S.max)}</span></small></b></div>
+        <div class="dt-stat"><span class="lbl">ปิง</span><b class="js-ping-n">${S.ping != null ? `${S.ping}<small>ms</small>` : '—'}</b></div>
+        <div class="dt-stat"><span class="lbl">ความจุ</span><b class="js-pct" style="color:${pctColor(p)}">${full ? 'เต็ม · ' : ''}${p}%</b></div>
       </div>
-    </section>`;
-  }
-
-  function statsHTML() {
-    const online = state.servers.filter((s) => st(s).online).length;
-    const total = state.servers.length;
-    const players = state.servers.reduce((a, s) => a + (st(s).online ? st(s).players : 0), 0);
-    return `<div class="stats">
-      <div class="stat stat-dark">
-        <span class="ico">${I.bolt}</span>
-        <span class="lbl">ออนไลน์ตอนนี้</span>
-        <span class="num" id="statOnline">${online}<small>/${total}</small></span>
-        <span class="cap">${total ? `จาก ${total} เซิร์ฟในลิสต์ของคุณ` : 'ยังว่างอยู่เลย เพิ่มเซิร์ฟกัน'}</span>
+      <div class="bar"><i class="js-bar" style="width:${p}%;--barc:${barColor(p)}"></i></div>
+      ${s.desc ? `<p class="dt-desc" data-no-i18n>${esc(s.desc)}</p>` : ''}
+      <div class="dt-chips">${lastHTML(s)}${bellHTML(s)}</div>
+      <div class="dt-actions">
+        <button class="btn btn-tone btn-lg dt-play" data-act="play" data-id="${s.id}">${I.play} ${S.online ? 'เล่นเลย' : 'ลองเข้า'}</button>
+        <button class="more-btn" data-act="more" data-id="${s.id}" title="เพิ่มเติม">${I.more}</button>
       </div>
-      <div class="stat stat-line">
-        <span class="ico">${I.users}</span>
-        <span class="lbl">ผู้เล่นรวม</span>
-        <span class="num" id="statPlayers" data-count="${players}">${fmtNum(players)}</span>
-        <span class="cap">คนกำลังเล่นอยู่ในลิสต์ของคุณ</span>
-      </div>
-    </div>`;
+      <button class="dt-link" data-act="open-fivem">เปิด FiveM เฉย ๆ</button>
+    </aside>`;
   }
 
   // แจ้งเตือนเมื่อมีที่ว่าง (เซิร์ฟเต็ม) หรือเมื่อเซิร์ฟเปิด (เซิร์ฟออฟไลน์)
@@ -377,31 +373,22 @@
   };
 
   function cardHTML(s, i) {
-    const t = toneOf(s), S = st(s), p = loadPct(s), logo = logoOf(s), banner = bannerOf(s);
-    const full = S.online && S.max && S.players >= S.max;
-    return `<article class="card ${S.online ? '' : 'offline'}" ${state.page === 'home' && state.filter !== 'recent' ? 'draggable="true"' : ''} style="${toneStyle(t)};--i:${i}" data-id="${s.id}" data-bell="${bellKind(s)}|${state.watching[s.id] || ''}">
-      <div class="banner">
-        ${banner ? `<img class="bimg" src="${esc(banner)}" alt="">` : logo ? `<img class="blur-logo" src="${esc(logo)}" alt="">` : ''}
-        <span class="js-st">${S.online ? '<span class="pill pill-ok">ออนไลน์</span>' : '<span class="pill pill-off">ออฟไลน์</span>'}</span>
-        <button class="fav-btn ${s.fav ? 'on' : ''}" data-act="fav" data-id="${s.id}" title="เซิร์ฟโปรด">${I.heart}</button>
+    const t = toneOf(s), S = st(s), p = loadPct(s), logo = logoOf(s);
+    const drag = (state.page === 'home' || state.page === 'favorites') && state.filter !== 'recent' && state.page === 'home';
+    const sel = selected(filtered(state.page === 'favorites'));
+    return `<article class="srow ${S.online ? '' : 'offline'} ${sel && sel.id === s.id ? 'sel' : ''}" ${drag ? 'draggable="true"' : ''} style="${toneStyle(t)};--i:${i}" data-id="${s.id}" data-bell="${bellKind(s)}|${state.watching[s.id] || ''}">
+      <div class="sr-ic" style="background:${t}">${logo ? `<img src="${esc(logo)}" alt="">` : `<span>${esc(initial(s.name))}</span>`}<i class="sr-dot js-dot"></i></div>
+      <div class="sr-main">
+        <div class="sr-name" data-no-i18n>${esc(s.name)}${s.fav ? `<span class="sr-fav">${I.heart}</span>` : ''}</div>
+        <div class="sr-sub"><span data-no-i18n>${esc(s.display || s.address)}</span>${state.watching[s.id] ? '<span class="sr-bell">🔔</span>' : ''}</div>
       </div>
-      <div class="logo">${logo ? `<img src="${esc(logo)}" alt="">` : esc(initial(s.name))}</div>
-      <div class="card-body">
-        <div class="card-name" title="${esc(s.name)}" data-no-i18n>${esc(s.name)}</div>
-        ${s.desc ? `<div class="card-sub desc" title="${esc(s.desc)}" data-no-i18n>${esc(s.desc)}</div>` : `<div class="card-sub" data-no-i18n>${esc(s.display || s.address)}</div>`}
-        <div class="players"><span>${I.user}<b class="js-pl">${fmtNum(S.players)}</b> / <span class="js-max">${fmtNum(S.max)}</span> ผู้เล่น</span><span class="pct js-pct" style="color:${pctColor(p)}">${full ? 'เต็ม · ' : ''}${p}%</span></div>
+      <div class="sr-pl">
+        <div class="sr-num"><b class="js-pl">${fmtNum(S.players)}</b><span>/<span class="js-max">${fmtNum(S.max)}</span></span></div>
         <div class="bar"><i class="js-bar" style="width:${p}%;--barc:${barColor(p)}"></i></div>
-        <div class="chips">
-          <span class="pill pill-mono js-ping">${I.signal} ${S.ping != null ? `${S.ping}ms` : '—'}</span>
-          ${lastHTML(s)}
-          ${s.category ? `<span class="pill pill-tone">${esc(s.category)}</span>` : ''}
-          ${bellHTML(s)}
-        </div>
-        <div class="card-actions">
-          <button class="btn btn-tone" data-act="play" data-id="${s.id}">${I.play} ${S.online ? 'เล่น' : 'ลองเข้า'}</button>
-          <button class="more-btn" data-act="more" data-id="${s.id}" title="เพิ่มเติม">${I.more}</button>
-        </div>
       </div>
+      <span class="sr-ping js-ping">${S.ping != null ? `${S.ping}ms` : '—'}</span>
+      <button class="sr-play" data-act="play" data-id="${s.id}" title="${S.online ? 'เล่น' : 'ลองเข้า'}">${I.play}</button>
+      <button class="more-btn" data-act="more" data-id="${s.id}" title="เพิ่มเติม">${I.more}</button>
     </article>`;
   }
 
@@ -430,7 +417,7 @@
     if (!list.length) {
       return `<div class="empty"><div><div class="em-mark">${favOnly ? I.heart : I.search}</div><b>${favOnly && !state.q ? 'ยังไม่มีเซิร์ฟโปรด' : 'ไม่พบเซิร์ฟเวอร์'}</b>${favOnly && !state.q ? 'กดหัวใจบนการ์ดเพื่อเพิ่มเข้าลิสต์นี้' : 'ลองเปลี่ยนคำค้นหรือตัวกรองดู'}</div></div>`;
     }
-    if (favOnly || !state.groups.length || state.filter === 'recent') return `<div class="grid" data-gid="">${list.map(cardHTML).join('')}</div>`;
+    if (favOnly || !state.groups.length || state.filter === 'recent') return `<div class="grid rows" data-gid="">${list.map(cardHTML).join('')}</div>`;
     // แบ่งตามกลุ่ม
     const ids = new Set(state.groups.map((g) => g.id));
     const searching = !!state.q.trim() || state.filter !== 'all';
@@ -444,7 +431,7 @@
           <span class="grp-name" ${g ? 'data-no-i18n' : ''}>${esc(name)}</span><span class="grp-count">${items.length}</span>
           ${g ? `<button class="grp-more" data-grp="menu" data-gid="${gid}" title="จัดการกลุ่ม">${I.more}</button>` : ''}
         </div>
-        <div class="grid" data-gid="${gid}">${cards || '<div class="grp-empty">ลากการ์ดเซิร์ฟมาวางที่นี่</div>'}</div>
+        <div class="grid rows" data-gid="${gid}">${cards || '<div class="grp-empty">ลากเซิร์ฟมาวางที่นี่</div>'}</div>
       </section>`;
     };
     return state.groups.map((g) => section(g.id, g.name, list.filter((s) => s.group === g.id), g)).join('')
@@ -534,7 +521,7 @@
   // เลื่อนหน้าอัตโนมัติเมื่อลากการ์ดไปใกล้ขอบบน/ล่าง (ระหว่างลากบน Windows ใช้ล้อเมาส์ไม่ได้)
   let dragY = -1, autoScrolling = false;
   function autoScrollStep() {
-    const sc = $('#scroll');
+    const sc = $('#gridWrap') || $('#scroll');
     if (!dragId || !sc || dragY < 0) { autoScrolling = false; return; }
     const r = sc.getBoundingClientRect(), edge = 90;
     let v = 0;
@@ -553,7 +540,7 @@
     $$('.drop-before, .drop-after, .drop-into').forEach((e) => e.classList.remove('drop-before', 'drop-after', 'drop-into'));
   }
   function bindDnD() {
-    $$('.card[draggable]').forEach((c) => {
+    $$('.srow[draggable]').forEach((c) => {
       c.addEventListener('dragstart', (e) => {
         if (e.target.closest('button')) { e.preventDefault(); return; }
         dragId = c.dataset.id;
@@ -573,7 +560,7 @@
         if (!dragId || dragId === c.dataset.id) return;
         e.preventDefault(); e.stopPropagation();
         const r = c.getBoundingClientRect();
-        const after = e.clientX > r.left + r.width / 2;
+        const after = e.clientY > r.top + r.height / 2; // ลิสต์แนวตั้ง: ครึ่งล่าง = วางต่อท้าย
         clearDropMarks();
         c.classList.add(after ? 'drop-after' : 'drop-before');
       });
@@ -612,24 +599,33 @@
   }
 
   function homeHTML(favOnly) {
-    const title = favOnly
-      ? (isEN() ? `<h1 class="h1">My <span class="sq">favorite${SQUIGGLE}</span> servers</h1>` : `<h1 class="h1">เซิร์ฟ<span class="sq">โปรด${SQUIGGLE}</span>ของฉัน</h1>`) + '<p class="sub">รวมเซิร์ฟที่คุณกดหัวใจไว้</p>'
-      : (isEN() ? `<h1 class="h1">Ready to <span class="sq">roll${SQUIGGLE}</span>?</h1>` : `<h1 class="h1">พร้อม<span class="sq">ลุย${SQUIGGLE}</span>หรือยัง?</h1>`) + '<p class="sub">เลือกเซิร์ฟที่ชอบ แล้วกดเล่นได้เลย</p>';
-    return `
-      <div class="page-head"><div>${title}</div><button class="btn btn-dark btn-lg" data-act="add">${I.plus} เพิ่มเซิร์ฟเวอร์</button></div>
-      ${favOnly ? '' : `<div class="hero-grid">${heroHTML()}${statsHTML()}</div>`}
-      <div class="toolbar">
-        <label class="search">${I.search}<input id="q" placeholder="หาเซิร์ฟเวอร์..." value="${esc(state.q)}" spellcheck="false"><span class="kbd">Ctrl F</span></label>
-        ${favOnly ? '' : `<div class="seg" id="filters">
+    const list = filtered(favOnly);
+    return `<div class="home">
+      <section class="list-pane">
+        <div class="lp-head">
+          <div class="lp-title">
+            <h1 class="h2">${favOnly ? (isEN() ? 'Favorite <span class="sq">servers</span>' : 'เซิร์ฟ<span class="sq">โปรด</span>') : (isEN() ? 'My <span class="sq">servers</span>' : 'เซิร์ฟ<span class="sq">ของฉัน</span>')}</h1>
+            <div class="lp-stats" id="lpStats">${statsLine()}</div>
+          </div>
+          <div class="lp-actions">
+            ${favOnly ? '' : `<button class="icon-btn" data-act="new-group" title="สร้างกลุ่ม">${I.folder2}</button>`}
+            <button class="icon-btn ${state.refreshing ? 'spin' : ''}" data-act="refresh" id="btnRefresh" title="รีเฟรชสถานะ">${I.refresh}</button>
+            <button class="btn btn-dark" data-act="add">${I.plus} เพิ่ม</button>
+          </div>
+        </div>
+        <div class="lp-tools">
+          <label class="search">${I.search}<input id="q" placeholder="หาเซิร์ฟเวอร์..." value="${esc(state.q)}" spellcheck="false"><span class="kbd">Ctrl F</span></label>
+        </div>
+        ${favOnly ? '' : `<div class="seg sm" id="filters">
           <button data-f="all" class="${state.filter === 'all' ? 'on' : ''}">ทั้งหมด</button>
           <button data-f="online" class="${state.filter === 'online' ? 'on' : ''}">ออนไลน์</button>
           <button data-f="fav" class="${state.filter === 'fav' ? 'on' : ''}">โปรด</button>
           <button data-f="recent" class="${state.filter === 'recent' ? 'on' : ''}">ล่าสุด</button>
         </div>`}
-        ${favOnly ? '' : `<button class="icon-btn" data-act="new-group" title="สร้างกลุ่ม">${I.folder2}</button>`}
-        <button class="icon-btn ${state.refreshing ? 'spin' : ''}" data-act="refresh" id="btnRefresh" title="รีเฟรชสถานะ">${I.refresh}</button>
-      </div>
-      <div id="gridWrap">${gridHTML(favOnly)}</div>`;
+        <div class="lp-list" id="gridWrap">${gridHTML(favOnly)}</div>
+      </section>
+      <div id="detailWrap">${detailHTML(list.length ? list : (favOnly ? [] : state.servers))}</div>
+    </div>`;
   }
 
   // อัปเดตเฉพาะตัวเลข/สถานะ โดยไม่สร้างการ์ดใหม่ (ไม่โหลดรูป/GIF ซ้ำ ไม่กระตุก)
@@ -642,38 +638,49 @@
     if (s.lastPlayed) set('.js-last', (el) => { el.innerHTML = `${I.clock} ${ago(s.lastPlayed)}`; });
     set('.js-pct', (el) => { el.textContent = `${isCard && full ? 'เต็ม · ' : ''}${p}%`; el.style.color = pctColor(p); });
     set('.js-bar', (el) => { el.style.width = `${p}%`; el.style.setProperty('--barc', barColor(p)); });
-    set('.js-ping', (el) => { el.innerHTML = isCard ? `${I.signal} ${S.ping != null ? `${S.ping}ms` : '—'}` : S.ping != null ? `<span class="pill pill-mono">${I.signal} ${S.ping}ms</span>` : ''; });
+    set('.js-ping', (el) => { el.textContent = S.ping != null ? `${S.ping}ms` : '—'; });
+    set('.js-ping-n', (el) => { el.innerHTML = S.ping != null ? `${S.ping}<small>ms</small>` : '—'; });
     if (isCard) root.classList.toggle('offline', !S.online);
   }
   function patchAll() {
     if (state.page === 'settings' || state.page === 'browse') return;
-    const cards = $$('.card');
+    const rows = $$('.srow');
     const fav = state.page === 'favorites';
-    const want = filtered(fav).map((s) => s.id).join(',');
-    const have = cards.map((c) => c.dataset.id).join(',');
-    const f = featured();
-    const heroId = $('.hero [data-act="play"]')?.dataset.id || null;
-    if (want !== have || (state.page === 'home' && (f?.id || null) !== heroId)) return updateHomeParts();
-    if (cards.some((c) => { const s = byId(c.dataset.id); return s && c.dataset.bell !== `${bellKind(s)}|${state.watching[s.id] || ''}`; })) return updateHomeParts();
-    cards.forEach((c) => patchStatus(c, byId(c.dataset.id), true));
-    const hero = $('.hero');
-    if (hero && f) patchStatus(hero, f, false);
-    const online = state.servers.filter((s) => st(s).online).length;
-    const players = state.servers.reduce((a, s) => a + (st(s).online ? st(s).players : 0), 0);
-    if ($('#statOnline')) $('#statOnline').innerHTML = `${online}<small>/${state.servers.length}</small>`;
-    if ($('#statPlayers')) $('#statPlayers').textContent = fmtNum(players);
+    const list = filtered(fav);
+    const want = list.map((s) => s.id).join(',');
+    const have = rows.map((c) => c.dataset.id).join(',');
+    const d = selected(list.length ? list : fav ? [] : state.servers);
+    const dId = $('.detail')?.dataset.id || null;
+    if (want !== have || (d?.id || null) !== dId) return updateHomeParts();
+    if (rows.some((c) => { const s = byId(c.dataset.id); return s && c.dataset.bell !== `${bellKind(s)}|${state.watching[s.id] || ''}`; })) return updateHomeParts();
+    rows.forEach((c) => patchStatus(c, byId(c.dataset.id), true));
+    const det = $('.detail[data-id]');
+    if (det && d) patchStatus(det, d, false);
+    if ($('#lpStats')) $('#lpStats').innerHTML = statsLine();
     $('#btnRefresh')?.classList.toggle('spin', state.refreshing);
   }
 
   function updateHomeParts() {
-    if (state.page === 'settings') return;
+    if (state.page === 'settings' || state.page === 'browse') return;
     const fav = state.page === 'favorites';
+    const list = filtered(fav);
     const gw = $('#gridWrap');
-    if (gw) gw.innerHTML = gridHTML(fav);
-    const hg = $('.hero-grid');
-    if (hg) hg.innerHTML = heroHTML() + statsHTML();
+    if (gw) { const y = gw.scrollTop; gw.innerHTML = gridHTML(fav); gw.scrollTop = y; }
+    const dw = $('#detailWrap');
+    if (dw) dw.innerHTML = detailHTML(list.length ? list : fav ? [] : state.servers);
+    if ($('#lpStats')) $('#lpStats').innerHTML = statsLine();
     $('#btnRefresh')?.classList.toggle('spin', state.refreshing);
     bindCards();
+  }
+  // เลือกเซิร์ฟในลิสต์ → อัปเดตแผงรายละเอียดด้านขวา (ไม่สร้างลิสต์ใหม่)
+  function selectServer(id) {
+    if (state.sel === id && $('.detail')?.dataset.id === id) return;
+    state.sel = id;
+    $$('.srow').forEach((r) => r.classList.toggle('sel', r.dataset.id === id));
+    const fav = state.page === 'favorites';
+    const list = filtered(fav);
+    const dw = $('#detailWrap');
+    if (dw) { dw.innerHTML = detailHTML(list.length ? list : fav ? [] : state.servers); bindCards(true); }
   }
 
   // ---------- BROWSE (รายชื่อเซิร์ฟสาธารณะ) ----------
@@ -1008,19 +1015,18 @@
 
   // ---------- binding ----------
   function bindView() {
-    $$('[data-act="go-browse"]').forEach((b) => b.addEventListener('click', () => go('browse')));
+    $$('[data-act="go-browse"]').forEach((b) => (b.onclick = () => go('browse')));
     if (state.page === 'browse') { bindBrowse(); return; }
-    $$('[data-act="add"]').forEach((b) => b.addEventListener('click', () => openServerModal()));
-    $$('[data-act="open-fivem"]').forEach((b) => b.addEventListener('click', () => { api.openFiveM(); toast('กำลังเปิด FiveM'); }));
+    $$('[data-act="add"]').forEach((b) => (b.onclick = () => openServerModal()));
+    $$('[data-act="open-fivem"]').forEach((b) => (b.onclick = openFiveMOnly));
     $('[data-act="refresh"]')?.addEventListener('click', () => refreshAll(true));
     $('[data-act="new-group"]')?.addEventListener('click', () => groupModal(null));
     const q = $('#q');
-    if (q) q.addEventListener('input', () => { state.q = q.value; const gw = $('#gridWrap'); gw.innerHTML = gridHTML(state.page === 'favorites'); bindCards(); });
+    if (q) q.addEventListener('input', () => { state.q = q.value; updateHomeParts(); });
     $$('#filters button').forEach((b) => b.addEventListener('click', () => {
       state.filter = b.dataset.f;
       $$('#filters button').forEach((x) => x.classList.toggle('on', x === b));
-      $('#gridWrap').innerHTML = gridHTML(false);
-      bindCards();
+      updateHomeParts();
     }));
     bindCards();
 
@@ -1112,29 +1118,28 @@
     if (rerender) render();
   }
 
-  function bindCards() {
-    $$('[data-act="play"]').forEach((b) => (b.onclick = () => play(b.dataset.id)));
-    $$('[data-act="fav"]').forEach((b) => (b.onclick = (e) => {
+  function openFiveMOnly() { api.openFiveM(); toast('กำลังเปิด FiveM'); }
+  function bindCards(detailOnly = false) {
+    const scope = detailOnly ? $('#detailWrap') : document;
+    if (!scope) return;
+    $$('[data-act="play"]', scope).forEach((b) => (b.onclick = (e) => { e.stopPropagation(); play(b.dataset.id); }));
+    $$('[data-act="fav"]', scope).forEach((b) => (b.onclick = (e) => {
       e.stopPropagation();
       const s = byId(b.dataset.id);
       s.fav = !s.fav;
       persist();
-      b.classList.toggle('on', s.fav);
-      if (state.page === 'favorites' || state.filter === 'fav') updateHomeParts();
+      updateHomeParts();
     }));
-    $$('[data-act="more"]').forEach((b) => (b.onclick = (e) => { e.stopPropagation(); openMenu(b, byId(b.dataset.id)); }));
-    $$('[data-act="watch"]').forEach((b) => (b.onclick = (e) => { e.stopPropagation(); toggleWatch(byId(b.dataset.id)); }));
-    if (state.settings.motion === 'full') {
-      $$('.card').forEach((c) => {
-        c.onmousemove = (e) => {
-          if (document.body.classList.contains('dnd')) return;
-          const r = c.getBoundingClientRect();
-          const x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5;
-          c.style.transform = `perspective(900px) rotateX(${(-y * 4).toFixed(2)}deg) rotateY(${(x * 5).toFixed(2)}deg) translateY(-4px)`;
-        };
-        c.onmouseleave = () => { c.style.transform = ''; };
-      });
-    }
+    $$('[data-act="more"]', scope).forEach((b) => (b.onclick = (e) => { e.stopPropagation(); openMenu(b, byId(b.dataset.id)); }));
+    $$('[data-act="watch"]', scope).forEach((b) => (b.onclick = (e) => { e.stopPropagation(); toggleWatch(byId(b.dataset.id)); }));
+    $$('#detailWrap [data-act="add"]').forEach((b) => (b.onclick = () => openServerModal()));
+    $$('#detailWrap [data-act="go-browse"]').forEach((b) => (b.onclick = () => go('browse')));
+    $$('#detailWrap [data-act="open-fivem"]').forEach((b) => (b.onclick = openFiveMOnly));
+    if (detailOnly) return;
+    $$('.srow').forEach((r) => {
+      r.onclick = () => selectServer(r.dataset.id);
+      r.ondblclick = (e) => { if (!e.target.closest('button')) play(r.dataset.id); };
+    });
     bindDnD();
   }
 
