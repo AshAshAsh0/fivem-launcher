@@ -1111,6 +1111,7 @@
     if (key === 'refresh' || key === 'perf') restartAuto();
     if (key === 'perf') api.setPerfMode(val);
     if (key === 'lang') {
+      try { const u = new URL(location.href); u.searchParams.set('lang', val); u.searchParams.set('theme', state.settings.theme); history.replaceState(null, '', u); } catch {}
       try { sessionStorage.setItem('fl-page', state.page); } catch {}
       setTimeout(() => location.reload(), 450); // รอให้บันทึกการตั้งค่าก่อน
       return;
@@ -1577,6 +1578,8 @@
   }
 
   async function init() {
+    const S = window.Splash || { step() {}, done() {} };
+    S.step(1, 30);
     const saved = await api.load();
     if (saved) {
       state.servers = cleanServers(saved.servers);
@@ -1587,6 +1590,7 @@
     applyPrefs();
     try { const inf = await api.info(); state.version = inf.version || ''; state.os = inf.os || ''; } catch {}
     try { (await api.watchList?.() || []).forEach((w) => (state.watching[w.id] = w.kind)); } catch {}
+    S.step(2, 55);
     try { state.fivem = await api.fivemStatus(state.settings.fivemPath); } catch {}
     api.setPerfMode?.(state.settings.perf);
     bindGlobal();
@@ -1594,7 +1598,10 @@
     try { startPage = sessionStorage.getItem('fl-page') || 'home'; sessionStorage.removeItem('fl-page'); } catch {}
     go(['home', 'browse', 'favorites', 'settings'].includes(startPage) ? startPage : 'home');
     restartAuto();
-    refreshAll();
+    S.step(3, 75);
+    // รอผลสถานะเซิร์ฟสักครู่ (เซิร์ฟที่ไม่ตอบจะไม่ทำให้รอนาน) แล้วปิดหน้า loading
+    await Promise.race([refreshAll(), new Promise((r) => setTimeout(r, 1800))]).catch(() => {});
+    S.done();
     setTimeout(() => checkUpdate(false), 4000);
   }
 

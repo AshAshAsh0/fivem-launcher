@@ -26,7 +26,7 @@ import (
 var webFS embed.FS
 
 // version ถูกแทนค่าตอน build ด้วย -ldflags "-X main.version=..."
-var version = "2.8.1"
+var version = "2.9.0"
 
 const (
 	appTitle = "FiveM Launcher"
@@ -98,13 +98,18 @@ func main() {
 	}
 
 	// สีพื้นหลังตอนเปิดโปรแกรม ให้ตรงกับธีม (กันจอขาวแวบ)
-	bg := "FFEBEBEC"
+	bg, startTheme, startLang := "FFEBEBEC", "mono", ""
 	if b, err := os.ReadFile(filepath.Join(dataDir, "launcher-data.json")); err == nil {
 		switch {
 		case strings.Contains(string(b), `"theme": "sakura"`):
-			bg = "FFFBECF1"
+			bg, startTheme = "FFFBECF1", "sakura"
 		case strings.Contains(string(b), `"theme": "hud"`):
-			bg = "FF0B0C0E"
+			bg, startTheme = "FF0B0C0E", "hud"
+		}
+		if strings.Contains(string(b), `"lang": "en"`) {
+			startLang = "en"
+		} else if strings.Contains(string(b), `"lang": "th"`) {
+			startLang = "th"
 		}
 	}
 	os.Setenv("WEBVIEW2_DEFAULT_BACKGROUND_COLOR", bg)
@@ -148,7 +153,8 @@ func main() {
 			wv.Dispatch(func() { wv.Eval(js) })
 		}()
 	})
-	wv.Navigate(fmt.Sprintf("http://127.0.0.1:%d/index.html", ln.Addr().(*net.TCPAddr).Port))
+	// ส่งธีม/ภาษาไปให้หน้า loading ใช้ได้ตั้งแต่เฟรมแรก
+	wv.Navigate(fmt.Sprintf("http://127.0.0.1:%d/index.html?theme=%s&lang=%s&v=%s", ln.Addr().(*net.TCPAddr).Port, startTheme, startLang, version))
 	wv.Run()
 	flushSave()
 }
