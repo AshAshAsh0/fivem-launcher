@@ -814,16 +814,15 @@
   }
   // แผงเลือกเซิร์ฟ: ป้ายสถานะกรอบตัดมุม + โลโก้ใหญ่มีแสงฟุ้ง + กล่องสถิติแบบกระจก + ปุ่มเล่นเรืองแสง
   function sideTpl(o) {
-    const [k, label] = stInfo(o.online, o.players, o.max, o.priv);
     const pct = o.max ? Math.min(100, Math.round((o.players / o.max) * 100)) : 0;
     return `
-      <div class="sx-hero" style="--tone:${o.tone || '#0aaefb'}">
+      <div class="sx-hero" style="--tone:${o.tone || '#2ec2ff'}">
         ${o.bg ? `<img class="sx-bg ${o.blur ? 'blur' : ''}" src="${esc(o.bg)}" alt="">` : ''}
         <button class="x-btn sx-x" id="svClose" title="ปิด">${I.x}</button>
-        <div class="sx-badge sx-${k}"><b><i></i>${label}</b>${o.badgeSub ? `<small>${o.badgeSub}</small>` : ''}</div>
         <div class="sx-logo"><span>${esc(initial(o.name))}</span>${o.logo ? `<img src="${esc(o.logo)}" alt="">` : ''}</div>
         <h2 class="sx-name" data-no-i18n title="${esc(o.name)}">${esc(o.name)}</h2>
         ${o.sub ? `<div class="sx-sub" data-no-i18n title="${esc(o.sub)}">${esc(o.sub)}</div>` : ''}
+        <div class="sx-st">${stChip(o.online !== false, o.players, o.max, o.priv)}${o.badgeSub ? `<span class="sx-tag">${o.badgeSub}</span>` : ''}</div>
       </div>
       <div class="sv-body sx-body">
         <div class="sx-lbl"><i></i><span>ข้อมูลเซิร์ฟ</span></div>
@@ -845,7 +844,7 @@
     const side = openSide(sideTpl({
       name: s.name, online: true, players: s.players, max: s.max, priv: s.private, ping: s.private ? '—' : '…',
       bg: s.banner ? imgSrc(s.banner) : s.icon ? imgSrc(s.icon) : '', blur: !s.banner, logo: s.icon ? imgSrc(s.icon) : '',
-      badgeSub: [s.locale ? s.locale.replace('_', '-').toUpperCase() : '', 'FiveM'].filter(Boolean).join(' · '),
+      badgeSub: s.locale ? esc(s.locale.replace('_', '-').toUpperCase()) : '',
       sub: tags.slice(0, 4).join(' · '),
       extra: `
         ${s.desc ? `<p class="sv-desc" data-no-i18n>${esc(s.desc)}</p>` : ''}
