@@ -41,6 +41,7 @@
     exportData: (d) => call('exportData', d),
     importData: () => call('importData'),
     checkUpdate: (repo) => call('checkUpdate', repo),
+    browse: (o) => call('browse', o),
     installUpdate: (url, ver) => call('installUpdate', url, ver),
   };
 

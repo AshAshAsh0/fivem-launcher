@@ -640,3 +640,28 @@ html.idle[data-perf='eco'] :is(.bimg, .bn, .blur-logo) { visibility: hidden; }
 /* แถบแจ้งอัปเดต */
 .toast.upd { pointer-events: auto; gap: 10px; padding-right: 10px; }
 .toast.upd .btn-sm { height: 32px; padding: 0 12px; }
+
+/* ================= BROWSE ================= */
+.b-meta { color: var(--muted); font-size: 13px; margin: -8px 0 14px; min-height: 20px; }
+.b-list { display: grid; gap: 10px; }
+.b-row {
+  display: grid; grid-template-columns: 54px minmax(0, 1fr) 170px auto; gap: 16px; align-items: center;
+  background: var(--surface); border-radius: 18px; padding: 12px 14px;
+  box-shadow: inset 0 0 0 1px var(--line), 0 2px 0 var(--line);
+  transition: box-shadow .15s, transform .15s;
+}
+.b-row:hover { box-shadow: inset 0 0 0 2px var(--strong), 0 3px 0 var(--line); }
+.b-ic { position: relative; width: 54px; height: 54px; border-radius: 15px; overflow: hidden; background: var(--surface-3); display: grid; place-items: center; font: 800 20px 'Prompt', var(--font-head); color: var(--muted); }
+.b-ic img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.b-name { font-family: 'Prompt', var(--font-head); font-weight: 700; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.b-sub { color: var(--muted); font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+.b-pl { font-size: 12.5px; color: var(--muted); }
+.b-pl b { color: var(--ink); font-family: var(--font-mono); font-size: 14px; }
+.b-pl .bar { height: 7px; margin-top: 6px; }
+.b-act { display: flex; gap: 8px; }
+.b-act .btn-sm svg { width: 14px; height: 14px; }
+.b-more { display: flex; justify-content: center; padding: 18px 0 6px; }
+.b-row.skel .b-ic, .b-row.skel .b-main i { background: linear-gradient(90deg, var(--surface-3), var(--surface-2), var(--surface-3)); background-size: 200% 100%; animation: shimmer 1.2s linear infinite; }
+.b-row.skel .b-main i { display: block; height: 12px; border-radius: 6px; width: 60%; }
+.b-row.skel .b-main i + i { width: 35%; margin-top: 8px; }
+@keyframes shimmer { to { background-position: -200% 0; } }

@@ -23,7 +23,7 @@ import (
 var webFS embed.FS
 
 // version ถูกแทนค่าตอน build ด้วย -ldflags "-X main.version=..."
-var version = "2.2.1"
+var version = "2.3.0"
 
 const (
 	appTitle = "FiveM Launcher"
@@ -246,6 +246,14 @@ func handle(method, raw string) (any, error) {
 		return metrics(), nil
 	case "setPerfMode":
 		setPriority(arg[string](args, 0))
+	case "browse":
+		o := arg[map[string]any](args, 0)
+		q, _ := o["q"].(string)
+		region, _ := o["region"].(string)
+		off, _ := o["offset"].(float64)
+		lim, _ := o["limit"].(float64)
+		force, _ := o["force"].(bool)
+		return browseServers(q, region, int(off), int(lim), force), nil
 	case "checkUpdate":
 		return checkUpdate(arg[string](args, 0))
 	case "installUpdate":

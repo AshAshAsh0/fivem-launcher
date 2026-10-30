@@ -64,6 +64,14 @@
     async clearCache() { await wait(600); return { ok: true, freed: 729815040 }; },
     async metrics() { return { cpu: Math.random() * 0.4, ram: 420 + Math.random() * 15 }; },
     async setPerfMode() {}, async info() { return { version: '2.1.0' }; },
+    async browse(o) {
+      await wait(o.offset ? 300 : 900);
+      const names = ['เมืองหลวง RP', 'Bangkok Life', 'SCHOOL CITY', 'Neon Drift', 'โรงเรียนมัธยม RP', 'Sakura Town', 'Thai Police RP', 'Racing Club TH'];
+      window.__demoList ||= Array.from({ length: 140 }, (_, i) => ({ id: 'srv' + i, name: names[i % names.length] + (i > 7 ? ' #' + i : ''), desc: i % 3 ? '' : 'Roleplay เมืองไทย เปิด 24 ชม.', players: Math.max(0, 1800 - i * 13), max: 2048, locale: i % 4 ? 'th-TH' : 'en-US', tags: 'roleplay,thai,economy', icon: '', banner: '' }));
+      const q = (o.q || '').toLowerCase();
+      const all = window.__demoList.filter((s) => (o.region !== 'th' || s.locale === 'th-TH') && (!q || (s.name + s.desc + s.tags).toLowerCase().includes(q)));
+      return { items: all.slice(o.offset, o.offset + o.limit), total: all.length, players: all.reduce((a, s) => a + s.players, 0), all: 140, updated: Date.now() / 1000 };
+    },
     async checkUpdate() { return { available: true, version: '2.2.0', url: '#' }; }, async installUpdate() { await wait(800); throw new Error('preview'); },
     async exportData() { return false; }, async importData() { return null; },
   };

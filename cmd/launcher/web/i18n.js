@@ -82,6 +82,15 @@
     'ตรวจหาอัปเดตไม่สำเร็จ': 'Could not check for updates', 'อัปเดตเลย': 'Update now', 'ภายหลัง': 'Later',
     'กำลังดาวน์โหลดอัปเดต...': 'Downloading update...', 'ดาวน์โหลดอัปเดตไม่สำเร็จ': 'Update download failed',
     'โปรแกรมจะตรวจหาเวอร์ชันใหม่ให้อัตโนมัติทุกครั้งที่เปิด': 'The launcher checks for a new version automatically every time it starts',
+    // browse
+    'ค้นหาเซิร์ฟ': 'Browse servers', 'จากรายชื่อเซิร์ฟสาธารณะของ FiveM': 'From the public FiveM server list',
+    'พิมพ์ชื่อเซิร์ฟ หรือแนวเซิร์ฟ เช่น roleplay': 'Type a server name or style, e.g. roleplay',
+    'เซิร์ฟไทย': 'Thai servers', 'โหลดรายชื่อใหม่': 'Reload list', 'เข้าเซิร์ฟนี้เลย': 'Join this server',
+    'อยู่ในลิสต์แล้ว': 'In your list', 'เพิ่ม': 'Add', 'แสดงเพิ่ม': 'Show more', 'ลองใหม่': 'Retry',
+    'โหลดรายชื่อเซิร์ฟไม่สำเร็จ': 'Could not load the server list',
+    'กำลังโหลดรายชื่อเซิร์ฟ... ครั้งแรกอาจใช้เวลาสักครู่': 'Loading the server list... the first load may take a moment',
+    'ไม่พบเซิร์ฟที่ตรงกับคำค้น': 'No servers match your search', 'ลองพิมพ์คำอื่น หรือเปลี่ยนเป็น “ทั้งหมด”': 'Try another word, or switch to “All”',
+    'กด “เพิ่มเซิร์ฟเวอร์” เพื่อเริ่มต้น หรือหาเซิร์ฟจากรายชื่อของ FiveM': 'Click “Add server” to get started, or find one in the FiveM server list',
   };
 
   // ข้อความที่มีตัวเลข/ชื่อแทรกอยู่
@@ -97,6 +106,10 @@
     [/^มีเวอร์ชันใหม่ (.+)$/, (m) => `New version ${m[1]} available`],
     [/^เวอร์ชัน (.+)$/, (m) => `Version ${m[1]}`],
     [/^(\d+) ms$/, (m) => `${m[1]} ms`],
+    [/^พบ ([\d,]+) เซิร์ฟ$/, (m) => `${m[1]} servers found`],
+    [/^ผู้เล่นรวม ([\d,]+)$/, (m) => `${m[1]} players`],
+    [/^อัปเดตเมื่อ (.*)$/, (m) => `updated ${m[1]}`],
+    [/^เพิ่ม (.+) แล้ว$/, (m) => `Added ${m[1]}`],
     [/^([\d,]+\/[\d,]+) ผู้เล่น$/, (m) => `${m[1]} players`],
     [/^(.+) —$/, (m) => `${tr(m[1])} —`],
   ];

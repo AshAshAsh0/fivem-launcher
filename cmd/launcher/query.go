@@ -251,7 +251,11 @@ func queryServer(raw string, withImages bool) map[string]any {
 	ctx := context.Background()
 
 	if a.Kind == "cfx" {
-		r := getJSON(ctx, "https://servers-frontend.fivem.net/api/servers/single/"+a.Code, 7*time.Second)
+		// ที่อยู่ใหม่ของ Cfx.re (ที่อยู่เดิม servers-frontend.fivem.net ใช้เป็นตัวสำรอง)
+		r := getJSON(ctx, "https://frontend.cfx-services.net/api/servers/single/"+a.Code, 7*time.Second)
+		if r.err != nil {
+			r = getJSON(ctx, "https://servers-frontend.fivem.net/api/servers/single/"+a.Code, 7*time.Second)
+		}
 		if r.err != nil {
 			return offline(errText(r.err))
 		}
@@ -277,7 +281,11 @@ func queryServer(raw string, withImages bool) map[string]any {
 		}
 		var logo any
 		if iv, ok := num(d, "iconVersion"); ok && withImages {
-			logo = orNil(fetchDataURI(fmt.Sprintf("https://servers-live.fivem.net/servers/icon/%s/%d.png", a.Code, int64(iv))))
+			icon := fetchDataURI(fmt.Sprintf("https://frontend.cfx-services.net/api/servers/icon/%s/%d.png", a.Code, int32(iv)))
+			if icon == "" {
+				icon = fetchDataURI(fmt.Sprintf("https://servers-live.fivem.net/servers/icon/%s/%d.png", a.Code, int32(iv)))
+			}
+			logo = orNil(icon)
 		}
 		return map[string]any{
 			"ok": true, "online": true, "connect": a.Connect, "display": a.Display,

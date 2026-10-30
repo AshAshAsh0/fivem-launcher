@@ -50,6 +50,7 @@
     visible: true,
     version: '',
     update: null,
+    browse: { q: '', region: 'th', items: [], total: 0, players: 0, updated: 0, loading: false, error: null, loaded: false },
   };
 
   function persist() {
@@ -173,6 +174,7 @@
   function render(animate = false) {
     const v = $('#view');
     if (state.page === 'settings') v.innerHTML = settingsHTML();
+    else if (state.page === 'browse') v.innerHTML = browseHTML();
     else v.innerHTML = homeHTML(state.page === 'favorites');
     v.classList.toggle('enter', animate);
     if (animate) setTimeout(() => v.classList.remove('enter'), 700);
@@ -289,7 +291,7 @@
   function gridHTML(favOnly) {
     const list = filtered(favOnly);
     if (!state.servers.length) {
-      return `<div class="empty"><div><div class="em-mark">${I.mark}</div><b>ลิสต์ยังว่างอยู่</b>กด “เพิ่มเซิร์ฟเวอร์” เพื่อเริ่มต้น</div></div>`;
+      return `<div class="empty"><div><div class="em-mark">${I.mark}</div><b>ลิสต์ยังว่างอยู่</b>กด “เพิ่มเซิร์ฟเวอร์” เพื่อเริ่มต้น หรือหาเซิร์ฟจากรายชื่อของ FiveM<div style="margin-top:16px"><button class="btn" data-act="go-browse">${I.search} ค้นหาเซิร์ฟ</button></div></div></div>`;
     }
     if (!list.length) {
       return `<div class="empty"><div><div class="em-mark">${favOnly ? I.heart : I.search}</div><b>${favOnly && !state.q ? 'ยังไม่มีเซิร์ฟโปรด' : 'ไม่พบเซิร์ฟเวอร์'}</b>${favOnly && !state.q ? 'กดหัวใจบนการ์ดเพื่อเพิ่มเข้าลิสต์นี้' : 'ลองเปลี่ยนคำค้นหรือตัวกรองดู'}</div></div>`;
@@ -356,6 +358,135 @@
     if (hg) hg.innerHTML = heroHTML() + statsHTML();
     $('#btnRefresh')?.classList.toggle('spin', state.refreshing);
     bindCards();
+  }
+
+  // ---------- BROWSE (รายชื่อเซิร์ฟสาธารณะ) ----------
+  const joinOf = (id) => `cfx.re/join/${id}`;
+  const inList = (id) => state.servers.some((x) => String(x.connect || x.address).toLowerCase() === joinOf(id).toLowerCase());
+
+  function browseHTML() {
+    const B = state.browse;
+    const title = isEN()
+      ? `<h1 class="h1">Browse <span class="sq">servers${SQUIGGLE}</span></h1>`
+      : `<h1 class="h1">ค้นหา<span class="sq">เซิร์ฟ${SQUIGGLE}</span></h1>`;
+    return `
+      <div class="page-head"><div>${title}<p class="sub">จากรายชื่อเซิร์ฟสาธารณะของ FiveM</p></div></div>
+      <div class="toolbar">
+        <label class="search">${I.search}<input id="bq" placeholder="พิมพ์ชื่อเซิร์ฟ หรือแนวเซิร์ฟ เช่น roleplay" value="${esc(B.q)}" spellcheck="false"></label>
+        <div class="seg" id="bRegion">
+          <button data-r="th" class="${B.region === 'th' ? 'on' : ''}">เซิร์ฟไทย</button>
+          <button data-r="all" class="${B.region === 'all' ? 'on' : ''}">ทั้งหมด</button>
+        </div>
+        <button class="icon-btn ${B.loading ? 'spin' : ''}" id="bRefresh" title="โหลดรายชื่อใหม่">${I.refresh}</button>
+      </div>
+      <div class="b-meta" id="bMeta"></div>
+      <div class="b-list" id="bList"></div>
+      <div class="b-more" id="bMore"></div>`;
+  }
+
+  function browseRow(s) {
+    const p = s.max ? Math.min(100, Math.round((s.players / s.max) * 100)) : 0;
+    const sub = s.desc || s.tags.split(',').map((t) => t.trim()).filter(Boolean).slice(0, 6).join(' · ') || joinOf(s.id);
+    const added = inList(s.id);
+    return `<div class="b-row" data-id="${esc(s.id)}">
+      <div class="b-ic">${s.icon ? `<img src="${esc(s.icon)}" alt="" loading="lazy" onerror="this.remove()">` : ''}<span>${esc(initial(s.name))}</span></div>
+      <div class="b-main"><div class="b-name" title="${esc(s.name)}">${esc(s.name)}</div><div class="b-sub" title="${esc(sub)}">${esc(sub)}</div></div>
+      <div class="b-pl"><div><b>${fmtNum(s.players)}</b> / ${fmtNum(s.max)}</div><div class="bar"><i style="width:${p}%;--barc:${barColor(p)}"></i></div></div>
+      <div class="b-act">
+        <button class="btn btn-sm" data-b="play" title="เข้าเซิร์ฟนี้เลย">${I.play} เล่น</button>
+        ${added ? `<button class="btn btn-sm" disabled>${I.check} อยู่ในลิสต์แล้ว</button>` : `<button class="btn btn-sm btn-dark" data-b="add">${I.plus} เพิ่ม</button>`}
+      </div>
+    </div>`;
+  }
+
+  function browseSkeleton() {
+    return Array.from({ length: 6 }, () => '<div class="b-row skel"><div class="b-ic"></div><div class="b-main"><i></i><i></i></div><div></div><div></div></div>').join('');
+  }
+
+  function drawBrowse() {
+    const B = state.browse, list = $('#bList');
+    if (!list) return;
+    $('#bRefresh')?.classList.toggle('spin', B.loading);
+    if (B.error) {
+      $('#bMeta').textContent = '';
+      list.innerHTML = `<div class="empty"><div><div class="em-mark">${I.x}</div><b>โหลดรายชื่อเซิร์ฟไม่สำเร็จ</b>${esc(B.error)}<div style="margin-top:16px"><button class="btn" id="bRetry">${I.refresh} ลองใหม่</button></div></div></div>`;
+      $('#bMore').innerHTML = '';
+      $('#bRetry').onclick = () => loadBrowse(true, true);
+      return;
+    }
+    if (B.loading && !B.items.length) {
+      $('#bMeta').textContent = 'กำลังโหลดรายชื่อเซิร์ฟ... ครั้งแรกอาจใช้เวลาสักครู่';
+      list.innerHTML = browseSkeleton();
+      $('#bMore').innerHTML = '';
+      return;
+    }
+    const t = B.updated ? new Date(B.updated * 1000).toLocaleTimeString(isEN() ? 'en-GB' : 'th-TH', { hour: '2-digit', minute: '2-digit' }) : '';
+    $('#bMeta').textContent = `พบ ${fmtNum(B.total)} เซิร์ฟ · ผู้เล่นรวม ${fmtNum(B.players)} · อัปเดตเมื่อ ${t}`;
+    list.innerHTML = B.items.length ? B.items.map(browseRow).join('') : `<div class="empty"><div><div class="em-mark">${I.search}</div><b>ไม่พบเซิร์ฟที่ตรงกับคำค้น</b>ลองพิมพ์คำอื่น หรือเปลี่ยนเป็น “ทั้งหมด”</div></div>`;
+    $('#bMore').innerHTML = B.items.length < B.total ? `<button class="btn" id="bMoreBtn" ${B.loading ? 'disabled' : ''}>แสดงเพิ่ม</button>` : '';
+    $('#bMoreBtn')?.addEventListener('click', () => loadBrowse(false));
+    list.querySelectorAll('.b-row').forEach((row) => {
+      const s = B.items.find((x) => x.id === row.dataset.id);
+      row.querySelector('[data-b="play"]').onclick = () => {
+        toast(`กำลังเข้า ${s.name}`);
+        api.launch(joinOf(s.id), state.settings.after).catch(() => toast('เปิด FiveM ไม่สำเร็จ', 'err'));
+      };
+      row.querySelector('[data-b="add"]')?.addEventListener('click', () => addFromBrowse(s));
+    });
+  }
+
+  let browseSeq = 0;
+  async function loadBrowse(reset, force = false) {
+    const B = state.browse, seq = ++browseSeq;
+    if (reset) { B.items = []; B.total = 0; }
+    B.loading = true; B.error = null;
+    drawBrowse();
+    let r;
+    try {
+      r = await api.browse({ q: B.q, region: B.region, offset: B.items.length, limit: 50, force });
+    } catch (e) {
+      r = { error: e.message };
+    }
+    if (seq !== browseSeq) return; // มีการค้นหาใหม่ระหว่างรอ
+    B.loading = false;
+    if (r.error) { B.error = r.error; drawBrowse(); return; }
+    B.items = B.items.concat(r.items || []);
+    B.total = r.total; B.players = r.players; B.updated = r.updated; B.loaded = true;
+    drawBrowse();
+  }
+
+  async function addFromBrowse(s) {
+    if (inList(s.id)) return;
+    const rec = {
+      id: uid(), address: joinOf(s.id), connect: joinOf(s.id), display: joinOf(s.id),
+      name: s.name, category: '', desc: '', bannerUrl: '', logoUrl: '', discord: '',
+      tone: 'auto', autoTone: null, logo: null, banner: s.banner || null, fav: false,
+      addedAt: Date.now(), lastPlayed: null,
+      status: { online: true, players: s.players, max: s.max, ping: null, checkedAt: Date.now() },
+    };
+    state.servers.push(rec);
+    persist();
+    toast(`เพิ่ม ${s.name} แล้ว`);
+    drawBrowse();
+    try { await refreshOne(rec, true); persist(); } catch {}
+  }
+
+  function bindBrowse() {
+    const B = state.browse;
+    let t;
+    $('#bq').addEventListener('input', (e) => {
+      B.q = e.target.value;
+      clearTimeout(t);
+      t = setTimeout(() => loadBrowse(true), 300);
+    });
+    $$('#bRegion button').forEach((b) => b.addEventListener('click', () => {
+      B.region = b.dataset.r;
+      $$('#bRegion button').forEach((x) => x.classList.toggle('on', x === b));
+      loadBrowse(true);
+    }));
+    $('#bRefresh').addEventListener('click', () => loadBrowse(true, true));
+    if (B.loaded) { drawBrowse(); if (Date.now() / 1000 - B.updated > 300) loadBrowse(true); }
+    else loadBrowse(true);
   }
 
   // ---------- SETTINGS ----------
@@ -500,6 +631,8 @@
 
   // ---------- binding ----------
   function bindView() {
+    $$('[data-act="go-browse"]').forEach((b) => b.addEventListener('click', () => go('browse')));
+    if (state.page === 'browse') { bindBrowse(); return; }
     $$('[data-act="add"]').forEach((b) => b.addEventListener('click', () => openServerModal()));
     $$('[data-act="open-fivem"]').forEach((b) => b.addEventListener('click', () => { api.openFiveM(); toast('กำลังเปิด FiveM'); }));
     $('[data-act="refresh"]')?.addEventListener('click', () => refreshAll(true));
@@ -953,7 +1086,7 @@
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f') {
         e.preventDefault();
         if (state.page === 'settings') go('home');
-        setTimeout(() => { $('#q')?.focus(); $('#q')?.select(); }, 30);
+        setTimeout(() => { const q = $('#q') || $('#bq'); q?.focus(); q?.select(); }, 30);
       }
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'n') { e.preventDefault(); openServerModal(); }
       if (e.key === 'F5') { e.preventDefault(); refreshAll(true); }
@@ -978,7 +1111,7 @@
     bindGlobal();
     let startPage = 'home';
     try { startPage = sessionStorage.getItem('fl-page') || 'home'; sessionStorage.removeItem('fl-page'); } catch {}
-    go(['home', 'favorites', 'settings'].includes(startPage) ? startPage : 'home');
+    go(['home', 'browse', 'favorites', 'settings'].includes(startPage) ? startPage : 'home');
     restartAuto();
     refreshAll();
     setTimeout(() => checkUpdate(false), 4000);
