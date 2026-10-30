@@ -767,9 +767,12 @@
     return `<div class="b-sec sec-${kind}"><div class="sh-ic">${ic}</div><div class="sh-t"><p data-no-i18n>${a}<span>${b}</span></p><small id="${kind === 'pub' ? 'bMeta' : 'mMeta'}">${sub}</small></div>${extra}</div>`;
   }
   // สถานะเซิร์ฟแบบชัด ๆ: ออนไลน์ (เขียว) / ใกล้เต็ม (ส้ม) / เต็ม (แดง) / ออฟไลน์ (เทา) / ส่วนตัว (เหลือง)
-  function stChip(online, players, max, priv) {
+  function stInfo(online, players, max, priv) {
     const p = max ? players / max : 0;
-    const [k, label] = priv ? ['priv', 'ส่วนตัว'] : !online ? ['off', 'ออฟไลน์'] : max && players >= max ? ['full', 'เต็ม'] : p >= 0.85 ? ['busy', 'ใกล้เต็ม'] : ['ok', 'ออนไลน์'];
+    return priv ? ['priv', 'ส่วนตัว'] : !online ? ['off', 'ออฟไลน์'] : max && players >= max ? ['full', 'เต็ม'] : p >= 0.85 ? ['busy', 'ใกล้เต็ม'] : ['ok', 'ออนไลน์'];
+  }
+  function stChip(online, players, max, priv) {
+    const [k, label] = stInfo(online, players, max, priv);
     return `<span class="stc stc-${k}">${priv ? '<b>🔒</b>' : '<i></i>'}<span>${label}</span></span>`;
   }
   function plHTML(players, max, online) {
@@ -809,31 +812,42 @@
     $$('.b-row.sel').forEach((r) => r.classList.remove('sel'));
     const side = $('#svSide'); if (side) side.innerHTML = '';
   }
+  // แผงเลือกเซิร์ฟ: ป้ายสถานะกรอบตัดมุม + โลโก้ใหญ่มีแสงฟุ้ง + กล่องสถิติแบบกระจก + ปุ่มเล่นเรืองแสง
+  function sideTpl(o) {
+    const [k, label] = stInfo(o.online, o.players, o.max, o.priv);
+    const pct = o.max ? Math.min(100, Math.round((o.players / o.max) * 100)) : 0;
+    return `
+      <div class="sx-hero" style="--tone:${o.tone || '#0aaefb'}">
+        ${o.bg ? `<img class="sx-bg ${o.blur ? 'blur' : ''}" src="${esc(o.bg)}" alt="">` : ''}
+        <button class="x-btn sx-x" id="svClose" title="ปิด">${I.x}</button>
+        <div class="sx-badge sx-${k}"><b><i></i>${label}</b>${o.badgeSub ? `<small>${o.badgeSub}</small>` : ''}</div>
+        <div class="sx-logo"><span>${esc(initial(o.name))}</span>${o.logo ? `<img src="${esc(o.logo)}" alt="">` : ''}</div>
+        <h2 class="sx-name" data-no-i18n title="${esc(o.name)}">${esc(o.name)}</h2>
+        ${o.sub ? `<div class="sx-sub" data-no-i18n title="${esc(o.sub)}">${esc(o.sub)}</div>` : ''}
+      </div>
+      <div class="sv-body sx-body">
+        <div class="sx-lbl"><i></i><span>ข้อมูลเซิร์ฟ</span></div>
+        <div class="sx-stats">
+          <div class="sx-box"><span>ผู้เล่น</span><b>${o.online === false ? '—' : fmtNum(o.players)}<small>/${fmtNum(o.max)}</small></b></div>
+          <div class="sx-box"><span>ปิง</span><b id="svPing">${o.ping}</b></div>
+          <div class="sx-box"><span>ความจุ</span><b style="color:${pctColor(pct)}">${pct}%</b></div>
+        </div>
+        <div class="bar sx-bar"><i style="width:${o.online === false ? 0 : pct}%;--barc:${barColor(pct)}"></i></div>
+        ${o.extra || ''}
+      </div>
+      ${o.foot || ''}`;
+  }
   function serverPopup(s) {
     state.browse.selItem = s;
-    const p = s.max ? Math.min(100, Math.round((s.players / s.max) * 100)) : 0;
     const tags = s.tags.split(',').map((t) => t.trim()).filter(Boolean).slice(0, 8);
     const target = targetOf(s);
     const mineOf = state.servers.find((x) => x.cfxId === s.id);
-    const side = openSide(`
-      <div class="sv-banner">
-        ${s.banner ? `<img src="${esc(imgSrc(s.banner))}" alt="">` : s.icon ? `<img class="blur" src="${esc(imgSrc(s.icon))}" alt="">` : ''}
-        <button class="x-btn" id="svClose" title="ปิด">${I.x}</button>
-      </div>
-      <div class="sv-head">
-        <div class="sv-ic"><span>${esc(initial(s.name))}</span>${s.icon ? `<img src="${esc(imgSrc(s.icon))}" alt="">` : ''}</div>
-      </div>
-      <div class="sv-title">
-        <h2 data-no-i18n title="${esc(s.name)}">${esc(s.name)}</h2>
-        <div class="sv-tags">${stChip(true, s.players, s.max, s.private)}${s.locale ? `<span class="pill pill-mono" data-no-i18n>${esc(s.locale.replace('_', '-'))}</span>` : ''}${tags.map((t) => `<span class="pill pill-mono" data-no-i18n>${esc(t)}</span>`).join('')}</div>
-      </div>
-      <div class="sv-body">
-        <div class="sv-stats">
-          <div><span class="lbl">จำนวนผู้เล่น</span><b>${fmtNum(s.players)}<small>/${fmtNum(s.max)}</small></b></div>
-          <div><span class="lbl">ปิง</span><b id="svPing">…</b></div>
-          <div><span class="lbl">ความจุ</span><b style="color:${pctColor(p)}">${p}%</b></div>
-        </div>
-        <div class="bar"><i style="width:${p}%;--barc:${barColor(p)}"></i></div>
+    const side = openSide(sideTpl({
+      name: s.name, online: true, players: s.players, max: s.max, priv: s.private, ping: s.private ? '—' : '…',
+      bg: s.banner ? imgSrc(s.banner) : s.icon ? imgSrc(s.icon) : '', blur: !s.banner, logo: s.icon ? imgSrc(s.icon) : '',
+      badgeSub: [s.locale ? s.locale.replace('_', '-').toUpperCase() : '', 'FiveM'].filter(Boolean).join(' · '),
+      sub: tags.slice(0, 4).join(' · '),
+      extra: `
         ${s.desc ? `<p class="sv-desc" data-no-i18n>${esc(s.desc)}</p>` : ''}
         ${s.private
           ? (mineOf
@@ -842,11 +856,11 @@
               <div class="sv-ipbox"><input class="input" id="svIp" placeholder="เช่น 103.91.190.199:30120" spellcheck="false"><button class="btn btn-dark" id="svSave">${I.check} บันทึก</button></div>`)
           : `<div class="sv-addr"><code data-no-i18n>${esc(target)}</code><button class="btn btn-sm" id="svCopy">${I.copy} คัดลอก</button></div>`}
         ${s.discord || s.website ? `<div class="sv-links">
-          ${s.discord ? `<button class="btn btn-sm sv-discord" data-link="${esc(s.discord)}">Discord</button>` : ''}
+          ${s.discord ? `<button class="btn btn-sm sv-discord" data-link="${esc(s.discord)}">${I.discord} Discord</button>` : ''}
           ${s.website ? `<button class="btn btn-sm" data-link="${esc(s.website)}">${I.globe} เว็บไซต์</button>` : ''}
-        </div>` : ''}
-      </div>
-      ${s.private ? '' : `<div class="sv-foot"><button class="btn btn-dark btn-lg sv-play" id="svPlay">${I.play} เล่นเลย</button></div>`}`, s.id);
+        </div>` : ''}`,
+      foot: s.private ? '' : `<div class="sv-foot"><button class="btn btn-dark btn-lg sv-play" id="svPlay">${I.play} เล่นเลย</button></div>`,
+    }), s.id);
     if (!side) return;
     $('#svSave', side)?.addEventListener('click', () => savePrivate(s, $('#svIp', side).value));
     $('#svIp', side)?.addEventListener('keydown', (e) => { if (e.key === 'Enter') savePrivate(s, e.target.value); });
@@ -927,31 +941,22 @@
   function mineSide(s) {
     const S = st(s), p = loadPct(s), logo = logoOf(s), banner = bannerOf(s), t = toneOf(s);
     state.browse.selItem = null;
-    const side = openSide(`
-      <div class="sv-banner" style="background:linear-gradient(135deg, ${shade(t, 0.4)}, ${t})">
-        ${banner ? `<img src="${esc(banner)}" alt="">` : logo ? `<img class="blur" src="${esc(logo)}" alt="">` : ''}
-        <button class="x-btn" id="svClose" title="ปิด">${I.x}</button>
-      </div>
-      <div class="sv-head"><div class="sv-ic" style="background:${t}"><span>${esc(initial(s.name))}</span>${logo ? `<img src="${esc(logo)}" alt="">` : ''}</div></div>
-      <div class="sv-title"><h2 data-no-i18n title="${esc(s.name)}">${esc(s.name)}</h2>
-        <div class="sv-tags">${stChip(S.online, S.players, S.max, false)}${s.category ? `<span class="pill pill-mono" data-no-i18n>${esc(s.category)}</span>` : ''}${lastHTML(s)}</div></div>
-      <div class="sv-body">
-        <div class="sv-stats">
-          <div><span class="lbl">จำนวนผู้เล่น</span><b>${fmtNum(S.players)}<small>/${fmtNum(S.max)}</small></b></div>
-          <div><span class="lbl">ปิง</span><b>${S.ping != null ? `${S.ping}<small>ms</small>` : '—'}</b></div>
-          <div><span class="lbl">ความจุ</span><b style="color:${pctColor(p)}">${p}%</b></div>
-        </div>
-        <div class="bar"><i style="width:${p}%;--barc:${barColor(p)}"></i></div>
+    const side = openSide(sideTpl({
+      name: s.name, online: S.online, players: S.players, max: S.max, priv: false, tone: t,
+      ping: S.ping != null ? `${S.ping}<small>ms</small>` : '—',
+      bg: banner || logo || '', blur: !banner, logo,
+      badgeSub: 'เซิร์ฟของฉัน', sub: [s.category, s.display || s.address].filter(Boolean).join(' · '),
+      extra: `
         ${s.desc ? `<p class="sv-desc" data-no-i18n>${esc(s.desc)}</p>` : ''}
         <div class="sv-addr"><code data-no-i18n>${esc(s.connect || s.address)}</code><button class="btn btn-sm" id="svCopy">${I.copy} คัดลอก</button></div>
         <div class="sv-links">
           ${bellHTML(s)}
-          ${s.discord ? `<button class="btn btn-sm sv-discord" data-link="${esc(normUrl(s.discord))}">Discord</button>` : ''}
+          ${s.discord ? `<button class="btn btn-sm sv-discord" data-link="${esc(normUrl(s.discord))}">${I.discord} Discord</button>` : ''}
           <button class="btn btn-sm" id="svGrp">${I.folder2} กลุ่ม</button>
           <button class="btn btn-sm" id="svDel" style="color:var(--danger)">${I.trash} ลบ</button>
-        </div>
-      </div>
-      <div class="sv-foot"><button class="btn btn-dark btn-lg sv-play" id="svPlay">${I.play} ${S.online ? 'เล่นเลย' : 'ลองเข้า'}</button></div>`, 'm:' + s.id);
+        </div>`,
+      foot: `<div class="sv-foot"><button class="btn btn-dark btn-lg sv-play" id="svPlay">${I.play} ${S.online ? 'เล่นเลย' : 'ลองเข้า'}</button></div>`,
+    }), 'm:' + s.id);
     if (!side) return;
     $('#svPlay', side).onclick = () => play(s.id);
     $('#svDel', side).onclick = () => confirmDelete(s);

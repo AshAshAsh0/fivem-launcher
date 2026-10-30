@@ -1502,3 +1502,107 @@ html[data-motion='full'] .stc-ok i { animation: stPulse 2s ease-in-out infinite;
 [data-theme='hud'] .b-row:hover::before { border-image-source: var(--row-hov) !important; filter: none; }
 [data-theme='hud'] .b-row.sel::before, [data-theme='hud'] .b-row.sel:hover::before { border-image-source: var(--item-sel) !important; filter: drop-shadow(0 0 10px rgba(10, 174, 251, .28)); }
 [data-theme='hud'] .b-row.skel::before { border-image-source: var(--row) !important; }
+
+/* ================= v13: แสงนีออนบาง ๆ + แผงเลือกเซิร์ฟใหม่ =================
+   แสงทั้งหมดเป็นแบบนิ่ง (วาดครั้งเดียว) — แสงที่เคลื่อนไหวมีแค่ปุ่มเล่นเลย
+   โหมด "ประหยัดสุด" ในหน้าตั้งค่า ปิดแสงทั้งหมด */
+[data-theme='hud'] {
+  --neon: #0aaefb;
+  --neon-glow: 0 0 6px rgba(10, 174, 251, .55), 0 0 18px rgba(10, 174, 251, .25);
+  /* กรอบแผงใหญ่: กระจกไล่สี + เส้นนีออนบาง + แสงฟุ้งด้านใน (วาดใน SVG ไม่ต้องคำนวณตอนเลื่อน) */
+  --frame-neon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23142230' stop-opacity='.88'/%3E%3Cstop offset='1' stop-color='%23101317' stop-opacity='.9'/%3E%3C/linearGradient%3E%3Cfilter id='b' x='-20%25' y='-20%25' width='140%25' height='140%25'%3E%3CfeGaussianBlur stdDeviation='2.2'/%3E%3C/filter%3E%3C/defs%3E%3Cpath d='M12 .75H88A11.25 11.25 0 0 1 99.25 12V84L84 99.25H12A11.25 11.25 0 0 1 .75 88V12A11.25 11.25 0 0 1 12 .75Z' fill='url(%23g)'/%3E%3Cpath d='M12 .75H88A11.25 11.25 0 0 1 99.25 12V84L84 99.25H12A11.25 11.25 0 0 1 .75 88V12A11.25 11.25 0 0 1 12 .75Z' fill='none' stroke='%230AAEFB' stroke-opacity='.55' stroke-width='3' filter='url(%23b)'/%3E%3Cpath d='M12 .75H88A11.25 11.25 0 0 1 99.25 12V84L84 99.25H12A11.25 11.25 0 0 1 .75 88V12A11.25 11.25 0 0 1 12 .75Z' fill='none' stroke='%2363CFFF' stroke-opacity='.75' stroke-width='1'/%3E%3C/svg%3E");
+  --frame-dim: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cpath d='M12 .75H88A11.25 11.25 0 0 1 99.25 12V84L84 99.25H12A11.25 11.25 0 0 1 .75 88V12A11.25 11.25 0 0 1 12 .75Z' fill='rgba(17,20,24,.9)' stroke='rgba(10,174,251,.35)' stroke-width='1'/%3E%3C/svg%3E");
+}
+
+/* พื้นหลัง: ฟ้าฟุ้ง 2 มุม + เส้นนีออนเฉียงจาง ๆ (ภาพนิ่ง) */
+[data-theme='hud'] .shell {
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1120' height='710' viewBox='0 0 1120 710' preserveAspectRatio='none'%3E%3Cg fill='none' stroke='%230AAEFB'%3E%3Cpath d='M760 -10 1130 360' stroke-opacity='.10'/%3E%3Cpath d='M820 -10 1130 300' stroke-opacity='.06'/%3E%3Cpath d='M-10 520 190 720' stroke-opacity='.08'/%3E%3Cpath d='M-10 600 110 720' stroke-opacity='.05'/%3E%3C/g%3E%3C/svg%3E"),
+    radial-gradient(760px 420px at 92% -12%, rgba(10, 174, 251, .16), transparent 62%),
+    radial-gradient(620px 380px at -8% 112%, rgba(10, 174, 251, .09), transparent 60%),
+    linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px) !important;
+  background-size: 100% 100%, auto, auto, 34px 34px, 34px 34px !important;
+}
+
+/* ตัวหนังสือ/ไอคอนเรืองแสง (เฉพาะจุดสำคัญ ไม่ใส่ทุกแถว) */
+[data-theme='hud'] .brand-name span,
+[data-theme='hud'] .b-sec .sh-t p span,
+[data-theme='hud'] .h1 .sq { text-shadow: var(--neon-glow); }
+[data-theme='hud'] .nav-btn.active, [data-theme='hud'] .seg button.on { text-shadow: 0 0 10px rgba(10, 174, 251, .6); }
+[data-theme='hud'] :is(.nav-btn.active, .seg button.on, .b-flt, #bRefresh, .wc-fivem, .search) svg { filter: drop-shadow(0 0 4px rgba(10, 174, 251, .7)); }
+[data-theme='hud'] .search svg { color: var(--neon) !important; }
+[data-theme='hud'] .mark.sm svg { filter: drop-shadow(0 0 6px rgba(10, 174, 251, .9)); }
+[data-theme='hud'] .b-sec .sh-ic { box-shadow: inset 0 0 0 1px rgba(10, 174, 251, .35), 0 0 14px -4px rgba(10, 174, 251, .6); }
+[data-theme='hud'] .stc i { box-shadow: 0 0 8px var(--c), 0 0 2px var(--c); }
+[data-theme='hud'] .b-row.sel .b-name { text-shadow: 0 0 10px rgba(10, 174, 251, .55); }
+[data-theme='hud'] .b-row.sel .pl-n b { color: #fff; text-shadow: 0 0 10px rgba(10, 174, 251, .5); }
+/* ปุ่มที่เลือกอยู่ (แท็บ/ภาค/ตัวกรอง): แสงฟุ้งรอบกรอบ */
+[data-theme='hud'] :is(.nav-btn.active, .seg button.on, .b-flt:has(i:not(:empty)))::after { filter: drop-shadow(0 0 6px rgba(10, 174, 251, .45)); }
+
+/* แผงรายชื่อ + แผงเลือกเซิร์ฟ: กรอบนีออน */
+[data-theme='hud'] .b-panel::before { border-width: 14px 18px 18px 14px; border-image: var(--frame-dim) 14 18 18 14 fill / 14px 18px 18px 14px stretch; }
+[data-theme='hud'] .sv-side::before { border-width: 14px 18px 18px 14px !important; border-image: var(--frame-neon) 14 18 18 14 fill / 14px 18px 18px 14px stretch !important; }
+[data-theme='hud'] .sv-side { box-shadow: 0 0 30px -12px rgba(10, 174, 251, .45) !important; border-radius: 12px; }
+
+/* ===== แผงเลือกเซิร์ฟ ===== */
+.sx-hero { position: relative; flex: none; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 16px 18px 6px; overflow: hidden; border-radius: 12px 12px 0 0; }
+.sx-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .32; z-index: -1;
+  -webkit-mask-image: linear-gradient(#000 20%, transparent 92%); mask-image: linear-gradient(#000 20%, transparent 92%); }
+.sx-bg.blur { filter: blur(22px) saturate(1.5); transform: scale(1.5); opacity: .4; }
+.sx-hero { isolation: isolate; }
+.sx-x { position: absolute !important; top: 12px; right: 12px; z-index: 3; width: 30px !important; height: 30px !important; background: rgba(10, 14, 18, .6) !important; }
+.sx-x:hover { background: rgba(240, 82, 82, .8) !important; color: #fff !important; }
+/* ป้ายสถานะ: กรอบบางตัดมุมขวาล่าง แบบ "PROTECTION IS ACTIVE" */
+.sx-badge { --c: #34d399; position: relative; align-self: stretch; margin: 0 34px 0 0; padding: 7px 12px 8px; border-radius: 8px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, .015));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 55%, transparent), 0 0 16px -6px var(--c);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%); }
+.sx-badge b { display: flex; align-items: center; justify-content: center; gap: 7px; font: 600 13px 'Kanit', var(--font-head); letter-spacing: .06em; text-transform: uppercase; color: var(--c); text-shadow: 0 0 10px color-mix(in srgb, var(--c) 60%, transparent); }
+.sx-badge b i { width: 7px; height: 7px; border-radius: 50%; background: var(--c); box-shadow: 0 0 8px var(--c); }
+.sx-badge small { display: block; font: 400 10px 'Kanit', var(--font-body); letter-spacing: .08em; text-transform: uppercase; color: rgba(255, 255, 255, .5); margin-top: 1px; }
+.sx-ok { --c: #34d399; } .sx-busy { --c: #f5a524; } .sx-full { --c: #f05252; } .sx-off { --c: #8b939c; } .sx-priv { --c: #f2c94c; }
+/* โลโก้ใหญ่ + แสงฟุ้งด้านหลัง */
+.sx-logo { position: relative; width: 84px; height: 84px; margin: 16px 0 10px; border-radius: 16px; display: grid; place-items: center;
+  background: var(--tone, #1b2026); font: 700 32px 'Kanit', var(--font-head); color: #fff;
+  box-shadow: 0 0 0 1.5px rgba(10, 174, 251, .55), 0 0 26px -2px rgba(10, 174, 251, .55), 0 14px 30px -12px rgba(0, 0, 0, .9); }
+.sx-logo::before { content: ''; position: absolute; inset: -26px; z-index: -1; border-radius: 50%; background: radial-gradient(closest-side, rgba(10, 174, 251, .35), transparent); }
+.sx-logo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: inherit; }
+.sx-name { margin: 0; max-width: 100%; font: 600 18px/1.25 'Kanit', var(--font-head); text-transform: uppercase; color: #fff; letter-spacing: .02em;
+  text-shadow: 0 0 14px rgba(10, 174, 251, .45); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; word-break: break-word; }
+.sx-sub { margin-top: 3px; max-width: 100%; font: 400 10.5px 'Kanit', var(--font-body); letter-spacing: .06em; text-transform: uppercase; color: rgba(255, 255, 255, .5); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* ข้อมูล: หัวข้อนำด้วย ◆ + กล่องกระจก */
+.sx-body { padding: 12px 16px 8px !important; gap: 10px !important; }
+.sx-lbl { display: flex; align-items: center; gap: 9px; font: 600 11px 'Kanit', var(--font-head); letter-spacing: .08em; text-transform: uppercase; color: rgba(255, 255, 255, .85); }
+.sx-lbl i { width: 7px; height: 7px; background: #fff; transform: rotate(45deg); border-radius: 1px; box-shadow: 0 0 6px rgba(255, 255, 255, .6); }
+.sx-lbl::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(10, 174, 251, .4), transparent); }
+.sx-stats { display: grid; grid-template-columns: 1.35fr 1fr 1fr; gap: 6px; }
+.sx-box { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 4px 9px; border-radius: 8px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .07), rgba(255, 255, 255, .025)); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .09); }
+.sx-box span { font: 400 10px 'Kanit', var(--font-body); letter-spacing: .06em; text-transform: uppercase; color: rgba(255, 255, 255, .5); }
+.sx-box b { font: 600 16px 'Kanit', var(--font-head); color: #fff; white-space: nowrap; }
+.sx-box b small { font-size: 11px; color: rgba(255, 255, 255, .45); font-weight: 500; margin-left: 1px; }
+.sx-bar { height: 4px !important; margin: 0 2px; }
+.sx-bar i { box-shadow: 0 0 8px var(--barc); }
+.sx-body .sv-desc { font-size: 12.5px !important; color: rgba(255, 255, 255, .7); text-align: center; -webkit-line-clamp: 4 !important; }
+.sx-body .sv-addr { padding: 5px 5px 5px 12px !important; }
+.sx-body .sv-links { justify-content: center; }
+.sx-body .sv-links .btn { height: 30px; font-size: 12px; }
+.sx-body .sv-links svg { width: 15px; height: 15px; }
+.sv-side .sv-body { overflow-y: auto; }
+/* ปุ่มเล่นเลย: เรืองแสงชัดสุด + แสงวิ่งผ่าน (จุดเดียวที่เคลื่อนไหว) */
+.sv-foot { padding: 6px 16px 16px !important; }
+[data-theme='hud'] .sv-play { height: 50px !important; overflow: hidden; color: #fff !important; text-shadow: 0 0 10px rgba(10, 174, 251, .9);
+  filter: drop-shadow(0 0 12px rgba(10, 174, 251, .45)) !important; }
+[data-theme='hud'] .sv-play svg { filter: drop-shadow(0 0 4px #0aaefb); }
+[data-theme='hud'] .sv-play::before { content: ''; position: absolute; top: 0; bottom: 0; left: -40%; width: 30%; z-index: 0; pointer-events: none;
+  background: linear-gradient(100deg, transparent, rgba(150, 220, 255, .22), transparent); transform: skewX(-20deg); opacity: 0; }
+html[data-motion='full']:not([data-perf='eco']) [data-theme='hud'] .sv-play::before,
+html[data-motion='full']:not([data-perf='eco'])[data-theme='hud'] .sv-play::before { animation: sxSheen 3.2s ease-in-out infinite; }
+@keyframes sxSheen { 0%, 55% { left: -40%; opacity: 0; } 60% { opacity: 1; } 100% { left: 120%; opacity: 0; } }
+[data-theme='hud'] .sv-play:hover { filter: drop-shadow(0 0 20px rgba(10, 174, 251, .7)) !important; }
+
+/* โหมดประหยัดสุด: ปิดแสงทั้งหมด */
+html[data-perf='eco'] * { text-shadow: none !important; }
+html[data-perf='eco'] :is(.sv-play, .sv-play svg, .b-row.sel::before, .nav-btn.active::after, .seg button.on::after, svg) { filter: none !important; }
+html[data-perf='eco'] .sx-logo::before { display: none; }
+.sx-bg.blur { -webkit-mask-image: linear-gradient(#000 30%, transparent 78%); mask-image: linear-gradient(#000 30%, transparent 78%); }

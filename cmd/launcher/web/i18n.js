@@ -108,7 +108,7 @@
     'เช่น เซิร์ฟหลัก, ลองเล่น': 'e.g. Main, Trying out', 'สร้างกลุ่มแล้ว': 'Group created', 'เปลี่ยนชื่อกลุ่มแล้ว': 'Group renamed',
     '↑ เลื่อนกลุ่มขึ้น': '↑ Move group up', '↓ เลื่อนกลุ่มลง': '↓ Move group down', 'ลบกลุ่ม': 'Delete group',
     'ลบกลุ่มแล้ว (เซิร์ฟในกลุ่มย้ายไป “ไม่ได้จัดกลุ่ม”)': 'Group deleted (its servers moved to “Ungrouped”)',
-    'ไม่ได้จัดกลุ่ม': 'Ungrouped', 'ตัวกรอง': 'Filter', 'เรียงตาม': 'Sort by', 'กลุ่ม': 'Group', 'เซิร์ฟที่คุณบันทึกไว้': 'Servers you saved', 'ยังไม่มีเซิร์ฟในกลุ่มนี้ — คลิกขวาที่เซิร์ฟแล้วเลือกกลุ่ม': 'No servers here yet — right-click a server to move it into this group', 'ดับเบิลคลิกเพื่อเข้า': 'double-click to join', 'ย้ายไปกลุ่ม': 'Move to group', 'กลุ่มใหม่...': 'New group...', 'ย้ายไปกลุ่มใหม่...': 'Move to a new group...',
+    'ไม่ได้จัดกลุ่ม': 'Ungrouped', 'ตัวกรอง': 'Filter', 'ข้อมูลเซิร์ฟ': 'Server info', 'เรียงตาม': 'Sort by', 'กลุ่ม': 'Group', 'เซิร์ฟที่คุณบันทึกไว้': 'Servers you saved', 'ยังไม่มีเซิร์ฟในกลุ่มนี้ — คลิกขวาที่เซิร์ฟแล้วเลือกกลุ่ม': 'No servers here yet — right-click a server to move it into this group', 'ดับเบิลคลิกเพื่อเข้า': 'double-click to join', 'ย้ายไปกลุ่ม': 'Move to group', 'กลุ่มใหม่...': 'New group...', 'ย้ายไปกลุ่มใหม่...': 'Move to a new group...',
     'ลากการ์ดเซิร์ฟมาวางที่นี่': 'Drag server cards here', 'ย่อ/ขยายกลุ่ม': 'Collapse/expand', 'จัดการกลุ่ม': 'Group options',
     'คัดลอกไม่สำเร็จ': 'Copy failed',
   };
