@@ -8,6 +8,9 @@
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
   const fmtNum = (n) => Number(n || 0).toLocaleString('en-US');
+  // รูปที่โหลดไม่ได้ (แบนเนอร์/ไอคอนเสีย) ให้เอาออก ไม่ให้เห็นไอคอนรูปแตก
+  // (ใช้ตัวฟังกลางแทน onerror ในแท็ก เพราะ CSP ไม่อนุญาตสคริปต์ในแท็ก)
+  document.addEventListener('error', (e) => { const t = e.target; if (t && t.tagName === 'IMG' && !t.dataset.keep) t.remove(); }, true);
 
   // ---------- icons ----------
   const I = {
@@ -269,7 +272,7 @@
       </div>
       <div class="hero-art">
         <div class="tilt-card" style="background:linear-gradient(135deg, ${shade(t, 0.35)}, ${t})">
-          ${banner ? `<img class="bn" src="${esc(banner)}" alt="" onerror="this.remove()">` : logo ? `<img class="bn" src="${esc(logo)}" alt="" style="filter:blur(28px) saturate(1.4);transform:scale(1.6)">` : ''}
+          ${banner ? `<img class="bn" src="${esc(banner)}" alt="">` : logo ? `<img class="bn" src="${esc(logo)}" alt="" style="filter:blur(28px) saturate(1.4);transform:scale(1.6)">` : ''}
         </div>
         <div class="hero-logo" style="background:${t}">${logo ? `<img src="${esc(logo)}" alt="">` : `<div style="display:grid;place-items:center;height:100%;font:800 34px Prompt,'Segoe UI',sans-serif;color:var(--tone-ink)">${esc(initial(s.name))}</div>`}</div>
       </div>
@@ -335,7 +338,7 @@
     const full = S.online && S.max && S.players >= S.max;
     return `<article class="card ${S.online ? '' : 'offline'}" ${state.page === 'home' ? 'draggable="true"' : ''} style="${toneStyle(t)};--i:${i}" data-id="${s.id}" data-bell="${bellKind(s)}|${state.watching[s.id] || ''}">
       <div class="banner">
-        ${banner ? `<img class="bimg" src="${esc(banner)}" alt="" onerror="this.remove()">` : logo ? `<img class="blur-logo" src="${esc(logo)}" alt="">` : ''}
+        ${banner ? `<img class="bimg" src="${esc(banner)}" alt="">` : logo ? `<img class="blur-logo" src="${esc(logo)}" alt="">` : ''}
         <span class="js-st">${S.online ? '<span class="pill pill-ok">ออนไลน์</span>' : '<span class="pill pill-off">ออฟไลน์</span>'}</span>
         <button class="fav-btn ${s.fav ? 'on' : ''}" data-act="fav" data-id="${s.id}" title="เซิร์ฟโปรด">${I.heart}</button>
       </div>
@@ -471,13 +474,31 @@
   let dragId = null;
   // จบสถานะลาก (ต้องเรียกเองด้วย เพราะการ์ดที่ถูกลากอาจถูกวาดใหม่ก่อน dragend จะมาถึง)
   function endDrag() {
-    dragId = null;
+    dragId = null; dragY = -1;
     document.body.classList.remove('dnd');
     $$('.dragging').forEach((e) => e.classList.remove('dragging'));
     clearDropMarks();
   }
   document.addEventListener('dragend', endDrag, true);
   document.addEventListener('drop', () => setTimeout(endDrag, 0), true);
+  // เลื่อนหน้าอัตโนมัติเมื่อลากการ์ดไปใกล้ขอบบน/ล่าง (ระหว่างลากบน Windows ใช้ล้อเมาส์ไม่ได้)
+  let dragY = -1, autoScrolling = false;
+  function autoScrollStep() {
+    const sc = $('#scroll');
+    if (!dragId || !sc || dragY < 0) { autoScrolling = false; return; }
+    const r = sc.getBoundingClientRect(), edge = 90;
+    let v = 0;
+    if (dragY < r.top + edge) v = -Math.ceil(((r.top + edge - dragY) / edge) * 22);
+    else if (dragY > r.bottom - edge) v = Math.ceil(((dragY - (r.bottom - edge)) / edge) * 22);
+    if (!v) { autoScrolling = false; return; }
+    sc.scrollTop += Math.max(-30, Math.min(30, v));
+    requestAnimationFrame(autoScrollStep);
+  }
+  document.addEventListener('dragover', (e) => {
+    if (!dragId) return;
+    dragY = e.clientY;
+    if (!autoScrolling) { autoScrolling = true; requestAnimationFrame(autoScrollStep); }
+  }, true);
   function clearDropMarks() {
     $$('.drop-before, .drop-after, .drop-into').forEach((e) => e.classList.remove('drop-before', 'drop-after', 'drop-into'));
   }
@@ -638,7 +659,7 @@
     const sub = s.desc || s.tags.split(',').map((t) => t.trim()).filter(Boolean).slice(0, 6).join(' · ') || joinOf(s.id);
     const added = inList(s);
     return `<div class="b-row" data-id="${esc(s.id)}">
-      <div class="b-ic">${s.icon ? `<img src="${esc(s.icon)}" alt="" loading="lazy" onerror="this.remove()">` : ''}<span>${esc(initial(s.name))}</span></div>
+      <div class="b-ic">${s.icon ? `<img src="${esc(s.icon)}" alt="" loading="lazy">` : ''}<span>${esc(initial(s.name))}</span></div>
       <div class="b-main"><div class="b-name" title="${esc(s.name)}">${s.private ? '<span class="b-lock">🔒 ส่วนตัว</span>' : ''}<span data-no-i18n>${esc(s.name)}</span></div><div class="b-sub" title="${esc(sub)}" data-no-i18n>${esc(sub)}</div></div>
       <div class="b-pl"><div><b>${fmtNum(s.players)}</b> / ${fmtNum(s.max)}</div><div class="bar"><i style="width:${p}%;--barc:${barColor(p)}"></i></div></div>
       <div class="b-act">
@@ -1156,7 +1177,7 @@
       const banner = d.bannerUrl || d.banner;
       const t = d.tone !== 'auto' ? d.tone : d.autoTone || '#2c2c3a';
       el('fPreview').setAttribute('style', toneStyle(t));
-      const bannerInner = banner ? `<img src="${esc(banner)}" alt="" onerror="this.remove()">` : logo ? `<img class="blur-logo" src="${esc(logo)}" alt="">` : '';
+      const bannerInner = banner ? `<img src="${esc(banner)}" alt="">` : logo ? `<img class="blur-logo" src="${esc(logo)}" alt="">` : '';
       el('fPreview').innerHTML = `
         <div class="pv-banner" style="${banner || logo ? `background:${t}` : ''}">${bannerInner}</div>
         <div class="pv-row">
