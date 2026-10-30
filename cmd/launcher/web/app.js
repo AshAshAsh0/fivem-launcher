@@ -396,11 +396,13 @@
     const added = inList(s);
     return `<div class="b-row" data-id="${esc(s.id)}">
       <div class="b-ic">${s.icon ? `<img src="${esc(s.icon)}" alt="" loading="lazy" onerror="this.remove()">` : ''}<span>${esc(initial(s.name))}</span></div>
-      <div class="b-main"><div class="b-name" title="${esc(s.name)}">${esc(s.name)}</div><div class="b-sub" title="${esc(sub)}">${esc(sub)}</div></div>
+      <div class="b-main"><div class="b-name" title="${esc(s.name)}">${s.private ? '<span class="b-lock">🔒 ส่วนตัว</span>' : ''}${esc(s.name)}</div><div class="b-sub" title="${esc(sub)}">${esc(sub)}</div></div>
       <div class="b-pl"><div><b>${fmtNum(s.players)}</b> / ${fmtNum(s.max)}</div><div class="bar"><i style="width:${p}%;--barc:${barColor(p)}"></i></div></div>
       <div class="b-act">
-        <button class="btn btn-sm" data-b="play" title="เข้าเซิร์ฟนี้เลย">${I.play} เล่น</button>
-        ${added ? `<button class="btn btn-sm" disabled>${I.check} อยู่ในลิสต์แล้ว</button>` : `<button class="btn btn-sm btn-dark" data-b="add">${I.plus} เพิ่ม</button>`}
+        ${s.private
+          ? `<button class="btn btn-sm" data-b="private" title="เซิร์ฟนี้ตั้งเป็นส่วนตัว">ทำไมเข้าไม่ได้?</button>`
+          : `<button class="btn btn-sm" data-b="play" title="เข้าเซิร์ฟนี้เลย">${I.play} เล่น</button>
+        ${added ? `<button class="btn btn-sm" disabled>${I.check} อยู่ในลิสต์แล้ว</button>` : `<button class="btn btn-sm btn-dark" data-b="add">${I.plus} เพิ่ม</button>`}`}
       </div>
     </div>`;
   }
@@ -433,7 +435,9 @@
     $('#bMoreBtn')?.addEventListener('click', () => loadBrowse(false));
     list.querySelectorAll('.b-row').forEach((row) => {
       const s = B.items.find((x) => x.id === row.dataset.id);
-      row.querySelector('[data-b="play"]').onclick = () => {
+      row.querySelector('[data-b="private"]')?.addEventListener('click', () => privateInfo(s));
+      const playBtn = row.querySelector('[data-b="play"]');
+      if (playBtn) playBtn.onclick = () => {
         toast(`กำลังเข้า ${s.name}`);
         api.launch(targetOf(s), state.settings.after).catch(() => toast('เปิด FiveM ไม่สำเร็จ', 'err'));
       };
@@ -459,6 +463,18 @@
     B.items = B.items.concat(r.items || []);
     B.total = r.total; B.players = r.players; B.updated = r.updated; B.loaded = true;
     drawBrowse();
+  }
+
+  function privateInfo(s) {
+    modal(`
+      <div class="modal sm">
+        <div class="modal-head"><h2>🔒 เซิร์ฟส่วนตัว</h2><button class="x-btn" data-close>${I.x}</button></div>
+        <div class="modal-body">
+          <p class="confirm-text"><b style="color:var(--ink)">${esc(s.name)}</b> ตั้งค่าเป็นเซิร์ฟส่วนตัว จึงเข้าจากรายชื่อของ FiveM ไม่ได้ (ปุ่ม Connect ในตัว FiveM เองก็กดไม่ได้เช่นกัน)</p>
+          <p class="confirm-text" style="margin-top:12px">ต้องเข้าผ่านช่องทางของเซิร์ฟเอง เช่น Launcher เฉพาะของเซิร์ฟ หรือลิงก์/IP ที่แจกใน Discord ของเซิร์ฟ — ถ้ามีที่อยู่แล้ว กด “เพิ่มเซิร์ฟเวอร์” ที่หน้าหลักแล้ววางที่อยู่นั้นได้เลย</p>
+        </div>
+        <div class="modal-foot"><button class="btn btn-dark" data-close>เข้าใจแล้ว</button></div>
+      </div>`);
   }
 
   const adding = new Set();

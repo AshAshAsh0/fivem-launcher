@@ -665,3 +665,4 @@ html.idle[data-perf='eco'] :is(.bimg, .bn, .blur-logo) { visibility: hidden; }
 .b-row.skel .b-main i { display: block; height: 12px; border-radius: 6px; width: 60%; }
 .b-row.skel .b-main i + i { width: 35%; margin-top: 8px; }
 @keyframes shimmer { to { background-position: -200% 0; } }
+.b-lock { display: inline-block; font: 700 11px var(--font-body); color: #8a6100; background: #fff1c9; border-radius: 99px; padding: 1px 8px; margin-right: 8px; vertical-align: 2px; }

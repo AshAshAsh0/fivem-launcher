@@ -30,6 +30,7 @@ type listServer struct {
 	Tags     string `json:"tags"`
 	Icon     string `json:"icon"`
 	Banner   string `json:"banner"`
+	Private  bool   `json:"private"`  // เซิร์ฟส่วนตัว: เข้าจากรายชื่อไม่ได้ ต้องเข้าผ่านช่องทางของเซิร์ฟเอง
 	Endpoint string `json:"endpoint"` // ที่อยู่ตรงสำหรับเชื่อมต่อ (ว่าง = เซิร์ฟซ่อน IP ต้องใช้ cfx.re/join)
 	search   string
 	isThai   bool
@@ -138,6 +139,9 @@ func decodeListServer(msg []byte) *listServer {
 		case f == 11 && wt == 0:
 			iconVer, hasIcon = int32(v), true
 		case f == 18 && wt == 2:
+			if strings.Contains(strings.ToLower(string(d)), "private-placeholder") {
+				s.Private = true
+			}
 			if s.Endpoint == "" {
 				s.Endpoint = usableEndpoint(string(d))
 			}

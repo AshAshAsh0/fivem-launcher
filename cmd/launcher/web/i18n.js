@@ -91,6 +91,10 @@
     'กำลังโหลดรายชื่อเซิร์ฟ... ครั้งแรกอาจใช้เวลาสักครู่': 'Loading the server list... the first load may take a moment',
     'ไม่พบเซิร์ฟที่ตรงกับคำค้น': 'No servers match your search', 'ลองพิมพ์คำอื่น หรือเปลี่ยนเป็น “ทั้งหมด”': 'Try another word, or switch to “All”',
     'กด “เพิ่มเซิร์ฟเวอร์” เพื่อเริ่มต้น หรือหาเซิร์ฟจากรายชื่อของ FiveM': 'Click “Add server” to get started, or find one in the FiveM server list',
+    '🔒 ส่วนตัว': '🔒 Private', 'ทำไมเข้าไม่ได้?': "Why can't I join?", 'เซิร์ฟนี้ตั้งเป็นส่วนตัว': 'This server is private',
+    '🔒 เซิร์ฟส่วนตัว': '🔒 Private server', 'เข้าใจแล้ว': 'Got it',
+    'ตั้งค่าเป็นเซิร์ฟส่วนตัว จึงเข้าจากรายชื่อของ FiveM ไม่ได้ (ปุ่ม Connect ในตัว FiveM เองก็กดไม่ได้เช่นกัน)': "is set to private, so it can't be joined from the FiveM server list (FiveM's own Connect button is disabled too).",
+    'ต้องเข้าผ่านช่องทางของเซิร์ฟเอง เช่น Launcher เฉพาะของเซิร์ฟ หรือลิงก์/IP ที่แจกใน Discord ของเซิร์ฟ — ถ้ามีที่อยู่แล้ว กด “เพิ่มเซิร์ฟเวอร์” ที่หน้าหลักแล้ววางที่อยู่นั้นได้เลย': "Join through the server's own channel instead — its own launcher, or the link/IP shared in its Discord. If you have the address, click “Add server” on the home page and paste it.",
   };
 
   // ข้อความที่มีตัวเลข/ชื่อแทรกอยู่
