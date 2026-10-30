@@ -1157,3 +1157,58 @@ html[data-motion='reduced'] .splash * { animation: none !important; }
 [data-theme='hud'] .sv-discord::after { display: none; }
 [data-theme='hud'] .sv-discord { border-radius: 6px; box-shadow: none !important; }
 [data-theme='hud'] .btn.sv-discord, [data-theme] .btn.sv-discord { background: #5865f2 !important; color: #fff !important; }
+
+/* ================= v5: แผงรายละเอียดเซิร์ฟด้านซ้าย ================= */
+.b-split { display: grid; grid-template-columns: 0 minmax(0, 1fr); gap: 0; align-items: start; transition: grid-template-columns .28s cubic-bezier(.2, .8, .2, 1), gap .28s; }
+.b-split.open { grid-template-columns: 340px minmax(0, 1fr); gap: 14px; }
+.b-col { min-width: 0; }
+.sv-side {
+  position: sticky; top: 0; min-width: 0; overflow: hidden auto; max-height: calc(100vh - 150px);
+  display: flex; flex-direction: column; border-radius: 22px; background: var(--surface);
+  box-shadow: var(--card-shadow), inset 0 0 0 1px var(--line); visibility: hidden; opacity: 0;
+}
+.sv-side::-webkit-scrollbar { width: 0; }
+.b-split.open .sv-side { visibility: visible; opacity: 1; animation: svIn .28s cubic-bezier(.2, .8, .2, 1); }
+.sv-side.swap { animation: svSwap .2s ease-out !important; }
+@keyframes svIn { from { transform: translateX(-24px); opacity: 0; } }
+@keyframes svSwap { from { opacity: .4; transform: translateY(6px); } }
+.sv-side .sv-banner { flex: none; height: 128px; border-radius: 0; }
+.sv-side .sv-head { padding: 0 16px; margin-top: -36px; }
+.sv-side .sv-ic { width: 72px; height: 72px; border-radius: 18px; font-size: 28px; }
+.sv-side .sv-title { padding: 10px 16px 0; }
+.sv-side .sv-title h2 { font-size: 18px; }
+.sv-side .sv-body { display: flex; flex-direction: column; gap: 12px; padding: 14px 16px 6px; }
+.sv-side .sv-stats b { font-size: 18px; }
+.sv-side .sv-desc { font-size: 13px; display: -webkit-box; -webkit-line-clamp: 6; -webkit-box-orient: vertical; overflow: hidden; }
+.sv-side .sv-addr { padding: 6px 6px 6px 12px; }
+.sv-foot { position: sticky; bottom: 0; padding: 12px 16px 16px; background: linear-gradient(transparent, var(--surface) 30%); margin-top: auto; }
+.sv-foot .sv-play { width: 100%; height: 52px; }
+.b-row.sel { box-shadow: inset 0 0 0 2px var(--strong), 0 3px 0 var(--line); }
+.b-split.open .b-row { grid-template-columns: 46px minmax(0, 1fr) 120px auto; gap: 12px; }
+.b-split.open .b-ic { width: 46px; height: 46px; border-radius: 13px; }
+.b-split.open .b-row .btn-sm { padding: 0 10px; }
+/* HUD */
+[data-theme='hud'] .sv-side { background: none; box-shadow: none; border-radius: 17px; isolation: isolate; }
+[data-theme='hud'] .sv-side::before { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none; border-style: solid; border-width: 20px 24px 24px 20px; border-image: var(--frame) 20 24 24 20 fill / 20px 24px 24px 20px stretch; }
+[data-theme='hud'] .sv-side .sv-banner { border-radius: 12px; margin: 8px 8px 0; }
+[data-theme='hud'] .sv-side .sv-head { padding: 0 22px; }
+[data-theme='hud'] .sv-foot { background: linear-gradient(transparent, rgba(20, 22, 25, .9) 30%); border-radius: 0 0 17px 17px; }
+[data-theme='hud'] .b-row.sel::before { border-image-source: var(--frame-sel); }
+/* v5: หน้าเลือกเซิร์ฟเต็มหน้าต่าง — หัวข้อ/ช่องค้นหาอยู่กับที่ รายชื่อเลื่อนในตัว แผงซ้ายสูงเต็ม */
+.scroll.split .view { flex-direction: column; min-height: 0; }
+.scroll.split .page-head { margin: 4px 0 10px; }
+.scroll.split .toolbar { margin: 0 0 14px; }
+.scroll.split .b-meta { margin: -4px 0 10px; }
+.scroll.split .b-split { flex: 1; min-height: 0; align-items: stretch; }
+.scroll.split .b-col { min-height: 0; overflow-y: auto; overflow-x: hidden; padding: 2px 4px 8px 2px; margin-right: -4px; }
+.scroll.split .b-col::-webkit-scrollbar { width: 5px; }
+.scroll.split .b-col::-webkit-scrollbar-thumb { background: var(--line-2); border-radius: 9px; }
+.scroll.split .sv-side { position: relative; max-height: none; height: 100%; }
+.scroll.split .sv-side { overflow: hidden; }
+.sv-side .sv-banner { height: 112px; }
+.sv-side .sv-body { flex: 1; min-height: 0; overflow-y: auto; padding-bottom: 10px; }
+.sv-side .sv-body::-webkit-scrollbar { width: 4px; }
+.sv-side .sv-body::-webkit-scrollbar-thumb { background: var(--line-2); border-radius: 9px; }
+.sv-foot { position: static; flex: none; background: none !important; padding: 8px 16px 16px; border-top: 1px solid var(--line); margin-top: 0; }
+.sv-side .sv-body > *, .sv-side > * { flex-shrink: 0; }
+.sv-side .sv-body { flex-shrink: 1; }

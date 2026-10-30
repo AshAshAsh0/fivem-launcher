@@ -261,7 +261,7 @@
     closeModal();
     state.page = page;
     $$('.nav-btn').forEach((b) => b.classList.toggle('active', b.dataset.page === page));
-    $('#scroll').classList.toggle('split', page === 'home' || page === 'favorites');
+    $('#scroll').classList.toggle('split', page === 'browse');
     render(true);
     $('#scroll').scrollTop = 0;
   }
@@ -711,8 +711,10 @@
         <button class="icon-btn ${B.loading ? 'spin' : ''}" id="bRefresh" title="โหลดรายชื่อใหม่">${I.refresh}</button>
       </div>
       <div class="b-meta" id="bMeta"></div>
-      <div class="b-list" id="bList"></div>
-      <div class="b-more" id="bMore"></div>`;
+      <div class="b-split ${B.sel ? 'open' : ''}" id="bSplit">
+        <aside class="sv-side" id="svSide"></aside>
+        <div class="b-col"><div class="b-list" id="bList"></div><div class="b-more" id="bMore"></div></div>
+      </div>`;
   }
 
   function browseRow(s) {
@@ -754,62 +756,70 @@
 
   const imgSrc = (u) => (api.img ? api.img(u) : u);
 
-  // ป๊อปอัปรายละเอียดเซิร์ฟ (คลิกที่แถว)
+  // แผงรายละเอียดเซิร์ฟด้านซ้าย (คลิกที่แถว) — รายชื่อยังอยู่ด้านขวา กดเซิร์ฟอื่นสลับได้ทันที
+  function closeServer() {
+    state.browse.sel = null;
+    $('#bSplit')?.classList.remove('open');
+    $$('.b-row.sel').forEach((r) => r.classList.remove('sel'));
+    const side = $('#svSide'); if (side) side.innerHTML = '';
+  }
   function serverPopup(s) {
+    const B = state.browse, side = $('#svSide'), split = $('#bSplit');
+    if (!side || !split) return;
+    B.sel = s.id; B.selItem = s;
+    $$('.b-row').forEach((r) => r.classList.toggle('sel', r.dataset.id === s.id));
     const p = s.max ? Math.min(100, Math.round((s.players / s.max) * 100)) : 0;
     const tags = s.tags.split(',').map((t) => t.trim()).filter(Boolean).slice(0, 8);
     const target = targetOf(s);
-    const m = modal(`
-      <div class="modal sv-pop">
-        <div class="sv-banner">
-          ${s.banner ? `<img src="${esc(imgSrc(s.banner))}" alt="">` : s.icon ? `<img class="blur" src="${esc(imgSrc(s.icon))}" alt="">` : ''}
-          <button class="x-btn" data-close>${I.x}</button>
-          ${s.private ? '<span class="b-lock sv-lock">🔒 ส่วนตัว</span>' : ''}
+    side.innerHTML = `
+      <div class="sv-banner">
+        ${s.banner ? `<img src="${esc(imgSrc(s.banner))}" alt="">` : s.icon ? `<img class="blur" src="${esc(imgSrc(s.icon))}" alt="">` : ''}
+        <button class="x-btn" id="svClose" title="ปิด">${I.x}</button>
+        ${s.private ? '<span class="b-lock sv-lock">🔒 ส่วนตัว</span>' : ''}
+      </div>
+      <div class="sv-head">
+        <div class="sv-ic"><span>${esc(initial(s.name))}</span>${s.icon ? `<img src="${esc(imgSrc(s.icon))}" alt="">` : ''}</div>
+      </div>
+      <div class="sv-title">
+        <h2 data-no-i18n title="${esc(s.name)}">${esc(s.name)}</h2>
+        <div class="sv-tags">${s.locale ? `<span class="pill pill-mono" data-no-i18n>${esc(s.locale.replace('_', '-'))}</span>` : ''}${tags.map((t) => `<span class="pill pill-mono" data-no-i18n>${esc(t)}</span>`).join('')}</div>
+      </div>
+      <div class="sv-body">
+        <div class="sv-stats">
+          <div><span class="lbl">จำนวนผู้เล่น</span><b>${fmtNum(s.players)}<small>/${fmtNum(s.max)}</small></b></div>
+          <div><span class="lbl">ปิง</span><b id="svPing">…</b></div>
+          <div><span class="lbl">ความจุ</span><b style="color:${pctColor(p)}">${p}%</b></div>
         </div>
-        <div class="sv-head">
-          <div class="sv-ic"><span>${esc(initial(s.name))}</span>${s.icon ? `<img src="${esc(imgSrc(s.icon))}" alt="">` : ''}</div>
-          <div class="sv-title">
-            <h2 data-no-i18n title="${esc(s.name)}">${esc(s.name)}</h2>
-            <div class="sv-tags">${s.locale ? `<span class="pill pill-mono" data-no-i18n>${esc(s.locale.replace('_', '-'))}</span>` : ''}${tags.map((t) => `<span class="pill pill-mono" data-no-i18n>${esc(t)}</span>`).join('')}</div>
-          </div>
-        </div>
-        <div class="modal-body sv-body">
-          <div class="sv-stats">
-            <div><span class="lbl">จำนวนผู้เล่น</span><b>${fmtNum(s.players)}<small>/${fmtNum(s.max)}</small></b></div>
-            <div><span class="lbl">ปิง</span><b id="svPing">…</b></div>
-            <div><span class="lbl">ความจุ</span><b style="color:${pctColor(p)}">${p}%</b></div>
-          </div>
-          <div class="bar"><i style="width:${p}%;--barc:${barColor(p)}"></i></div>
-          ${s.desc ? `<p class="sv-desc" data-no-i18n>${esc(s.desc)}</p>` : ''}
-          ${s.private
-            ? `<p class="sv-note">เซิร์ฟนี้ตั้งเป็นส่วนตัว จึงเข้าจากรายชื่อไม่ได้ ต้องใช้ IP หรือลิงก์ที่เซิร์ฟแจกใน Discord — วางในช่องค้นหาแล้วกด “เข้าเลย”</p>`
-            : `<div class="sv-addr"><code data-no-i18n>${esc(target)}</code><button class="btn btn-sm" id="svCopy">${I.copy || ''} คัดลอก</button></div>`}
-          ${s.discord || s.website ? `<div class="sv-links">
-            ${s.discord ? `<button class="btn btn-sm sv-discord" data-link="${esc(s.discord)}">Discord</button>` : ''}
-            ${s.website ? `<button class="btn btn-sm" data-link="${esc(s.website)}">${I.globe || ''} เว็บไซต์</button>` : ''}
-          </div>` : ''}
-        </div>
-        <div class="modal-foot">
-          <button class="btn" data-close data-no-i18n>${isEN() ? 'Close' : 'ปิด'}</button>
-          ${s.private ? '' : `<button class="btn btn-dark btn-lg sv-play" id="svPlay">${I.play} เล่นเลย</button>`}
-        </div>
-      </div>`);
-    $('#svPlay', m)?.addEventListener('click', () => {
-      closeModal();
+        <div class="bar"><i style="width:${p}%;--barc:${barColor(p)}"></i></div>
+        ${s.desc ? `<p class="sv-desc" data-no-i18n>${esc(s.desc)}</p>` : ''}
+        ${s.private
+          ? `<p class="sv-note">เซิร์ฟนี้ตั้งเป็นส่วนตัว จึงเข้าจากรายชื่อไม่ได้ ต้องใช้ IP หรือลิงก์ที่เซิร์ฟแจกใน Discord — วางในช่องค้นหาแล้วกด “เข้าเลย”</p>`
+          : `<div class="sv-addr"><code data-no-i18n>${esc(target)}</code><button class="btn btn-sm" id="svCopy">${I.copy} คัดลอก</button></div>`}
+        ${s.discord || s.website ? `<div class="sv-links">
+          ${s.discord ? `<button class="btn btn-sm sv-discord" data-link="${esc(s.discord)}">Discord</button>` : ''}
+          ${s.website ? `<button class="btn btn-sm" data-link="${esc(s.website)}">${I.globe} เว็บไซต์</button>` : ''}
+        </div>` : ''}
+      </div>
+      ${s.private ? '' : `<div class="sv-foot"><button class="btn btn-dark btn-lg sv-play" id="svPlay">${I.play} เล่นเลย</button></div>`}`;
+    const wasOpen = split.classList.contains('open');
+    split.classList.add('open');
+    side.classList.toggle('swap', wasOpen);
+    side.scrollTop = 0;
+    $('#svClose', side).onclick = closeServer;
+    $('#svPlay', side)?.addEventListener('click', () => {
       toast(`กำลังเข้า ${s.name}`);
       api.launch(target, state.settings.after).catch(() => toast('เปิด FiveM ไม่สำเร็จ', 'err'));
     });
-    $$('[data-link]', m).forEach((btn) => btn.addEventListener('click', () => api.openExternal(btn.dataset.link)));
-    $('#svCopy', m)?.addEventListener('click', () => {
+    $$('[data-link]', side).forEach((btn) => btn.addEventListener('click', () => api.openExternal(btn.dataset.link)));
+    $('#svCopy', side)?.addEventListener('click', () => {
       try { navigator.clipboard.writeText(target); toast('คัดลอกที่อยู่แล้ว'); } catch { toast('คัดลอกไม่สำเร็จ', 'err'); }
     });
-    // ปิงจริงของเซิร์ฟ (ถามตอนเปิดป๊อปอัป)
-    if (!s.private) {
-      api.query(target, {}).then((r) => {
-        const el = $('#svPing', m);
-        if (el) el.innerHTML = r && r.online && r.ping != null ? `${r.ping}<small>ms</small>` : '—';
-      }).catch(() => { const el = $('#svPing', m); if (el) el.textContent = '—'; });
-    } else { const el = $('#svPing', m); if (el) el.textContent = '—'; }
+    const ping = $('#svPing', side);
+    if (s.private) { ping.textContent = '—'; return; }
+    api.query(target, {}).then((r) => {
+      if (state.browse.sel !== s.id) return; // ผู้ใช้เปลี่ยนไปเซิร์ฟอื่นแล้ว
+      const el = $('#svPing'); if (el) el.innerHTML = r && r.online && r.ping != null ? `${r.ping}<small>ms</small>` : '—';
+    }).catch(() => { const el = $('#svPing'); if (el && state.browse.sel === s.id) el.textContent = '—'; });
   }
 
   function browseSkeleton() {
@@ -847,25 +857,17 @@
     $('#bMoreBtn')?.addEventListener('click', () => loadBrowse(false));
     list.querySelectorAll('.b-row').forEach((row) => {
       const s = B.items.find((x) => x.id === row.dataset.id);
-      row.querySelector('[data-b="private"]')?.addEventListener('click', () => privateInfo(s));
       if (!s) return;
+      row.classList.toggle('sel', B.sel === s.id);
+      row.querySelector('[data-b="private"]')?.addEventListener('click', (e) => { e.stopPropagation(); serverPopup(s); });
       const join = () => {
         toast(`กำลังเข้า ${s.name}`);
         api.launch(targetOf(s), state.settings.after).catch(() => toast('เปิด FiveM ไม่สำเร็จ', 'err'));
       };
       const playBtn = row.querySelector('[data-b="play"]');
       if (playBtn) playBtn.onclick = (e) => { e.stopPropagation(); join(); };
-      let clickT = 0;
-      row.onclick = (e) => {
-        if (e.target.closest('button')) return;
-        clearTimeout(clickT);
-        clickT = setTimeout(() => serverPopup(s), 230);
-      };
-      row.ondblclick = (e) => {
-        if (e.target.closest('button')) return;
-        clearTimeout(clickT);
-        s.private ? serverPopup(s) : join();
-      };
+      row.onclick = (e) => { if (!e.target.closest('button') && B.sel !== s.id) serverPopup(s); };
+      row.ondblclick = (e) => { if (!e.target.closest('button') && !s.private) join(); };
     });
   }
 
@@ -927,6 +929,7 @@
 
   function bindBrowse() {
     const B = state.browse;
+    if (B.sel && B.selItem) setTimeout(() => B.sel && serverPopup(B.selItem), 0);
     let t;
     $('#bq').addEventListener('keydown', (e) => { if (e.key === 'Enter' && directTarget(B.q)) joinDirect(directTarget(B.q)); });
     $('#bq').addEventListener('input', (e) => {
@@ -1660,7 +1663,7 @@
     else $('.made').innerHTML = `<b>${esc(CFG.appName)} Launcher</b> <span style="opacity:.6">v${esc(state.version)}</span>`;
 
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') { closeMenu(); closeModal(); }
+      if (e.key === 'Escape') { if ($('#modalRoot').innerHTML) closeModal(); else if (state.browse.sel) closeServer(); closeMenu(); }
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f') {
         e.preventDefault();
         if (state.page === 'settings') go('browse');
