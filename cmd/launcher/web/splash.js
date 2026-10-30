@@ -1,8 +1,7 @@
 // หน้า loading: ตั้งธีม/ภาษาจากพารามิเตอร์ที่ตัวโปรแกรมส่งมา ก่อนหน้าเว็บวาดเฟรมแรก
 (() => {
   const q = new URLSearchParams(location.search);
-  const theme = q.get('theme');
-  if (theme === 'mono' || theme === 'sakura' || theme === 'hud') document.documentElement.dataset.theme = theme;
+  document.documentElement.dataset.theme = 'hud'; // ธีมหลักถาวร
   const lang = q.get('lang') || ((navigator.language || '').toLowerCase().startsWith('th') ? 'th' : 'en');
   const en = lang === 'en';
   const v = (q.get('v') || '').replace(/[^0-9.]/g, '');

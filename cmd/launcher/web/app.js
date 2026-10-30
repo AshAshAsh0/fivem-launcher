@@ -228,11 +228,12 @@
   }
   function applyPrefs() {
     const r = document.documentElement;
-    r.dataset.theme = state.settings.theme;
+    state.settings.theme = 'hud'; // ธีมหลักถาวรของ Launcher
+    r.dataset.theme = 'hud';
     r.dataset.motion = state.settings.motion;
     r.dataset.cursor = state.settings.cursor;
     r.dataset.perf = state.settings.perf;
-    const wall = Number(state.settings.wall) && api.wallpaperURL ? api.wallpaperURL(state.settings.wall) : '';
+    const wall = ''; // ปิดรูปพื้นหลังแบบกำหนดเอง
     if (wall) { r.dataset.wall = ''; r.style.setProperty('--wall', `url("${wall}")`); }
     else { delete r.dataset.wall; r.style.removeProperty('--wall'); }
     if (!state.settings.lang) state.settings.lang = window.I18N?.detect() || 'th';
@@ -963,40 +964,6 @@
       </section>
 
       <section class="sect">
-        <h3>ธีมโปรแกรม</h3>
-        <p class="d">เลือกสไตล์ที่ใช่ — เรียบหรู น่ารัก หรือมืดแบบเมนูในเกม เปลี่ยนได้ทันที</p>
-        <div class="theme-opts">
-          <button class="theme-opt ${S.theme === 'mono' ? 'on' : ''}" data-theme-pick="mono">
-            <span class="check">${I.check}</span>
-            <div class="mini mono"><span class="t"></span><span class="a"></span><span class="b"></span><span class="c"></span></div>
-            <div class="theme-meta"><div><b>ขาว-เทา</b><small>ขาวสะอาด เทาละมุน เรียบหรู</small></div><span class="pill">มินิมอล</span></div>
-          </button>
-          <button class="theme-opt ${S.theme === 'sakura' ? 'on' : ''}" data-theme-pick="sakura">
-            <span class="check">${I.check}</span>
-            <div class="mini sakura"><span class="t"></span><span class="a"></span><span class="b"></span><span class="c"></span></div>
-            <div class="theme-meta"><div><b style="font-family:Mali,var(--font-head)">ซากุระ</b><small>พาสเทลชมพู สว่าง สดใส</small></div><span class="pill pill-sakura">คาวาอิ</span></div>
-          </button>
-          <button class="theme-opt ${S.theme === 'hud' ? 'on' : ''}" data-theme-pick="hud">
-            <span class="check">${I.check}</span>
-            <div class="mini hud"><span class="t"></span><span class="a"></span><span class="b"></span><span class="c"></span></div>
-            <div class="theme-meta"><div><b>HUD</b><small>เทาดำโปร่ง ฟ้านีออน สไตล์เมนูในเกม</small></div><span class="pill pill-hud">เกมมิ่ง</span></div>
-          </button>
-        </div>
-      </section>
-
-      <section class="sect">
-        <h3>รูปพื้นหลัง</h3>
-        <p class="d">ใช้รูปของคุณเป็นพื้นหลังหลังแผงกระจก เช่น ภาพแคปจากในเกม — โปรแกรมจะเบลอให้อัตโนมัติ (แสดงเฉพาะธีม HUD)</p>
-        <div class="wall-row">
-          <div class="wall-prev" id="wallPrev" ${S.wall && api.wallpaperURL ? `style="background-image:url('${api.wallpaperURL(S.wall)}')"` : ''}>${S.wall ? '' : 'ไม่มีรูป'}</div>
-          <button class="btn" data-act="pick-wall">${I.folder2 || ''} เลือกรูป...</button>
-          ${S.wall ? '<button class="btn" data-act="clear-wall">ลบรูป</button>' : ''}
-          ${S.theme !== 'hud' ? '<button class="btn btn-dark" data-act="use-hud">ใช้ธีม HUD</button>' : ''}
-          <input type="file" id="wallFile" accept="image/png,image/jpeg,image/webp,image/bmp" hidden>
-        </div>
-      </section>
-
-      <section class="sect">
         <h3>ตำแหน่ง FiveM</h3>
         <p class="d">โปรแกรมจะค้นหา FiveM.exe ให้อัตโนมัติ หากติดตั้งไว้ที่อื่นสามารถเลือกไฟล์เองได้</p>
         <div class="path-box">${state.fivem.found ? '<span class="pill pill-ok">พบแล้ว</span>' : '<span class="pill pill-off">ไม่พบ</span>'}<code title="${esc(state.fivem.path)}">${esc(state.fivem.path || '—')}</code></div>
@@ -1645,16 +1612,11 @@
 
   // ---------- global ----------
   function bindGlobal() {
-    $$('.nav-btn').forEach((b) => b.addEventListener('click', () => go(state.page === 'settings' ? 'browse' : 'settings')));
+    $$('.nav-btn').forEach((b) => b.addEventListener('click', () => { if (state.page !== b.dataset.page) go(b.dataset.page); }));
     $('.brand')?.addEventListener('click', () => { if (state.page !== 'browse') go('browse'); });
     $('#btnMin').addEventListener('click', () => api.minimize());
     $('#btnClose').addEventListener('click', () => api.close());
     $('.titlebar').addEventListener('dblclick', (e) => { if (!e.target.closest('button')) api.toggleMax(); });
-    $('#btnTheme').addEventListener('click', () => {
-      const order = ['mono', 'sakura', 'hud'];
-      setSetting('theme', order[(order.indexOf(state.settings.theme) + 1) % order.length], state.page === 'settings');
-      toast({ mono: 'ธีมขาว-เทา', sakura: 'ธีมซากุระ 🌸', hud: 'ธีม HUD' }[state.settings.theme]);
-    });
     $('#btnDiscord').addEventListener('click', () => api.openExternal(CFG.discordUrl));
     $('#btnDiscord').hidden = !CFG.discordUrl;
     $('#brandName').textContent = CFG.appName;

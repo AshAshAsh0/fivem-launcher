@@ -26,7 +26,7 @@ import (
 var webFS embed.FS
 
 // version ถูกแทนค่าตอน build ด้วย -ldflags "-X main.version=..."
-var version = "3.2.0"
+var version = "3.3.0"
 
 const (
 	appTitle = "FiveM Launcher"
@@ -99,14 +99,8 @@ func main() {
 	}
 
 	// สีพื้นหลังตอนเปิดโปรแกรม ให้ตรงกับธีม (กันจอขาวแวบ)
-	bg, startTheme, startLang := "FFEBEBEC", "mono", ""
+	bg, startTheme, startLang := "FF0B0C0E", "hud", "" // ธีม HUD เป็นธีมหลักถาวร
 	if b, err := os.ReadFile(filepath.Join(dataDir, "launcher-data.json")); err == nil {
-		switch {
-		case strings.Contains(string(b), `"theme": "sakura"`):
-			bg, startTheme = "FFFBECF1", "sakura"
-		case strings.Contains(string(b), `"theme": "hud"`):
-			bg, startTheme = "FF0B0C0E", "hud"
-		}
 		if strings.Contains(string(b), `"lang": "en"`) {
 			startLang = "en"
 		} else if strings.Contains(string(b), `"lang": "th"`) {

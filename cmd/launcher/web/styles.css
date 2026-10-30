@@ -1212,3 +1212,8 @@ html[data-motion='reduced'] .splash * { animation: none !important; }
 .sv-foot { position: static; flex: none; background: none !important; padding: 8px 16px 16px; border-top: 1px solid var(--line); margin-top: 0; }
 .sv-side .sv-body > *, .sv-side > * { flex-shrink: 0; }
 .sv-side .sv-body { flex-shrink: 1; }
+
+/* v6: แท็บ หน้าหลัก/ตั้งค่า ชิดซ้ายข้างโลโก้ */
+.titlebar { justify-content: flex-start; }
+.titlebar .tabs { margin: 0 0 0 18px; }
+.titlebar .win-ctrls { margin-left: auto; }
