@@ -50,6 +50,8 @@
     visible: true,
     version: '',
     update: null,
+    watching: {},
+    os: '',
     browse: { q: '', region: 'th', items: [], total: 0, players: 0, updated: 0, loading: false, error: null, loaded: false },
   };
 
@@ -160,6 +162,7 @@
     r.dataset.perf = state.settings.perf;
     if (!state.settings.lang) state.settings.lang = window.I18N?.detect() || 'th';
     window.I18N?.set(state.settings.lang);
+    api.setLang?.(state.settings.lang);
   }
   const isEN = () => state.settings.lang === 'en';
 
@@ -250,10 +253,44 @@
     </div>`;
   }
 
+  // แจ้งเตือนเมื่อมีที่ว่าง (เซิร์ฟเต็ม) หรือเมื่อเซิร์ฟเปิด (เซิร์ฟออฟไลน์)
+  function bellKind(s) {
+    const S = st(s);
+    if (!S.online) return 'online';
+    if (S.max && S.players >= S.max) return 'slot';
+    return '';
+  }
+  function bellHTML(s) {
+    const w = state.watching[s.id];
+    if (w) return `<button class="pill pill-bell on" data-act="watch" data-id="${s.id}" title="กดเพื่อยกเลิก">🔔 ${w === 'online' ? 'รอเซิร์ฟเปิด' : 'รอที่ว่าง'} · ยกเลิก</button>`;
+    const k = bellKind(s);
+    if (!k) return '';
+    return `<button class="pill pill-bell" data-act="watch" data-id="${s.id}">🔔 ${k === 'online' ? 'แจ้งเมื่อเปิด' : 'แจ้งเมื่อว่าง'}</button>`;
+  }
+  async function toggleWatch(s) {
+    if (state.watching[s.id]) {
+      try { await api.watchStop(s.id); } catch {}
+      delete state.watching[s.id];
+      toast('ยกเลิกการแจ้งเตือนแล้ว');
+    } else {
+      const kind = bellKind(s) || 'slot';
+      try { await api.watchStart({ id: s.id, address: s.address, connect: s.connect || s.address, name: s.name, kind }); } catch { return toast('ตั้งแจ้งเตือนไม่สำเร็จ', 'err'); }
+      state.watching[s.id] = kind;
+      toast(kind === 'online' ? `จะแจ้งเตือนเมื่อ ${s.name} เปิด` : `จะแจ้งเตือนเมื่อ ${s.name} มีที่ว่าง`);
+    }
+    updateHomeParts();
+  }
+  window.__goWatchHit = ({ id, kind }) => {
+    delete state.watching[id];
+    const s = byId(id);
+    if (s) toast(kind === 'online' ? `${s.name} เปิดแล้ว!` : `${s.name} มีที่ว่างแล้ว!`);
+    refreshAll();
+  };
+
   function cardHTML(s, i) {
     const t = toneOf(s), S = st(s), p = loadPct(s), logo = logoOf(s), banner = bannerOf(s);
     const full = S.online && S.max && S.players >= S.max;
-    return `<article class="card ${S.online ? '' : 'offline'}" style="${toneStyle(t)};--i:${i}" data-id="${s.id}">
+    return `<article class="card ${S.online ? '' : 'offline'}" style="${toneStyle(t)};--i:${i}" data-id="${s.id}" data-bell="${bellKind(s)}|${state.watching[s.id] || ''}">
       <div class="banner">
         ${banner ? `<img class="bimg" src="${esc(banner)}" alt="" onerror="this.remove()">` : logo ? `<img class="blur-logo" src="${esc(logo)}" alt="">` : ''}
         <span class="js-st">${S.online ? '<span class="pill pill-ok">ออนไลน์</span>' : '<span class="pill pill-off">ออฟไลน์</span>'}</span>
@@ -268,6 +305,7 @@
         <div class="chips">
           <span class="pill pill-mono js-ping">${I.signal} ${S.ping != null ? `${S.ping}ms` : '—'}</span>
           ${s.category ? `<span class="pill pill-tone">${esc(s.category)}</span>` : ''}
+          ${bellHTML(s)}
         </div>
         <div class="card-actions">
           <button class="btn btn-tone" data-act="play" data-id="${s.id}">${I.play} ${S.online ? 'เล่น' : 'ลองเข้า'}</button>
@@ -339,6 +377,7 @@
     const f = featured();
     const heroId = $('.hero [data-act="play"]')?.dataset.id || null;
     if (want !== have || (f?.id || null) !== heroId) return updateHomeParts();
+    if (cards.some((c) => { const s = byId(c.dataset.id); return s && c.dataset.bell !== `${bellKind(s)}|${state.watching[s.id] || ''}`; })) return updateHomeParts();
     cards.forEach((c) => patchStatus(c, byId(c.dataset.id), true));
     const hero = $('.hero');
     if (hero && f) patchStatus(hero, f, false);
@@ -593,6 +632,16 @@
         </div>
       </section>
 
+      ${CFG.updateRepo ? `<section class="sect">
+        <h3>ช่วยเหลือ</h3>
+        <p class="d">เจอปัญหา หรืออยากได้ฟีเจอร์อะไร บอกผู้พัฒนาได้ที่นี่ (ต้องมีบัญชี GitHub ฟรี)</p>
+        <div class="btn-row">
+          <button class="btn" data-act="report" data-kind="bug">${I.x} แจ้งปัญหา</button>
+          <button class="btn" data-act="report" data-kind="idea">${I.sparkle} เสนอฟีเจอร์</button>
+          <button class="btn" data-act="website">${I.ext} เว็บไซต์</button>
+        </div>
+      </section>` : ''}
+
       <section class="sect">
         <h3>ข้อมูลของคุณ</h3>
         <p class="d">สำรองลิสต์เซิร์ฟเวอร์และการตั้งค่าไว้เป็นไฟล์ หรือย้ายไปเครื่องอื่น</p>
@@ -703,6 +752,11 @@
       });
       $('[data-act="reset"]').addEventListener('click', confirmReset);
       $('[data-act="check-update"]').addEventListener('click', () => checkUpdate(true));
+      $$('[data-act="report"]').forEach((b) => b.addEventListener('click', () => openReport(b.dataset.kind)));
+      $('[data-act="website"]')?.addEventListener('click', () => {
+        const [o, r] = CFG.updateRepo.split('/');
+        api.openExternal(`https://${o.toLowerCase()}.github.io/${r}/`);
+      });
       loadCache();
       startMetrics();
     }
@@ -748,6 +802,7 @@
       if (state.page === 'favorites' || state.filter === 'fav') updateHomeParts();
     }));
     $$('[data-act="more"]').forEach((b) => (b.onclick = (e) => { e.stopPropagation(); openMenu(b, byId(b.dataset.id)); }));
+    $$('[data-act="watch"]').forEach((b) => (b.onclick = (e) => { e.stopPropagation(); toggleWatch(byId(b.dataset.id)); }));
     if (state.settings.motion === 'full') {
       $$('.card').forEach((c) => {
         c.onmousemove = (e) => {
@@ -774,6 +829,7 @@
       <button data-m="copy">${I.copy} คัดลอกที่อยู่</button>
       ${s.discord ? `<button data-m="discord">${I.discord} เปิด Discord</button>` : ''}
       <button data-m="refresh">${I.refresh} รีเฟรชเซิร์ฟนี้</button>
+      ${state.watching[s.id] ? `<button data-m="watch">🔔 ยกเลิกการแจ้งเตือน</button>` : bellKind(s) ? `<button data-m="watch">🔔 ${bellKind(s) === 'online' ? 'แจ้งเตือนเมื่อเซิร์ฟเปิด' : 'แจ้งเตือนเมื่อมีที่ว่าง'}</button>` : ''}
       <hr><button data-m="del" class="danger">${I.trash} ลบเซิร์ฟเวอร์</button>`;
     $('#menuLayer').appendChild(m);
     const mw = m.offsetWidth, mh = m.offsetHeight;
@@ -791,6 +847,7 @@
       if (k === 'discord') api.openExternal(normUrl(s.discord));
       if (k === 'refresh') { await refreshOne(s, true); updateHomeParts(); }
       if (k === 'del') confirmDelete(s);
+      if (k === 'watch') toggleWatch(s);
     });
   }
   document.addEventListener('mousedown', (e) => { if (!e.target.closest('.menu') && !e.target.closest('.more-btn')) closeMenu(); });
@@ -806,6 +863,7 @@
       </div>`);
     $('#doDel', m).addEventListener('click', () => {
       state.servers = state.servers.filter((x) => x.id !== s.id);
+      if (state.watching[s.id]) { api.watchStop(s.id); delete state.watching[s.id]; }
       persist(); closeModal(); updateHomeParts();
       toast('ลบเซิร์ฟเวอร์แล้ว');
     });
@@ -1049,6 +1107,16 @@
     if (state.page === 'home') setTimeout(updateHomeParts, 300);
   }
 
+  // ---------- แจ้งปัญหา / เสนอฟีเจอร์ (GitHub Issues) ----------
+  function openReport(kind) {
+    const bug = kind === 'bug';
+    const title = bug ? '[ปัญหา] ' : '[ฟีเจอร์] ';
+    const body = bug
+      ? `**เกิดอะไรขึ้น**\n\n\n**ทำอะไรก่อนเกิดปัญหา**\n1. \n\n**ภาพหน้าจอ (ถ้ามี)**\n\n\n---\nเวอร์ชัน: ${state.version}\nระบบ: ${state.os}\nภาษา: ${state.settings.lang} · ธีม: ${state.settings.theme}`
+      : `**อยากได้อะไร**\n\n\n**ใช้ทำอะไร / ช่วยอะไร**\n\n\n---\nเวอร์ชัน: ${state.version}`;
+    api.openExternal(`https://github.com/${CFG.updateRepo}/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}`);
+  }
+
   // ---------- auto update ----------
   async function checkUpdate(manual = false) {
     const st = $('#updStatus');
@@ -1135,7 +1203,8 @@
       state.settings = { ...DEFAULT_SETTINGS, ...(saved.settings || {}) };
     }
     applyPrefs();
-    try { state.version = (await api.info()).version || ''; } catch {}
+    try { const inf = await api.info(); state.version = inf.version || ''; state.os = inf.os || ''; } catch {}
+    try { (await api.watchList?.() || []).forEach((w) => (state.watching[w.id] = w.kind)); } catch {}
     try { state.fivem = await api.fivemStatus(state.settings.fivemPath); } catch {}
     api.setPerfMode?.(state.settings.perf);
     bindGlobal();

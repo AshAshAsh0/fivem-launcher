@@ -95,6 +95,12 @@
     '🔒 เซิร์ฟส่วนตัว': '🔒 Private server', 'เข้าใจแล้ว': 'Got it',
     'ตั้งค่าเป็นเซิร์ฟส่วนตัว จึงเข้าจากรายชื่อของ FiveM ไม่ได้ (ปุ่ม Connect ในตัว FiveM เองก็กดไม่ได้เช่นกัน)': "is set to private, so it can't be joined from the FiveM server list (FiveM's own Connect button is disabled too).",
     'ต้องเข้าผ่านช่องทางของเซิร์ฟเอง เช่น Launcher เฉพาะของเซิร์ฟ หรือลิงก์/IP ที่แจกใน Discord ของเซิร์ฟ — ถ้ามีที่อยู่แล้ว กด “เพิ่มเซิร์ฟเวอร์” ที่หน้าหลักแล้ววางที่อยู่นั้นได้เลย': "Join through the server's own channel instead — its own launcher, or the link/IP shared in its Discord. If you have the address, click “Add server” on the home page and paste it.",
+    // watch / help
+    'แจ้งเมื่อว่าง': 'Notify when free', 'แจ้งเมื่อเปิด': 'Notify when online', 'รอที่ว่าง': 'Waiting for a slot', 'รอเซิร์ฟเปิด': 'Waiting to go online',
+    'ยกเลิก': 'Cancel', 'กดเพื่อยกเลิก': 'Click to cancel', 'ยกเลิกการแจ้งเตือนแล้ว': 'Notification cancelled', 'ตั้งแจ้งเตือนไม่สำเร็จ': 'Could not set the notification',
+    'ยกเลิกการแจ้งเตือน': 'Cancel notification', 'แจ้งเตือนเมื่อเซิร์ฟเปิด': 'Notify when online', 'แจ้งเตือนเมื่อมีที่ว่าง': 'Notify when a slot opens',
+    'ช่วยเหลือ': 'Help', 'เจอปัญหา หรืออยากได้ฟีเจอร์อะไร บอกผู้พัฒนาได้ที่นี่ (ต้องมีบัญชี GitHub ฟรี)': 'Found a problem or want a feature? Tell the developer here (requires a free GitHub account)',
+    'แจ้งปัญหา': 'Report a problem', 'เสนอฟีเจอร์': 'Suggest a feature', 'เว็บไซต์': 'Website',
   };
 
   // ข้อความที่มีตัวเลข/ชื่อแทรกอยู่
@@ -114,6 +120,10 @@
     [/^ผู้เล่นรวม ([\d,]+)$/, (m) => `${m[1]} players`],
     [/^อัปเดตเมื่อ (.*)$/, (m) => `updated ${m[1]}`],
     [/^เพิ่ม (.+) แล้ว$/, (m) => `Added ${m[1]}`],
+    [/^จะแจ้งเตือนเมื่อ (.+) มีที่ว่าง$/, (m) => `You'll be notified when ${m[1]} has a free slot`],
+    [/^จะแจ้งเตือนเมื่อ (.+) เปิด$/, (m) => `You'll be notified when ${m[1]} is online`],
+    [/^(.+) มีที่ว่างแล้ว!$/, (m) => `${m[1]} has a free slot!`],
+    [/^(.+) เปิดแล้ว!$/, (m) => `${m[1]} is online!`],
     [/^([\d,]+\/[\d,]+) ผู้เล่น$/, (m) => `${m[1]} players`],
     [/^(.+) —$/, (m) => `${tr(m[1])} —`],
   ];

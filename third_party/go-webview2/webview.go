@@ -48,6 +48,10 @@ type browser interface {
 	Hide() error
 }
 
+// OnMessage receives window messages not handled by the webview (e.g. tray icon callbacks).
+// Return true if handled.
+var OnMessage func(msg, wp, lp uintptr) bool
+
 // OnClose is called on WM_CLOSE; return false to keep the window open.
 var OnClose func() bool
 
@@ -288,6 +292,9 @@ func wndproc(hwnd, msg, wp, lp uintptr) uintptr {
 				lpmmi.PtMinTrackSize = w.minsz
 			}
 		default:
+			if OnMessage != nil && OnMessage(msg, wp, lp) {
+				return 0
+			}
 			r, _, _ := w32.User32DefWindowProcW.Call(hwnd, msg, wp, lp)
 			return r
 		}

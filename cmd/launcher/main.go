@@ -17,13 +17,14 @@ import (
 	"time"
 
 	webview2 "github.com/jchv/go-webview2"
+	"golang.org/x/sys/windows"
 )
 
 //go:embed web
 var webFS embed.FS
 
 // version ถูกแทนค่าตอน build ด้วย -ldflags "-X main.version=..."
-var version = "2.3.2"
+var version = "2.4.0"
 
 const (
 	appTitle = "FiveM Launcher"
@@ -66,6 +67,12 @@ func main() {
 
 	webview2.FramelessPopup = true
 	lastMin := false
+	webview2.OnMessage = handleTrayMessage
+	webview2.OnClose = func() bool {
+		trayRemove() // ไม่ให้ไอคอนค้างข้างนาฬิกาหลังปิดโปรแกรม
+		return true
+	}
+	go serverListJanitor()
 	webview2.OnMinimize = func(min bool) {
 		if wv == nil || min == lastMin {
 			return
@@ -259,7 +266,29 @@ func handle(method, raw string) (any, error) {
 	case "installUpdate":
 		return nil, installUpdate(arg[string](args, 0), arg[string](args, 1))
 	case "info":
-		return map[string]any{"version": version, "dataDir": dataDir}, nil
+		v := windows.RtlGetVersion()
+		return map[string]any{"version": version, "dataDir": dataDir, "os": fmt.Sprintf("Windows %d.%d build %d", v.MajorVersion, v.MinorVersion, v.BuildNumber)}, nil
+	case "setLang":
+		if l := arg[string](args, 0); l == "en" || l == "th" {
+			currentLang = l
+		}
+	case "watchStart":
+		var w watchItem
+		if len(args) > 0 && json.Unmarshal(args[0], &w) == nil && w.ID != "" && w.Address != "" {
+			if w.Connect == "" {
+				w.Connect = w.Address
+			}
+			if w.Kind != "online" {
+				w.Kind = "slot"
+			}
+			watchStart(&w)
+		}
+		return watchList(), nil
+	case "watchStop":
+		watchStop(arg[string](args, 0))
+		return watchList(), nil
+	case "watchList":
+		return watchList(), nil
 
 	case "exportData":
 		name := "fivem-launcher-backup-" + time.Now().Format("2006-01-02") + ".json"

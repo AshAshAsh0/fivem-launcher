@@ -42,6 +42,10 @@
     importData: () => call('importData'),
     checkUpdate: (repo) => call('checkUpdate', repo),
     browse: (o) => call('browse', o),
+    setLang: (l) => call('setLang', l),
+    watchStart: (w) => call('watchStart', w),
+    watchStop: (id) => call('watchStop', id),
+    watchList: () => call('watchList'),
     installUpdate: (url, ver) => call('installUpdate', url, ver),
   };
 

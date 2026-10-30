@@ -64,6 +64,7 @@
     async clearCache() { await wait(600); return { ok: true, freed: 729815040 }; },
     async metrics() { return { cpu: Math.random() * 0.4, ram: 420 + Math.random() * 15 }; },
     async setPerfMode() {}, async info() { return { version: '2.1.0' }; },
+    async setLang() {}, async watchStart() { return []; }, async watchStop() { return []; }, async watchList() { return []; },
     async browse(o) {
       await wait(o.offset ? 300 : 900);
       const names = ['เมืองหลวง RP', 'Bangkok Life', 'SCHOOL CITY', 'Neon Drift', 'โรงเรียนมัธยม RP', 'Sakura Town', 'Thai Police RP', 'Racing Club TH'];

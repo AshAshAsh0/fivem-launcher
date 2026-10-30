@@ -7,6 +7,7 @@ package main
 
 import (
 	"bufio"
+	"runtime/debug"
 	"encoding/binary"
 	"errors"
 	"fmt"
@@ -43,6 +44,22 @@ var serverList struct {
 	loading bool
 	err     error
 	done    chan struct{}
+	used    time.Time
+}
+
+// serverListJanitor คืน RAM ของรายชื่อเซิร์ฟ ถ้าไม่ได้ใช้หน้าค้นหาเกิน 10 นาที
+func serverListJanitor() {
+	for range time.Tick(time.Minute) {
+		serverList.Lock()
+		if serverList.items != nil && !serverList.loading && time.Since(serverList.used) > 10*time.Minute {
+			serverList.items = nil
+			serverList.fetched = time.Time{}
+			serverList.Unlock()
+			debug.FreeOSMemory()
+			continue
+		}
+		serverList.Unlock()
+	}
 }
 
 // ---------- protobuf (เฉพาะที่ต้องใช้) ----------
@@ -279,6 +296,7 @@ func fetchServerList() ([]*listServer, error) {
 // loadServerList คืนรายชื่อจากแคช (อายุ 5 นาที) หรือโหลดใหม่ — ถ้ามีการโหลดอยู่แล้วจะรอผลเดียวกัน
 func loadServerList(force bool) ([]*listServer, time.Time, error) {
 	serverList.Lock()
+	serverList.used = time.Now()
 	if !force && serverList.items != nil && time.Since(serverList.fetched) < 5*time.Minute {
 		items, at := serverList.items, serverList.fetched
 		serverList.Unlock()
