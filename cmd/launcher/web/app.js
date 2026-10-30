@@ -32,6 +32,9 @@
     download: '<svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>',
     upload: '<svg viewBox="0 0 24 24"><path d="M12 20V9M7 14l5-5 5 5M5 4h14"/></svg>',
     reset: '<svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.3-5.7"/><path d="M4 4v5h5"/></svg>',
+    folder2: '<svg viewBox="0 0 24 24"><path d="M3.5 7.5A2 2 0 0 1 5.5 5.5h4l2 2h7a2 2 0 0 1 2 2v7.5a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2Z"/><path d="M12 11v5M9.5 13.5h5"/></svg>',
+    chev: '<svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>',
+    grip: '<svg viewBox="0 0 24 24"><circle cx="9" cy="6" r="1.2" fill="currentColor"/><circle cx="15" cy="6" r="1.2" fill="currentColor"/><circle cx="9" cy="12" r="1.2" fill="currentColor"/><circle cx="15" cy="12" r="1.2" fill="currentColor"/><circle cx="9" cy="18" r="1.2" fill="currentColor"/><circle cx="15" cy="18" r="1.2" fill="currentColor"/></svg>',
     sparkle: '<svg viewBox="0 0 24 24"><path d="M12 3c.6 4.6 2.4 6.4 7 7-4.6.6-6.4 2.4-7 7-.6-4.6-2.4-6.4-7-7 4.6-.6 6.4-2.4 7-7Z" fill="currentColor" stroke="none"/></svg>',
     mark: '<svg viewBox="0 0 40 40"><path d="M13 30 21.2 9.5c.5-1.3 2.3-1.3 2.8 0L32 30" fill="none" stroke="currentColor" stroke-width="4.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 30h7.5" stroke="currentColor" stroke-width="4.4" stroke-linecap="round"/><path d="M22.6 21.5v8.5" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/></svg>',
   };
@@ -41,6 +44,7 @@
   const DEFAULT_SETTINGS = { lang: null, theme: 'mono', after: 'minimize', refresh: 15, perf: 'balanced', cursor: 'theme', motion: 'full', fivemPath: null };
   const state = {
     servers: [],
+    groups: [],
     settings: { ...DEFAULT_SETTINGS },
     page: 'home',
     filter: 'all',
@@ -56,7 +60,7 @@
   };
 
   function persist() {
-    api.save({ version: 1, servers: state.servers, settings: state.settings });
+    api.save({ version: 1, servers: state.servers, groups: state.groups, settings: state.settings });
   }
 
   // ---------- color ----------
@@ -75,6 +79,20 @@
   const isHex = (c) => typeof c === 'string' && /^#[0-9a-f]{6}$/i.test(c);
   const toneOf = (s) => (isHex(s.tone) ? s.tone : isHex(s.autoTone) ? s.autoTone : '#2c2c3a');
   // ตรวจข้อมูลที่โหลดจากไฟล์ (กันไฟล์สำรองที่เสียหรือถูกแก้มา)
+  function cleanGroups(list, servers) {
+    if (!Array.isArray(list)) list = [];
+    const out = [], seen = new Set();
+    for (const g of list) {
+      if (!g || typeof g !== 'object') continue;
+      const id = typeof g.id === 'string' && /^[a-z0-9]{4,40}$/i.test(g.id) && !seen.has(g.id) ? g.id : null;
+      const name = typeof g.name === 'string' ? g.name.trim().slice(0, 40) : '';
+      if (!id || !name) continue;
+      seen.add(id);
+      out.push({ id, name, collapsed: !!g.collapsed });
+    }
+    servers.forEach((s) => { if (s.group && !seen.has(s.group)) s.group = null; });
+    return out;
+  }
   function cleanServers(list) {
     if (!Array.isArray(list)) return [];
     const seen = new Set();
@@ -91,7 +109,7 @@
         discord: str(x.discord), bannerUrl: str(x.bannerUrl, 2000), logoUrl: str(x.logoUrl, 2000),
         logo: img(x.logo), banner: img(x.banner),
         tone: isHex(x.tone) ? x.tone : 'auto', autoTone: isHex(x.autoTone) ? x.autoTone : null,
-        fav: !!x.fav, lastPlayed: Number(x.lastPlayed) || null, addedAt: Number(x.addedAt) || Date.now(),
+        fav: !!x.fav, group: typeof x.group === 'string' ? x.group : null, lastPlayed: Number(x.lastPlayed) || null, addedAt: Number(x.addedAt) || Date.now(),
         status: x.status && typeof x.status === 'object' ? { online: !!x.status.online, players: Number(x.status.players) || 0, max: Number(x.status.max) || 0, ping: x.status.ping == null ? null : Number(x.status.ping) || 0 } : null,
       };
     });
@@ -191,6 +209,8 @@
 
   // ---------- navigation ----------
   function go(page) {
+    closeMenu();
+    closeModal();
     state.page = page;
     $$('.nav-btn').forEach((b) => b.classList.toggle('active', b.dataset.page === page));
     render(true);
@@ -313,7 +333,7 @@
   function cardHTML(s, i) {
     const t = toneOf(s), S = st(s), p = loadPct(s), logo = logoOf(s), banner = bannerOf(s);
     const full = S.online && S.max && S.players >= S.max;
-    return `<article class="card ${S.online ? '' : 'offline'}" style="${toneStyle(t)};--i:${i}" data-id="${s.id}" data-bell="${bellKind(s)}|${state.watching[s.id] || ''}">
+    return `<article class="card ${S.online ? '' : 'offline'}" ${state.page === 'home' ? 'draggable="true"' : ''} style="${toneStyle(t)};--i:${i}" data-id="${s.id}" data-bell="${bellKind(s)}|${state.watching[s.id] || ''}">
       <div class="banner">
         ${banner ? `<img class="bimg" src="${esc(banner)}" alt="" onerror="this.remove()">` : logo ? `<img class="blur-logo" src="${esc(logo)}" alt="">` : ''}
         <span class="js-st">${S.online ? '<span class="pill pill-ok">ออนไลน์</span>' : '<span class="pill pill-off">ออฟไลน์</span>'}</span>
@@ -342,8 +362,8 @@
     const q = state.q.trim().toLowerCase();
     return state.servers.filter((s) => {
       if (favOnly && !s.fav) return false;
-      if (state.filter === 'online' && !st(s).online) return false;
-      if (state.filter === 'fav' && !s.fav) return false;
+      if (!favOnly && state.filter === 'online' && !st(s).online) return false;
+      if (!favOnly && state.filter === 'fav' && !s.fav) return false;
       if (q && ![s.name, s.display, s.address, s.category, s.desc].join(' ').toLowerCase().includes(q)) return false;
       return true;
     });
@@ -357,7 +377,167 @@
     if (!list.length) {
       return `<div class="empty"><div><div class="em-mark">${favOnly ? I.heart : I.search}</div><b>${favOnly && !state.q ? 'ยังไม่มีเซิร์ฟโปรด' : 'ไม่พบเซิร์ฟเวอร์'}</b>${favOnly && !state.q ? 'กดหัวใจบนการ์ดเพื่อเพิ่มเข้าลิสต์นี้' : 'ลองเปลี่ยนคำค้นหรือตัวกรองดู'}</div></div>`;
     }
-    return `<div class="grid">${list.map(cardHTML).join('')}</div>`;
+    if (favOnly || !state.groups.length) return `<div class="grid" data-gid="">${list.map(cardHTML).join('')}</div>`;
+    // แบ่งตามกลุ่ม
+    const ids = new Set(state.groups.map((g) => g.id));
+    const searching = !!state.q.trim() || state.filter !== 'all';
+    let i = 0;
+    const section = (gid, name, items, g) => {
+      if (searching && !items.length) return '';
+      const cards = items.map((s) => cardHTML(s, i++)).join('');
+      return `<section class="grp ${g?.collapsed ? 'collapsed' : ''}" data-gid="${gid}">
+        <div class="grp-head" data-gid="${gid}">
+          ${g ? `<button class="grp-tog" data-grp="toggle" data-gid="${gid}" title="ย่อ/ขยายกลุ่ม">${I.chev}</button>` : ''}
+          <span class="grp-name" ${g ? 'data-no-i18n' : ''}>${esc(name)}</span><span class="grp-count">${items.length}</span>
+          ${g ? `<button class="grp-more" data-grp="menu" data-gid="${gid}" title="จัดการกลุ่ม">${I.more}</button>` : ''}
+        </div>
+        <div class="grid" data-gid="${gid}">${cards || '<div class="grp-empty">ลากการ์ดเซิร์ฟมาวางที่นี่</div>'}</div>
+      </section>`;
+    };
+    return state.groups.map((g) => section(g.id, g.name, list.filter((s) => s.group === g.id), g)).join('')
+      + section('', 'ไม่ได้จัดกลุ่ม', list.filter((s) => !s.group || !ids.has(s.group)), null);
+  }
+
+  // ---------- กลุ่ม & ลากเรียง ----------
+  const groupById = (id) => state.groups.find((g) => g.id === id);
+
+  function groupModal(g, thenMove) {
+    const m = modal(`
+      <div class="modal sm">
+        <div class="modal-head"><h2>${g ? 'เปลี่ยนชื่อกลุ่ม' : 'สร้างกลุ่มใหม่'}</h2><button class="x-btn" data-close>${I.x}</button></div>
+        <div class="modal-body">
+          <div class="field"><label>ชื่อกลุ่ม</label><input class="input" id="gName" maxlength="40" placeholder="เช่น เซิร์ฟหลัก, ลองเล่น" value="${esc(g?.name || '')}"></div>
+        </div>
+        <div class="modal-foot"><button class="btn" data-close>ยกเลิก</button><button class="btn btn-dark" id="gSave">${I.check} บันทึก</button></div>
+      </div>`);
+    const save = () => {
+      const name = $('#gName', m).value.trim().slice(0, 40);
+      if (!name) return $('#gName', m).focus();
+      if (g) g.name = name;
+      else {
+        const ng = { id: uid(), name, collapsed: false };
+        state.groups.push(ng);
+        if (thenMove) thenMove.group = ng.id;
+      }
+      persist(); closeModal(); updateHomeParts();
+      toast(g ? 'เปลี่ยนชื่อกลุ่มแล้ว' : 'สร้างกลุ่มแล้ว');
+    };
+    $('#gSave', m).addEventListener('click', save);
+    $('#gName', m).addEventListener('keydown', (e) => { if (e.key === 'Enter') save(); });
+    setTimeout(() => $('#gName', m)?.focus(), 50);
+  }
+
+  function groupMenu(anchor, g) {
+    showMenu(anchor, `
+      <button data-m="rename">${I.edit} เปลี่ยนชื่อกลุ่ม</button>
+      <button data-m="up" ${state.groups[0] === g ? 'disabled' : ''}>↑ เลื่อนกลุ่มขึ้น</button>
+      <button data-m="down" ${state.groups[state.groups.length - 1] === g ? 'disabled' : ''}>↓ เลื่อนกลุ่มลง</button>
+      <hr><button data-m="del" class="danger">${I.trash} ลบกลุ่ม</button>`, (k) => {
+      const i = state.groups.indexOf(g);
+      if (k === 'rename') return groupModal(g);
+      if (k === 'up' && i > 0) [state.groups[i - 1], state.groups[i]] = [state.groups[i], state.groups[i - 1]];
+      if (k === 'down' && i < state.groups.length - 1) [state.groups[i + 1], state.groups[i]] = [state.groups[i], state.groups[i + 1]];
+      if (k === 'del') {
+        state.servers.forEach((s) => { if (s.group === g.id) s.group = null; });
+        state.groups = state.groups.filter((x) => x !== g);
+        toast('ลบกลุ่มแล้ว (เซิร์ฟในกลุ่มย้ายไป “ไม่ได้จัดกลุ่ม”)');
+      }
+      persist(); updateHomeParts();
+    });
+  }
+
+  // ย้ายเซิร์ฟ id ไปไว้ก่อน/หลัง targetId (หรือท้ายกลุ่ม gid ถ้าไม่มี target)
+  function moveServer(id, targetId, after, gid) {
+    const s = byId(id);
+    endDrag();
+    if (!s || id === targetId) return;
+    const arr = state.servers.filter((x) => x !== s);
+    if (targetId) {
+      const t = byId(targetId);
+      s.group = t.group && groupById(t.group) ? t.group : null;
+      const ti = arr.indexOf(t);
+      arr.splice(after ? ti + 1 : ti, 0, s);
+    } else {
+      s.group = gid || null;
+      let last = -1;
+      arr.forEach((x, i) => { if ((x.group && groupById(x.group) ? x.group : '') === (gid || '')) last = i; });
+      arr.splice(last + 1, 0, s);
+    }
+    state.servers = arr;
+    persist();
+    updateHomeParts();
+  }
+
+  let dragId = null;
+  // จบสถานะลาก (ต้องเรียกเองด้วย เพราะการ์ดที่ถูกลากอาจถูกวาดใหม่ก่อน dragend จะมาถึง)
+  function endDrag() {
+    dragId = null;
+    document.body.classList.remove('dnd');
+    $$('.dragging').forEach((e) => e.classList.remove('dragging'));
+    clearDropMarks();
+  }
+  document.addEventListener('dragend', endDrag, true);
+  document.addEventListener('drop', () => setTimeout(endDrag, 0), true);
+  function clearDropMarks() {
+    $$('.drop-before, .drop-after, .drop-into').forEach((e) => e.classList.remove('drop-before', 'drop-after', 'drop-into'));
+  }
+  function bindDnD() {
+    $$('.card[draggable]').forEach((c) => {
+      c.addEventListener('dragstart', (e) => {
+        if (e.target.closest('button')) { e.preventDefault(); return; }
+        dragId = c.dataset.id;
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('application/x-fl-server', dragId);
+        c.style.transform = '';
+        document.body.classList.add('dnd');
+        setTimeout(() => c.classList.add('dragging'), 0);
+      });
+      c.addEventListener('dragend', () => {
+        dragId = null;
+        c.classList.remove('dragging');
+        document.body.classList.remove('dnd');
+        clearDropMarks();
+      });
+      c.addEventListener('dragover', (e) => {
+        if (!dragId || dragId === c.dataset.id) return;
+        e.preventDefault(); e.stopPropagation();
+        const r = c.getBoundingClientRect();
+        const after = e.clientX > r.left + r.width / 2;
+        clearDropMarks();
+        c.classList.add(after ? 'drop-after' : 'drop-before');
+      });
+      c.addEventListener('drop', (e) => {
+        if (!dragId) return;
+        e.preventDefault(); e.stopPropagation();
+        const after = c.classList.contains('drop-after');
+        const id = dragId;
+        clearDropMarks();
+        moveServer(id, c.dataset.id, after);
+      });
+    });
+    $$('.grid[data-gid], .grp-head').forEach((z) => {
+      z.addEventListener('dragover', (e) => {
+        if (!dragId) return;
+        e.preventDefault();
+        clearDropMarks();
+        (z.classList.contains('grid') ? z : z.nextElementSibling)?.classList.add('drop-into');
+      });
+      z.addEventListener('drop', (e) => {
+        if (!dragId) return;
+        e.preventDefault();
+        const id = dragId;
+        clearDropMarks();
+        moveServer(id, null, true, z.dataset.gid || '');
+      });
+    });
+    $$('[data-grp="toggle"]').forEach((b) => (b.onclick = () => {
+      const g = groupById(b.dataset.gid);
+      if (!g) return;
+      g.collapsed = !g.collapsed;
+      b.closest('.grp').classList.toggle('collapsed', g.collapsed);
+      persist();
+    }));
+    $$('[data-grp="menu"]').forEach((b) => (b.onclick = (e) => { e.stopPropagation(); const g = groupById(b.dataset.gid); if (g) groupMenu(b, g); }));
   }
 
   function homeHTML(favOnly) {
@@ -374,6 +554,7 @@
           <button data-f="online" class="${state.filter === 'online' ? 'on' : ''}">ออนไลน์</button>
           <button data-f="fav" class="${state.filter === 'fav' ? 'on' : ''}">โปรด</button>
         </div>`}
+        ${favOnly ? '' : `<button class="icon-btn" data-act="new-group" title="สร้างกลุ่ม">${I.folder2}</button>`}
         <button class="icon-btn ${state.refreshing ? 'spin' : ''}" data-act="refresh" id="btnRefresh" title="รีเฟรชสถานะ">${I.refresh}</button>
       </div>
       <div id="gridWrap">${gridHTML(favOnly)}</div>`;
@@ -738,6 +919,7 @@
     $$('[data-act="add"]').forEach((b) => b.addEventListener('click', () => openServerModal()));
     $$('[data-act="open-fivem"]').forEach((b) => b.addEventListener('click', () => { api.openFiveM(); toast('กำลังเปิด FiveM'); }));
     $('[data-act="refresh"]')?.addEventListener('click', () => refreshAll(true));
+    $('[data-act="new-group"]')?.addEventListener('click', () => groupModal(null));
     const q = $('#q');
     if (q) q.addEventListener('input', () => { state.q = q.value; const gw = $('#gridWrap'); gw.innerHTML = gridHTML(state.page === 'favorites'); bindCards(); });
     $$('#filters button').forEach((b) => b.addEventListener('click', () => {
@@ -762,13 +944,14 @@
       });
       $('[data-act="dl-fivem"]').addEventListener('click', () => api.openExternal(CFG.fivemDownloadUrl));
       $('[data-act="export"]').addEventListener('click', async () => {
-        if (await api.exportData({ app: 'fivem-launcher', version: 1, servers: state.servers, settings: state.settings })) toast('ส่งออกข้อมูลแล้ว');
+        if (await api.exportData({ app: 'fivem-launcher', version: 1, servers: state.servers, groups: state.groups, settings: state.settings })) toast('ส่งออกข้อมูลแล้ว');
       });
       $('[data-act="import"]').addEventListener('click', async () => {
         const d = await api.importData();
         if (!d) return;
         if (d.error || !Array.isArray(d.servers)) return toast('ไฟล์ไม่ถูกต้อง', 'err');
         state.servers = cleanServers(d.servers);
+        state.groups = cleanGroups(d.groups, state.servers);
         state.settings = { ...DEFAULT_SETTINGS, ...(d.settings || {}) };
         applyPrefs(); persist(); render(); restartAuto(); refreshAll();
         toast(`นำเข้า ${d.servers.length} เซิร์ฟเวอร์แล้ว`);
@@ -794,6 +977,7 @@
       </div>`);
     $('#doReset', m).addEventListener('click', () => {
       state.servers = [];
+      state.groups = [];
       state.settings = { ...DEFAULT_SETTINGS };
       applyPrefs(); persist(); closeModal(); render(); restartAuto();
       toast('รีเซ็ตเรียบร้อย');
@@ -829,6 +1013,7 @@
     if (state.settings.motion === 'full') {
       $$('.card').forEach((c) => {
         c.onmousemove = (e) => {
+          if (document.body.classList.contains('dnd')) return;
           const r = c.getBoundingClientRect();
           const x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5;
           c.style.transform = `perspective(900px) rotateX(${(-y * 4).toFixed(2)}deg) rotateY(${(x * 5).toFixed(2)}deg) translateY(-4px)`;
@@ -836,44 +1021,67 @@
         c.onmouseleave = () => { c.style.transform = ''; };
       });
     }
+    bindDnD();
   }
 
   const byId = (id) => state.servers.find((s) => s.id === id);
 
   // ---------- menu ----------
   function closeMenu() { $('#menuLayer').innerHTML = ''; }
-  function openMenu(anchor, s) {
+  function showMenu(anchor, html, onPick) {
     closeMenu();
     const r = anchor.getBoundingClientRect();
     const m = document.createElement('div');
     m.className = 'menu';
-    m.innerHTML = `
+    m.innerHTML = html;
+    $('#menuLayer').appendChild(m);
+    // ไม่ให้เมนูลอยทับแถบหัวหน้าต่าง
+    const tb = document.querySelector('.titlebar');
+    const minTop = tb ? Math.max(10, tb.getBoundingClientRect().bottom + 4) : 10;
+    const room = innerHeight - minTop - 10;
+    const mw = m.offsetWidth, mh = Math.min(m.offsetHeight, room);
+    let top = r.bottom + 8;
+    if (top + mh > innerHeight - 10) top = r.top - mh - 8;
+    top = Math.max(minTop, Math.min(top, innerHeight - mh - 10));
+    m.style.maxHeight = `${room}px`;
+    m.style.left = `${Math.max(10, Math.min(r.right - mw, innerWidth - mw - 10))}px`;
+    m.style.top = `${top}px`;
+    m.addEventListener('click', (e) => {
+      const b = e.target.closest('button');
+      if (!b || b.disabled) return;
+      closeMenu();
+      onPick(b.dataset.m, b);
+    });
+  }
+
+  function openMenu(anchor, s) {
+    const cur = s.group && groupById(s.group) ? s.group : '';
+    const mark = (on) => (on ? I.check : '<i class="mk"></i>');
+    const groups = state.groups.length
+      ? `<hr><div class="menu-label">ย้ายไปกลุ่ม</div>
+         ${state.groups.map((g) => `<button data-m="grp" data-g="${g.id}">${mark(cur === g.id)} <span data-no-i18n>${esc(g.name)}</span></button>`).join('')}
+         <button data-m="grp" data-g="">${mark(!cur)} ไม่ได้จัดกลุ่ม</button>
+         <button data-m="newgrp">${I.folder2} กลุ่มใหม่...</button>`
+      : `<button data-m="newgrp">${I.folder2} ย้ายไปกลุ่มใหม่...</button>`;
+    showMenu(anchor, `
       <button data-m="edit">${I.edit} แก้ไข</button>
       <button data-m="copy">${I.copy} คัดลอกที่อยู่</button>
       ${s.discord ? `<button data-m="discord">${I.discord} เปิด Discord</button>` : ''}
       <button data-m="refresh">${I.refresh} รีเฟรชเซิร์ฟนี้</button>
       ${state.watching[s.id] ? `<button data-m="watch">🔔 ยกเลิกการแจ้งเตือน</button>` : bellKind(s) ? `<button data-m="watch">🔔 ${bellKind(s) === 'online' ? 'แจ้งเตือนเมื่อเซิร์ฟเปิด' : 'แจ้งเตือนเมื่อมีที่ว่าง'}</button>` : ''}
-      <hr><button data-m="del" class="danger">${I.trash} ลบเซิร์ฟเวอร์</button>`;
-    $('#menuLayer').appendChild(m);
-    const mw = m.offsetWidth, mh = m.offsetHeight;
-    let left = r.right - mw, top = r.bottom + 8;
-    if (top + mh > innerHeight - 10) top = r.top - mh - 8;
-    m.style.left = `${Math.max(10, left)}px`;
-    m.style.top = `${top}px`;
-    m.addEventListener('click', async (e) => {
-      const b = e.target.closest('button');
-      if (!b) return;
-      closeMenu();
-      const k = b.dataset.m;
+      ${groups}
+      <hr><button data-m="del" class="danger">${I.trash} ลบเซิร์ฟเวอร์</button>`, async (k, b) => {
       if (k === 'edit') openServerModal(s);
-      if (k === 'copy') { await navigator.clipboard.writeText(s.connect || s.address); toast('คัดลอกที่อยู่แล้ว'); }
+      if (k === 'copy') { try { await navigator.clipboard.writeText(s.connect || s.address); toast('คัดลอกที่อยู่แล้ว'); } catch { toast('คัดลอกไม่สำเร็จ', 'err'); } }
       if (k === 'discord') api.openExternal(normUrl(s.discord));
-      if (k === 'refresh') { await refreshOne(s, true); updateHomeParts(); }
+      if (k === 'refresh') { await refreshOne(s, true); persist(); updateHomeParts(); }
       if (k === 'del') confirmDelete(s);
       if (k === 'watch') toggleWatch(s);
+      if (k === 'grp') { s.group = b.dataset.g || null; persist(); updateHomeParts(); }
+      if (k === 'newgrp') groupModal(null, s);
     });
   }
-  document.addEventListener('mousedown', (e) => { if (!e.target.closest('.menu') && !e.target.closest('.more-btn')) closeMenu(); });
+  document.addEventListener('mousedown', (e) => { if (!e.target.closest('.menu, .more-btn, .grp-more')) closeMenu(); });
   document.getElementById('scroll').addEventListener('wheel', closeMenu, { passive: true });
   window.addEventListener('resize', closeMenu);
 
@@ -1224,6 +1432,7 @@
     const saved = await api.load();
     if (saved) {
       state.servers = cleanServers(saved.servers);
+      state.groups = cleanGroups(saved.groups, state.servers);
       state.settings = { ...DEFAULT_SETTINGS, ...(saved.settings || {}) };
     }
     applyPrefs();

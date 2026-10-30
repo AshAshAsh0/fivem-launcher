@@ -101,6 +101,14 @@
     'ยกเลิกการแจ้งเตือน': 'Cancel notification', 'แจ้งเตือนเมื่อเซิร์ฟเปิด': 'Notify when online', 'แจ้งเตือนเมื่อมีที่ว่าง': 'Notify when a slot opens',
     'ช่วยเหลือ': 'Help', 'เจอปัญหา หรืออยากได้ฟีเจอร์อะไร บอกผู้พัฒนาได้ที่นี่ (ต้องมีบัญชี GitHub ฟรี)': 'Found a problem or want a feature? Tell the developer here (requires a free GitHub account)',
     'แจ้งปัญหา': 'Report a problem', 'เสนอฟีเจอร์': 'Suggest a feature', 'เว็บไซต์': 'Website',
+    // groups
+    'สร้างกลุ่ม': 'New group', 'สร้างกลุ่มใหม่': 'New group', 'เปลี่ยนชื่อกลุ่ม': 'Rename group', 'ชื่อกลุ่ม': 'Group name',
+    'เช่น เซิร์ฟหลัก, ลองเล่น': 'e.g. Main, Trying out', 'สร้างกลุ่มแล้ว': 'Group created', 'เปลี่ยนชื่อกลุ่มแล้ว': 'Group renamed',
+    '↑ เลื่อนกลุ่มขึ้น': '↑ Move group up', '↓ เลื่อนกลุ่มลง': '↓ Move group down', 'ลบกลุ่ม': 'Delete group',
+    'ลบกลุ่มแล้ว (เซิร์ฟในกลุ่มย้ายไป “ไม่ได้จัดกลุ่ม”)': 'Group deleted (its servers moved to “Ungrouped”)',
+    'ไม่ได้จัดกลุ่ม': 'Ungrouped', 'ย้ายไปกลุ่ม': 'Move to group', 'กลุ่มใหม่...': 'New group...', 'ย้ายไปกลุ่มใหม่...': 'Move to a new group...',
+    'ลากการ์ดเซิร์ฟมาวางที่นี่': 'Drag server cards here', 'ย่อ/ขยายกลุ่ม': 'Collapse/expand', 'จัดการกลุ่ม': 'Group options',
+    'คัดลอกไม่สำเร็จ': 'Copy failed',
   };
 
   // ข้อความที่มีตัวเลข/ชื่อแทรกอยู่

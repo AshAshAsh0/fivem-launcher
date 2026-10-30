@@ -601,7 +601,6 @@ textarea.input { height: 84px; padding: 14px 20px; resize: none; line-height: 1.
 
 /* ================= TOAST ================= */
 .toasts { position: fixed; bottom: 76px; right: 26px; z-index: 80; display: flex; flex-direction: column; gap: 10px; align-items: flex-end; pointer-events: none; max-width: min(520px, calc(100vw - 140px)); }
-.toast { pointer-events: auto; }
 .toast {
   display: flex; align-items: center; gap: 12px;
   padding: 10px 18px 10px 10px; border-radius: 18px;
@@ -682,3 +681,30 @@ html[data-motion='full'] .pill-bell.on { animation: ring 2.4s ease-in-out infini
 .foot-upd .fu-ic { display: grid; place-items: center; color: var(--accent); }
 .foot-upd .fu-ic svg { width: 16px; height: 16px; }
 .foot-upd .btn-sm { height: 30px; padding: 0 12px; }
+
+/* ================= GROUPS & DRAG ================= */
+.grp { margin-bottom: 26px; }
+.grp-head { display: flex; align-items: center; gap: 10px; margin: 2px 0 12px; min-height: 34px; }
+.grp-name { font-family: var(--font-head); font-weight: 800; font-size: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.grp-count { font: 700 12px var(--font-mono); color: var(--muted); background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); border-radius: 99px; padding: 2px 9px; }
+.grp-tog, .grp-more { width: 30px; height: 30px; border-radius: 10px; display: grid; place-items: center; color: var(--ink-2); }
+.grp-tog:hover, .grp-more:hover { background: var(--surface-3); color: var(--ink); }
+.grp-tog svg { width: 18px; height: 18px; transition: transform .2s; }
+.grp.collapsed .grp-tog svg { transform: rotate(-90deg); }
+.grp.collapsed .grid { display: none; }
+.grp-head::after { content: ''; flex: 1; height: 1px; background: var(--line); margin-left: 6px; order: 9; }
+.grp-more { order: 10; }
+.grp-empty { grid-column: 1 / -1; border: 2px dashed var(--line-2); border-radius: var(--radius-lg); padding: 26px; text-align: center; color: var(--muted); font-size: 13px; }
+.card[draggable="true"] { cursor: grab; }
+.card.dragging { opacity: .35; transform: none !important; }
+.card.drop-before::before, .card.drop-after::after {
+  content: ''; position: absolute; top: 8%; bottom: 8%; width: 5px; border-radius: 9px; background: var(--accent); z-index: 5;
+}
+.card.drop-before::before { left: -13px; }
+.card.drop-after::after { right: -13px; }
+.grid.drop-into { outline: 2.5px dashed var(--accent); outline-offset: 8px; border-radius: var(--radius-xl); }
+body.dnd .card * { pointer-events: none; }
+.menu { overflow-y: auto; }
+.menu-label { font-size: 11.5px; color: var(--muted); padding: 6px 12px 2px; font-weight: 600; }
+.menu .mk { display: inline-block; width: 18px; }
+.menu button:disabled { opacity: .4; }

@@ -60,6 +60,10 @@
   // ปิดเมนูคลิกขวา/ซูมด้วย Ctrl+ล้อเมาส์ ให้เหมือนโปรแกรมทั่วไป
   document.addEventListener('contextmenu', (e) => { if (!e.target.closest('input, textarea')) e.preventDefault(); });
   window.addEventListener('wheel', (e) => { if (e.ctrlKey) e.preventDefault(); }, { passive: false });
+  // กันการลากไฟล์จากเครื่องมาวางในหน้าต่าง (ไม่งั้น WebView จะเปิดไฟล์นั้นแทนหน้าโปรแกรม)
+  ['dragover', 'drop'].forEach((ev) => window.addEventListener(ev, (e) => {
+    if (e.dataTransfer && [...(e.dataTransfer.types || [])].includes('Files')) { e.preventDefault(); e.dataTransfer.dropEffect = 'none'; }
+  }));
   // กันปุ่มลัดของเบราว์เซอร์ (รีโหลด, พิมพ์, เครื่องมือนักพัฒนา, ซูม)
   window.addEventListener('keydown', (e) => {
     const k = e.key.toLowerCase();
