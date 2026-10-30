@@ -35,6 +35,7 @@
     folder2: '<svg viewBox="0 0 24 24"><path d="M3.5 7.5A2 2 0 0 1 5.5 5.5h4l2 2h7a2 2 0 0 1 2 2v7.5a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2Z"/><path d="M12 11v5M9.5 13.5h5"/></svg>',
     sliders: '<svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>',
     gamepad: '<svg viewBox="0 0 24 24"><path d="M7.5 7h9a4.5 4.5 0 0 1 4.4 5.4l-.9 4.3a2.3 2.3 0 0 1-4 1l-1.6-1.9h-5l-1.6 1.9a2.3 2.3 0 0 1-4-1l-.9-4.3A4.5 4.5 0 0 1 7.5 7Z"/><path d="M8 10.5v3M6.5 12h3"/><circle cx="15.5" cy="11" r=".6" fill="currentColor"/><circle cx="17" cy="13" r=".6" fill="currentColor"/></svg>',
+    chevs: '<svg viewBox="0 0 24 24"><path d="m6 6 6 6-6 6M13 6l6 6-6 6"/></svg>',
     filter: '<svg viewBox="0 0 24 24"><path d="M4 6.5h16M7 12h10M10 17.5h4"/></svg>',
     star: '<svg viewBox="0 0 24 24"><path d="m12 3.8 2.5 5.1 5.6.8-4 3.9 1 5.6-5.1-2.7-5 2.7 1-5.6-4.1-3.9 5.6-.8Z"/></svg>',
     sparkle: '<svg viewBox="0 0 24 24"><path d="M12 3c.6 4.6 2.4 6.4 7 7-4.6.6-6.4 2.4-7 7-.6-4.6-2.4-6.4-7-7 4.6-.6 6.4-2.4 7-7Z" fill="currentColor" stroke="none"/></svg>',
@@ -393,8 +394,9 @@
     return `<div class="b-row ${s.private ? 'priv' : ''}" data-id="${esc(s.id)}">
       <div class="b-ic"><span>${esc(initial(s.name))}</span>${s.icon ? `<img src="${esc(imgSrc(s.icon))}" alt="" loading="lazy">` : ''}</div>
       <div class="b-main"><div class="b-name" title="${esc(s.name)}" data-no-i18n>${esc(s.name)}</div><div class="b-sub" title="${esc(sub)}" data-no-i18n>${esc(sub)}</div></div>
-      <div class="b-st">${stChip(true, s.players, s.max, s.private)}</div>
       <div class="b-pl">${plHTML(s.players, s.max, true)}</div>
+      <i class="b-chev">${I.chevs}</i>
+      <div class="b-st">${stChip(true, s.players, s.max, s.private)}</div>
     </div>`;
   }
 
@@ -544,8 +546,9 @@
     return `<div class="b-row mine ${S.online ? '' : 'offline'} ${sel ? 'sel' : ''}" data-mid="${s.id}" title="ดับเบิลคลิกเพื่อเข้าเซิร์ฟ">
       <div class="b-ic" style="background:${toneOf(s)}"><span>${esc(initial(s.name))}</span>${logo ? `<img src="${esc(logo)}" alt="">` : ''}</div>
       <div class="b-main"><div class="b-name" data-no-i18n>${esc(s.name)}</div><div class="b-sub" data-no-i18n>${esc(s.display || s.address)}${s.lastPlayed ? ` · ${esc(ago(s.lastPlayed))}` : ''}</div></div>
-      <div class="b-st js-stc">${s.status ? stChip(S.online, S.players, S.max, false) : '<span class="stc stc-off"><i></i>…</span>'}</div>
       <div class="b-pl">${plHTML(S.players, S.max, S.online)}</div>
+      <i class="b-chev">${I.chevs}</i>
+      <div class="b-st js-stc">${s.status ? stChip(S.online, S.players, S.max, false) : '<span class="stc stc-off"><i></i>…</span>'}</div>
     </div>`;
   }
   function bindMine(root) {
