@@ -656,7 +656,13 @@
   }
   function patchAll() {
     if (state.page === 'browse') {
-      $$('.b-row[data-mid]').forEach((r) => { const s = byId(r.dataset.mid); if (s) { patchStatus(r, s, true); const stEl = r.querySelector('.js-st'); if (stEl) stEl.innerHTML = st(s).online ? '' : '<span class="pill pill-off">ออฟไลน์</span>'; } });
+      $$('.b-row[data-mid]').forEach((r) => {
+        const s = byId(r.dataset.mid); if (!s) return;
+        const S = st(s);
+        patchStatus(r, s, true);
+        const c = r.querySelector('.js-stc'); if (c) c.innerHTML = stChip(S.online, S.players, S.max, false);
+        if (!S.online) { const pl = r.querySelector('.js-pl'); if (pl) pl.textContent = '—'; const b = r.querySelector('.js-bar'); if (b) b.style.width = '0%'; }
+      });
       return;
     }
     if (state.page === 'settings') return;
@@ -722,10 +728,10 @@
     const title = isEN()
       ? `<h1 class="h1">Choose a <span class="sq">server${SQUIGGLE}</span></h1>`
       : `<h1 class="h1">เลือก<span class="sq">เซิร์ฟ${SQUIGGLE}</span></h1>`;
+    void title;
     return `
-      <div class="page-head"><div>${title}<p class="sub">เลือกเซิร์ฟแล้วกดเล่น หรือดับเบิลคลิกเพื่อเข้าทันที</p></div></div>
       <div class="toolbar">
-        <label class="search">${I.search}<input id="bq" placeholder="พิมพ์ชื่อเซิร์ฟ แนวเซิร์ฟ หรือวาง IP / ลิงก์ cfx.re" value="${esc(B.q)}" spellcheck="false"></label>
+        <label class="search ${B.q ? 'has' : ''}" id="bSearch">${I.search}<input id="bq" placeholder="ค้นหาชื่อเซิร์ฟ หรือวาง IP / ลิงก์ cfx.re" value="${esc(B.q)}" spellcheck="false"><button class="q-clear" id="bqClear" title="ล้างคำค้นหา">${I.x}</button></label>
         <div class="seg" id="bRegion">
           <button data-r="th" class="${B.region === 'th' ? 'on' : ''}">เซิร์ฟไทย</button>
           <button data-r="all" class="${B.region === 'all' ? 'on' : ''}">ทั้งหมด</button>
@@ -735,9 +741,9 @@
       ${state.fivem && state.fivem.found === false ? `<div class="fivem-miss">${I.x}<span><b>ไม่พบ FiveM ในเครื่องนี้</b><small>ต้องติดตั้ง FiveM ก่อนถึงจะเข้าเซิร์ฟได้ ถ้าติดตั้งไว้ที่อื่น เลือกไฟล์ FiveM.exe เองได้</small></span><button class="btn btn-sm btn-dark" data-act="dl-fivem2">${I.ext} ดาวน์โหลด FiveM</button><button class="btn btn-sm" data-act="pick-fivem2">${I.folder2} เลือกไฟล์</button></div>` : ''}
       <div class="b-filters">
         <div class="b-meta" id="bMeta"></div>
-        <label class="b-chk"><input type="checkbox" id="fPriv" ${state.settings.bHidePrivate ? 'checked' : ''}><span>ซ่อนเซิร์ฟส่วนตัว</span></label>
+ <div class="b-fl"><label class="b-chk"><input type="checkbox" id="fPriv" ${state.settings.bHidePrivate ? 'checked' : ''}><span>ซ่อนเซิร์ฟส่วนตัว</span></label>
         <label class="b-chk"><input type="checkbox" id="fFull" ${state.settings.bHideFull ? 'checked' : ''}><span>ซ่อนเซิร์ฟเต็ม</span></label>
-        <div class="seg sm" id="bSort"><button data-s="players" class="${state.settings.bSort !== 'name' ? 'on' : ''}">คนเยอะสุด</button><button data-s="name" class="${state.settings.bSort === 'name' ? 'on' : ''}">ชื่อ ก-ฮ</button></div>
+        <div class="seg sm" id="bSort"><button data-s="players" class="${state.settings.bSort !== 'name' ? 'on' : ''}">คนเยอะสุด</button><button data-s="name" class="${state.settings.bSort === 'name' ? 'on' : ''}">ชื่อ ก-ฮ</button></div></div>
       </div>
       <div class="b-split ${B.sel ? 'open' : ''}" id="bSplit">
         <aside class="sv-side" id="svSide"></aside>
@@ -746,14 +752,26 @@
   }
 
   function browseRow(s) {
-    const p = s.max ? Math.min(100, Math.round((s.players / s.max) * 100)) : 0;
     const sub = s.desc || s.tags.split(',').map((t) => t.trim()).filter(Boolean).slice(0, 6).join(' · ') || joinOf(s.id);
-    return `<div class="b-row" data-id="${esc(s.id)}">
+    return `<div class="b-row ${s.private ? 'priv' : ''}" data-id="${esc(s.id)}">
       <div class="b-ic"><span>${esc(initial(s.name))}</span>${s.icon ? `<img src="${esc(imgSrc(s.icon))}" alt="" loading="lazy">` : ''}</div>
-      <div class="b-main"><div class="b-name" title="${esc(s.name)}">${s.private ? '<span class="b-lock">🔒 ส่วนตัว</span>' : ''}<span data-no-i18n>${esc(s.name)}</span></div><div class="b-sub" title="${esc(sub)}" data-no-i18n>${esc(sub)}</div></div>
-      <div class="b-pl"><div><b>${fmtNum(s.players)}</b> / ${fmtNum(s.max)}</div><div class="bar"><i style="width:${p}%;--barc:${barColor(p)}"></i></div></div>
+      <div class="b-main"><div class="b-name" title="${esc(s.name)}" data-no-i18n>${esc(s.name)}</div><div class="b-sub" title="${esc(sub)}" data-no-i18n>${esc(sub)}</div></div>
+      <div class="b-st">${stChip(true, s.players, s.max, s.private)}</div>
+      <div class="b-pl">${plHTML(s.players, s.max, true)}</div>
+      <div class="b-act"></div>
 
     </div>`;
+  }
+
+  // สถานะเซิร์ฟแบบชัด ๆ: ออนไลน์ (เขียว) / ใกล้เต็ม (ส้ม) / เต็ม (แดง) / ออฟไลน์ (เทา) / ส่วนตัว (เหลือง)
+  function stChip(online, players, max, priv) {
+    const p = max ? players / max : 0;
+    const [k, label] = priv ? ['priv', 'ส่วนตัว'] : !online ? ['off', 'ออฟไลน์'] : max && players >= max ? ['full', 'เต็ม'] : p >= 0.85 ? ['busy', 'ใกล้เต็ม'] : ['ok', 'ออนไลน์'];
+    return `<span class="stc stc-${k}">${priv ? '<b>🔒</b>' : '<i></i>'}<span>${label}</span></span>`;
+  }
+  function plHTML(players, max, online) {
+    const p = max ? Math.min(100, Math.round((players / max) * 100)) : 0;
+    return `<div class="pl-n"><b class="js-pl">${online === false ? '—' : fmtNum(players)}</b><span>/<span class="js-max">${fmtNum(max)}</span></span></div><div class="bar"><i class="js-bar" style="width:${online === false ? 0 : p}%;--barc:${barColor(p)}"></i></div>`;
   }
 
   // ช่องค้นหาเป็นที่อยู่เซิร์ฟ (IP:พอร์ต, โดเมน, ลิงก์ cfx.re, คำสั่ง connect) → เข้าได้ตรง ๆ
@@ -798,14 +816,13 @@
       <div class="sv-banner">
         ${s.banner ? `<img src="${esc(imgSrc(s.banner))}" alt="">` : s.icon ? `<img class="blur" src="${esc(imgSrc(s.icon))}" alt="">` : ''}
         <button class="x-btn" id="svClose" title="ปิด">${I.x}</button>
-        ${s.private ? '<span class="b-lock sv-lock">🔒 ส่วนตัว</span>' : ''}
       </div>
       <div class="sv-head">
         <div class="sv-ic"><span>${esc(initial(s.name))}</span>${s.icon ? `<img src="${esc(imgSrc(s.icon))}" alt="">` : ''}</div>
       </div>
       <div class="sv-title">
         <h2 data-no-i18n title="${esc(s.name)}">${esc(s.name)}</h2>
-        <div class="sv-tags">${s.locale ? `<span class="pill pill-mono" data-no-i18n>${esc(s.locale.replace('_', '-'))}</span>` : ''}${tags.map((t) => `<span class="pill pill-mono" data-no-i18n>${esc(t)}</span>`).join('')}</div>
+        <div class="sv-tags">${stChip(true, s.players, s.max, s.private)}${s.locale ? `<span class="pill pill-mono" data-no-i18n>${esc(s.locale.replace('_', '-'))}</span>` : ''}${tags.map((t) => `<span class="pill pill-mono" data-no-i18n>${esc(t)}</span>`).join('')}</div>
       </div>
       <div class="sv-body">
         <div class="sv-stats">
@@ -867,11 +884,12 @@
     return head + parts + (loose.length ? `<div class="mine-grp"><span>ไม่ได้จัดกลุ่ม</span><i>${loose.length}</i></div>` + loose.map(mineRow).join('') : '');
   }
   function mineRow(s) {
-    const S = st(s), p = loadPct(s), logo = logoOf(s), sel = state.browse.sel === 'm:' + s.id;
+    const S = st(s), logo = logoOf(s), sel = state.browse.sel === 'm:' + s.id;
     return `<div class="b-row mine ${S.online ? '' : 'offline'} ${sel ? 'sel' : ''}" data-mid="${s.id}" title="ดับเบิลคลิกเพื่อเข้าเซิร์ฟ">
-      <div class="b-ic" style="background:${toneOf(s)}"><span>${esc(initial(s.name))}</span>${logo ? `<img src="${esc(logo)}" alt="">` : ''}<i class="sr-dot"></i></div>
-      <div class="b-main"><div class="b-name"><span class="b-mine">★ ของฉัน</span><span data-no-i18n>${esc(s.name)}</span></div><div class="b-sub" data-no-i18n>${esc(s.display || s.address)}${s.lastPlayed ? ` · ${esc(ago(s.lastPlayed))}` : ''}</div></div>
-      <div class="b-pl"><div><b class="js-pl">${fmtNum(S.players)}</b> / <span class="js-max">${fmtNum(S.max)}</span> <span class="js-st b-st">${S.online ? '' : '<span class="pill pill-off">ออฟไลน์</span>'}</span></div><div class="bar"><i class="js-bar" style="width:${p}%;--barc:${barColor(p)}"></i></div></div>
+      <div class="b-ic" style="background:${toneOf(s)}"><span>${esc(initial(s.name))}</span>${logo ? `<img src="${esc(logo)}" alt="">` : ''}</div>
+      <div class="b-main"><div class="b-name" data-no-i18n>${esc(s.name)}</div><div class="b-sub" data-no-i18n>${esc(s.display || s.address)}${s.lastPlayed ? ` · ${esc(ago(s.lastPlayed))}` : ''}</div></div>
+      <div class="b-st js-stc">${s.status ? stChip(S.online, S.players, S.max, false) : '<span class="stc stc-off"><i></i>…</span>'}</div>
+      <div class="b-pl">${plHTML(S.players, S.max, S.online)}</div>
       <div class="b-act"><button class="more-btn" data-act="more" data-id="${s.id}" title="เพิ่มเติม">${I.more}</button></div>
     </div>`;
   }
@@ -912,11 +930,10 @@
       <div class="sv-banner" style="background:linear-gradient(135deg, ${shade(t, 0.4)}, ${t})">
         ${banner ? `<img src="${esc(banner)}" alt="">` : logo ? `<img class="blur" src="${esc(logo)}" alt="">` : ''}
         <button class="x-btn" id="svClose" title="ปิด">${I.x}</button>
-        <span class="b-mine sv-lock">★ เซิร์ฟของฉัน</span>
       </div>
       <div class="sv-head"><div class="sv-ic" style="background:${t}"><span>${esc(initial(s.name))}</span>${logo ? `<img src="${esc(logo)}" alt="">` : ''}</div></div>
       <div class="sv-title"><h2 data-no-i18n title="${esc(s.name)}">${esc(s.name)}</h2>
-        <div class="sv-tags">${S.online ? '<span class="pill pill-ok">ออนไลน์</span>' : '<span class="pill pill-off">ออฟไลน์</span>'}${s.category ? `<span class="pill pill-mono" data-no-i18n>${esc(s.category)}</span>` : ''}${lastHTML(s)}</div></div>
+        <div class="sv-tags">${stChip(S.online, S.players, S.max, false)}${s.category ? `<span class="pill pill-mono" data-no-i18n>${esc(s.category)}</span>` : ''}${lastHTML(s)}</div></div>
       <div class="sv-body">
         <div class="sv-stats">
           <div><span class="lbl">จำนวนผู้เล่น</span><b>${fmtNum(S.players)}<small>/${fmtNum(S.max)}</small></b></div>
@@ -1080,6 +1097,13 @@
       else if (B.selItem) serverPopup(B.selItem);
     }, 0);
     let t;
+    const syncClear = () => $('#bSearch')?.classList.toggle('has', !!$('#bq')?.value);
+    $('#bqClear').addEventListener('click', (e) => {
+      e.preventDefault();
+      if (!B.q) return;
+      B.q = ''; $('#bq').value = ''; syncClear(); loadBrowse(true); $('#bq').focus();
+    });
+    $('#bq').addEventListener('input', syncClear);
     $('#bq').addEventListener('keydown', (e) => { if (e.key === 'Enter' && directTarget(B.q)) joinDirect(directTarget(B.q)); });
     $('#bq').addEventListener('input', (e) => {
       B.q = e.target.value;
@@ -1115,7 +1139,7 @@
   function settingsHTML() {
     const S = state.settings;
     return `
-      <div class="page-head"><div><h1 class="h1"><span class="sq">ตั้งค่า${SQUIGGLE}</span></h1><p class="sub">ปรับให้เข้ากับสไตล์คุณ</p></div></div>
+      <div class="page-head set-head"><h1 class="h1">ตั้ง<span class="sq">ค่า</span></h1></div>
 
       <section class="sect">
         <h3>ภาษา${isEN() ? '' : ' <span style="opacity:.45;font-weight:600" data-no-i18n>· Language</span>'}</h3>
@@ -1707,6 +1731,7 @@
     $$('.nav-btn').forEach((b) => b.addEventListener('click', () => { if (state.page !== b.dataset.page) go(b.dataset.page); }));
     $('.brand')?.addEventListener('click', () => { if (state.page !== 'browse') go('browse'); });
     $('#btnMin').addEventListener('click', () => api.minimize());
+    $('#btnFiveM').addEventListener('click', () => { warnNoFiveM(); openFiveMOnly(); });
     $('#btnClose').addEventListener('click', () => api.close());
     $('.titlebar').addEventListener('dblclick', (e) => { if (!e.target.closest('button')) api.toggleMax(); });
     $('#btnDiscord').addEventListener('click', () => api.openExternal(CFG.discordUrl));

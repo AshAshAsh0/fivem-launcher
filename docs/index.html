@@ -4,161 +4,148 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>FiveM Launcher — เข้าเซิร์ฟ FiveM ในคลิกเดียว</title>
-<meta name="description" content="Launcher ฟรีสำหรับ Windows เก็บเซิร์ฟ FiveM ที่ชอบ ดูคนออนไลน์และปิงแบบเรียลไทม์ แล้วเข้าเกมได้ในคลิกเดียว">
+<meta name="description" content="Launcher ฟรีสำหรับ Windows เลือกเซิร์ฟ FiveM จากรายชื่อทั้งหมด เก็บเซิร์ฟส่วนตัวด้วย IP แล้วเข้าเกมได้ในคลิกเดียว">
 <meta property="og:title" content="FiveM Launcher">
-<meta property="og:description" content="เก็บเซิร์ฟ FiveM ที่ชอบ ดูคนออนไลน์และปิง แล้วเข้าเกมได้ในคลิกเดียว — ฟรี ขนาดไม่ถึง 7 MB">
+<meta property="og:description" content="เลือกเซิร์ฟ FiveM ดูคนออนไลน์และสถานะเซิร์ฟ แล้วเข้าเกมได้ในคลิกเดียว — ฟรี เบา ไม่กินเครื่อง">
 <meta property="og:image" content="img/home.webp">
 <style>
-  @font-face { font-family: 'Prompt'; font-weight: 700; font-display: swap; src: url('fonts/Prompt-Bold.woff') format('woff'); }
-  @font-face { font-family: 'Prompt'; font-weight: 800; font-display: swap; src: url('fonts/Prompt-ExtraBold.woff') format('woff'); }
-  @font-face { font-family: 'Anuphan'; font-weight: 100 700; font-display: swap; src: url('fonts/Anuphanwght.woff') format('woff'); }
-  :root {
-    --bg: #ebebec; --grid: rgba(20,20,30,.05); --surface: #fff; --s2: #f3f3f4; --ink: #1d1d21; --ink2: #4d4d55; --muted: #85858e; --line: #dcdce0;
-    --ok: #2fcf7a; --head: 'Prompt', 'Leelawadee UI', system-ui, sans-serif; --body: 'Anuphan', 'Leelawadee UI', system-ui, sans-serif;
-  }
+  @font-face { font-family: 'Kanit'; font-weight: 300 400; font-display: swap; src: url('fonts/Kanit-Regular.woff') format('woff'); }
+  @font-face { font-family: 'Kanit'; font-weight: 500; font-display: swap; src: url('fonts/Kanit-Medium.woff') format('woff'); }
+  @font-face { font-family: 'Kanit'; font-weight: 600 900; font-display: swap; src: url('fonts/Kanit-SemiBold.woff') format('woff'); }
+  :root { --bg: #0b0c0e; --panel: rgba(20, 22, 25, .82); --panel2: rgba(57, 60, 65, .35); --ink: #fff; --ink2: rgba(255,255,255,.78); --muted: rgba(255,255,255,.5); --line: rgba(255,255,255,.07); --accent: #0aaefb; --ok: #34d399; --warn: #f5a524; --err: #f05252; }
   * { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
-  body {
-    margin: 0; font: 16px/1.65 var(--body); color: var(--ink); background-color: var(--bg);
-    background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
-    background-size: 34px 34px;
-  }
-  a { color: inherit; }
-  svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
-  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
-
-  nav { display: flex; align-items: center; justify-content: space-between; padding: 22px 0; }
-  .brand { display: flex; align-items: center; gap: 12px; font: 800 20px var(--head); text-decoration: none; }
-  .mark { width: 42px; height: 42px; border-radius: 13px; background: var(--ink); color: #fff; display: grid; place-items: center; transform: rotate(-4deg); box-shadow: 0 3px 0 rgba(0,0,0,.2); }
-  .mark svg { width: 24px; height: 24px; }
-  .tag { font: 700 11px var(--head); background: var(--ink); color: #fff; padding: 3px 10px; border-radius: 99px; transform: rotate(-4deg); }
-  .navlinks { display: flex; gap: 22px; font-size: 14px; color: var(--ink2); }
-  .navlinks a { text-decoration: none; }
-  .navlinks a:hover { color: var(--ink); }
-
-  .hero { display: grid; grid-template-columns: 1.05fr 1fr; gap: 40px; align-items: center; padding: 34px 0 60px; }
-  h1 { font: 800 clamp(34px, 5vw, 54px)/1.2 var(--head); margin: 14px 0 16px; letter-spacing: -.01em; }
-  .sq { position: relative; display: inline-block; }
-  .sq svg { position: absolute; left: 3%; bottom: -10px; width: 94%; height: 14px; stroke-width: 2.6; }
-  .lead { font-size: 18px; color: var(--ink2); margin: 0 0 28px; max-width: 520px; }
-  .badge { display: inline-flex; align-items: center; gap: 8px; font: 700 13px var(--head); background: var(--surface); padding: 6px 14px; border-radius: 99px; box-shadow: inset 0 0 0 1px var(--line); }
-  .badge i { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); }
-  .dl { display: inline-flex; align-items: center; gap: 12px; background: var(--ink); color: #fff; text-decoration: none; padding: 16px 28px; border-radius: 20px; font: 700 18px var(--head); box-shadow: 0 5px 0 #000; transition: transform .1s, box-shadow .1s; }
-  .dl:hover { transform: translateY(-1px); }
-  .dl:active { transform: translateY(3px); box-shadow: 0 2px 0 #000; }
-  .dl svg { width: 22px; height: 22px; stroke-width: 2.4; }
-  .dl small { display: block; font: 500 12px var(--body); opacity: .65; margin-top: -2px; }
-  .meta { margin-top: 14px; font-size: 13px; color: var(--muted); }
-  .shot { position: relative; }
-  .shot img { width: 100%; display: block; border-radius: 18px; border: 2.5px solid var(--ink); box-shadow: 10px 12px 0 rgba(0,0,0,.12); transform: rotate(2deg); background: #fff; }
-  .shot .mini { position: absolute; width: 46%; left: -8%; bottom: -14%; transform: rotate(-5deg); border-width: 2px; box-shadow: 0 16px 34px -12px rgba(0,0,0,.45); }
-
-  section { padding: 56px 0; }
-  h2 { font: 800 32px/1.25 var(--head); margin: 0 0 8px; }
-  .sub { color: var(--muted); margin: 0 0 30px; }
-  .feats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-  .feat { background: var(--surface); border-radius: 22px; padding: 22px; box-shadow: inset 0 0 0 1px var(--line), 0 4px 0 var(--line); }
-  .feat .ic { width: 42px; height: 42px; border-radius: 13px; background: var(--s2); display: grid; place-items: center; margin-bottom: 12px; }
-  .feat b { font: 700 17px var(--head); display: block; margin-bottom: 4px; }
+  body { margin: 0; font: 16px/1.65 'Kanit', 'Leelawadee UI', system-ui, sans-serif; color: var(--ink); background: var(--bg);
+    background-image: radial-gradient(1100px 600px at 75% -10%, rgba(10,174,251,.12), transparent 60%), linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+    background-size: auto, 34px 34px, 34px 34px; }
+  a { color: inherit; text-decoration: none; }
+  .wrap { max-width: 1140px; margin: 0 auto; padding: 0 24px; }
+  .panel { position: relative; background: var(--panel); border-radius: 14px; box-shadow: inset 0 0 0 1px var(--line); clip-path: polygon(0 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%); }
+  .sel { background: rgba(10,174,251,.18); box-shadow: inset 0 0 0 1.5px rgba(10,174,251,.6); }
+  .sel::after { content: ''; position: absolute; right: 0; bottom: 0; width: 12px; height: 12px; background: var(--accent); clip-path: polygon(100% 0, 100% 100%, 0 100%); }
+  nav { display: flex; align-items: center; justify-content: space-between; padding: 22px 0; gap: 16px; }
+  .brand { display: flex; align-items: center; gap: 12px; font-weight: 600; font-size: 20px; letter-spacing: .05em; }
+  .mark { width: 40px; height: 40px; border-radius: 9px; display: grid; place-items: center; background: rgba(10,174,251,.12); color: var(--accent); }
+  .mark svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; }
+  .navlinks { display: flex; gap: 6px; flex-wrap: wrap; }
+  .navlinks a { padding: 7px 14px; border-radius: 6px; font-size: 14px; font-weight: 500; color: var(--ink2); text-transform: uppercase; letter-spacing: .03em; }
+  .navlinks a:hover { background: var(--panel2); color: #fff; }
+  .hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 44px; align-items: center; padding: 34px 0 70px; }
+  .badge { display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px; border-radius: 6px; font-size: 13px; font-weight: 500; color: var(--accent); background: rgba(10,174,251,.1); text-transform: uppercase; letter-spacing: .04em; }
+  .badge i { width: 7px; height: 7px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 8px var(--ok); }
+  h1 { font-size: clamp(36px, 5vw, 54px); line-height: 1.15; margin: 18px 0 14px; font-weight: 600; text-transform: uppercase; }
+  h1 b { color: var(--accent); font-weight: 600; }
+  .lead { color: var(--ink2); font-size: 17px; margin: 0 0 28px; max-width: 520px; }
+  .dl { position: relative; display: inline-flex; align-items: center; gap: 14px; padding: 14px 30px 14px 22px; border-radius: 8px; font-weight: 600; font-size: 18px; color: #fff; background: rgba(10,174,251,.2); box-shadow: inset 0 0 0 1.5px rgba(10,174,251,.65), 0 0 40px -12px var(--accent); transition: background .15s, transform .15s; }
+  .dl::after { content: ''; position: absolute; right: 0; bottom: 0; width: 14px; height: 14px; background: var(--accent); clip-path: polygon(100% 0, 100% 100%, 0 100%); border-radius: 0 0 7px 0; }
+  .dl:hover { background: rgba(10,174,251,.32); transform: translateY(-1px); }
+  .dl svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+  .dl small { display: block; font-size: 12.5px; font-weight: 400; color: var(--ink2); margin-top: -2px; }
+  .meta { margin-top: 14px; color: var(--muted); font-size: 13.5px; }
+  .shot { position: relative; padding: 8px; }
+  .shot img { display: block; width: 100%; border-radius: 12px; box-shadow: 0 0 0 1.5px rgba(10,174,251,.35), 0 40px 80px -30px rgba(0,0,0,.9), 0 0 80px -30px var(--accent); }
+  section { padding: 70px 0; }
+  h2 { font-size: 30px; margin: 0; font-weight: 600; text-transform: uppercase; }
+  h2 b { color: var(--accent); font-weight: 600; }
+  .sub { color: var(--muted); margin: 6px 0 32px; font-size: 14px; text-transform: uppercase; letter-spacing: .04em; }
+  .feats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+  .feat { padding: 22px 22px 26px; }
+  .feat .ic { width: 42px; height: 42px; border-radius: 8px; display: grid; place-items: center; background: rgba(10,174,251,.1); color: var(--accent); margin-bottom: 14px; }
+  .feat .ic svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .feat b { display: block; font-size: 17px; font-weight: 600; margin-bottom: 4px; }
   .feat p { margin: 0; color: var(--ink2); font-size: 14.5px; }
-
-  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; counter-reset: s; }
-  .step { background: var(--surface); border-radius: 22px; padding: 22px; box-shadow: inset 0 0 0 1px var(--line); position: relative; }
-  .step::before { counter-increment: s; content: counter(s); position: absolute; top: -14px; left: 20px; width: 32px; height: 32px; border-radius: 10px; background: var(--ink); color: #fff; display: grid; place-items: center; font: 800 15px var(--head); transform: rotate(-5deg); }
-  .step b { font: 700 16px var(--head); display: block; margin: 8px 0 4px; }
-  .step p { margin: 0; font-size: 14.5px; color: var(--ink2); }
-  .note { margin-top: 18px; background: #fff4d6; color: #6b4f00; border-radius: 16px; padding: 14px 18px; font-size: 14.5px; display: flex; gap: 12px; }
-  .note svg { margin-top: 3px; }
-
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+  .stc { --c: var(--ok); display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 10px; border-radius: 6px; font-size: 12.5px; font-weight: 600; color: var(--c); background: color-mix(in srgb, var(--c) 13%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 40%, transparent); }
+  .stc i { width: 7px; height: 7px; border-radius: 50%; background: var(--c); box-shadow: 0 0 8px var(--c); }
+  .steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; counter-reset: s; }
+  .step { padding: 22px 22px 26px; counter-increment: s; }
+  .step::before { content: counter(s); display: grid; place-items: center; width: 34px; height: 34px; margin-bottom: 12px; border-radius: 6px; background: rgba(10,174,251,.14); box-shadow: inset 0 0 0 1.5px var(--accent); color: var(--accent); font-weight: 600; clip-path: polygon(0 0, 100% 0, 100% calc(100% - 9px), calc(100% - 9px) 100%, 0 100%); }
+  .step b { display: block; font-size: 17px; font-weight: 600; }
+  .step p { margin: 4px 0 0; color: var(--ink2); font-size: 14.5px; }
+  code { font-family: Consolas, monospace; font-size: 13px; padding: 1px 6px; border-radius: 4px; background: var(--panel2); }
+  .note { display: flex; gap: 14px; align-items: flex-start; margin-top: 16px; padding: 16px 18px; border-radius: 10px; background: rgba(245,165,36,.1); box-shadow: inset 0 0 0 1px rgba(245,165,36,.4); color: var(--ink2); font-size: 14.5px; }
+  .note svg { flex: none; width: 22px; height: 22px; fill: none; stroke: var(--warn); stroke-width: 2; stroke-linecap: round; margin-top: 2px; }
+  .note b { color: #fff; }
   .faq { display: grid; gap: 10px; }
-  details { background: var(--surface); border-radius: 18px; box-shadow: inset 0 0 0 1px var(--line); padding: 4px 20px; }
-  summary { cursor: pointer; font: 700 16px var(--head); padding: 14px 0; list-style: none; display: flex; justify-content: space-between; gap: 12px; }
-  summary::after { content: '+'; font-size: 22px; line-height: 1; color: var(--muted); }
+  details { padding: 4px 22px; }
+  summary { cursor: pointer; padding: 14px 0; font-weight: 500; font-size: 16px; list-style: none; display: flex; justify-content: space-between; gap: 12px; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: '+'; color: var(--accent); font-size: 22px; line-height: 1; }
   details[open] summary::after { content: '−'; }
-  details p { margin: 0 0 16px; color: var(--ink2); font-size: 15px; }
-
-  .cta { text-align: center; background: var(--ink); color: #fff; border-radius: 28px; padding: 48px 24px; }
-  .cta h2 { color: #fff; }
-  .cta .dl { background: #fff; color: var(--ink); box-shadow: 0 5px 0 rgba(255,255,255,.25); }
-  footer { padding: 34px 0 50px; font-size: 13px; color: var(--muted); text-align: center; }
+  details p { margin: 0 0 16px; color: var(--ink2); font-size: 14.5px; }
+  .cta { text-align: center; padding: 50px 24px 56px; margin: 30px 0 60px; }
+  .cta h2 { margin-bottom: 6px; }
+  footer { padding: 0 24px 50px; color: var(--muted); font-size: 13px; text-align: center; }
   footer p { margin: 4px 0; }
-
-  @media (max-width: 860px) {
-    .hero { grid-template-columns: 1fr; gap: 50px; }
-    .feats, .steps { grid-template-columns: 1fr; }
-    .navlinks { display: none; }
-    .shot .mini { display: none; }
-  }
+  @media (max-width: 860px) { .hero { grid-template-columns: 1fr; padding-top: 10px; } .feats, .steps { grid-template-columns: 1fr; } .navlinks { display: none; } }
 </style>
 </head>
 <body>
   <div class="wrap">
     <nav>
-      <a class="brand" href="#"><span class="mark"><svg viewBox="0 0 40 40"><path d="M13 30 21.2 9.5c.5-1.3 2.3-1.3 2.8 0L32 30" stroke-width="4.4"/><path d="M8 30h7.5" stroke-width="4.4"/><path d="M22.6 21.5v8.5" stroke-width="3.2"/></svg></span>FiveM <span class="tag">launcher ♡</span></a>
+      <a class="brand" href="#"><span class="mark"><svg viewBox="0 0 40 40"><path d="M13 30 21.2 9.5c.5-1.3 2.3-1.3 2.8 0L32 30" stroke-width="4.4"/><path d="M8 30h7.5" stroke-width="4.4"/><path d="M22.6 21.5v8.5" stroke-width="3.2"/></svg></span>FIVEM LAUNCHER</a>
       <div class="navlinks"><a href="#features">ฟีเจอร์</a><a href="#install">วิธีติดตั้ง</a><a href="#faq">คำถามที่พบบ่อย</a><a id="ghLink" href="#">GitHub</a></div>
     </nav>
 
     <header class="hero">
       <div>
         <span class="badge"><i></i> ฟรี · Windows 10 / 11</span>
-        <h1>เข้าเซิร์ฟ FiveM ใน<span class="sq">คลิกเดียว<svg viewBox="0 0 120 12" preserveAspectRatio="none"><path d="M2 7c8-6 14 4 22 0s14-6 22 0 14 4 22 0 14-6 22 0 14 4 22 0"/></svg></span></h1>
-        <p class="lead">เก็บเซิร์ฟที่ชอบไว้ที่เดียว ดูจำนวนคนออนไลน์และปิงแบบเรียลไทม์ ล้างแคชแก้เกมเด้งได้ในตัว — โปรแกรมเล็ก เบา ไม่กินเครื่อง</p>
+        <h1>เลือกเซิร์ฟ<br>แล้ว<b>เข้าเกม</b><span style="white-space:nowrap">ในคลิกเดียว</span></h1>
+        <p class="lead">เปิดมาเจอรายชื่อเซิร์ฟ FiveM ทั้งหมด เห็นทันทีว่าเซิร์ฟไหนว่าง ใกล้เต็ม หรือเต็ม เก็บเซิร์ฟส่วนตัวด้วย IP ไว้กดเข้าได้ตลอด — โปรแกรมเล็ก เบา ไม่กินเครื่อง</p>
         <a class="dl" id="dlBtn" href="#"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg><span>ดาวน์โหลดฟรี<small id="dlMeta">สำหรับ Windows</small></span></a>
-        <div class="meta" id="meta">ขนาดไม่ถึง 7 MB · ไม่ต้องใช้สิทธิ์ Admin · รองรับไทย / English</div>
+        <div class="meta" id="meta">ไม่ต้องใช้สิทธิ์ Admin · รองรับไทย / English · อัปเดตให้อัตโนมัติ</div>
       </div>
-      <div class="shot">
-        <img src="img/home.webp" alt="หน้าหลักของ FiveM Launcher" loading="eager">
-        <img class="mini" src="img/setup.webp" alt="หน้าติดตั้ง">
-      </div>
+      <div class="shot"><img src="img/home.webp" alt="หน้าหลักของ FiveM Launcher" loading="eager"></div>
     </header>
   </div>
 
   <section id="features">
     <div class="wrap">
-      <h2>ทำอะไรได้บ้าง</h2>
+      <h2>ทำอะไร<b>ได้บ้าง</b></h2>
       <p class="sub">ทุกอย่างที่ต้องใช้ก่อนเข้าเกม รวมไว้ในหน้าเดียว</p>
       <div class="feats">
-        <div class="feat"><div class="ic"><svg viewBox="0 0 24 24"><path d="M7 5.5v13a1 1 0 0 0 1.5.9l10.4-6.5a1 1 0 0 0 0-1.8L8.5 4.6A1 1 0 0 0 7 5.5Z"/></svg></div><b>กดเล่นแล้วเข้าเลย</b><p>เปิด FiveM และเชื่อมต่อเซิร์ฟให้อัตโนมัติ ไม่ต้องพิมพ์ connect ใน F8</p></div>
-        <div class="feat"><div class="ic"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M21.5 20a6.5 6.5 0 0 0-4-6"/></svg></div><b>เห็นคนออนไลน์และปิง</b><p>รู้ทันทีว่าเซิร์ฟไหนเปิด คนเยอะแค่ไหน เต็มหรือยัง อัปเดตให้เองทุก 15 วินาที</p></div>
-        <div class="feat"><div class="ic"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div><b>ค้นหาเซิร์ฟได้ในตัว</b><p>พิมพ์ชื่อแล้วเจอเลย มีรายชื่อเซิร์ฟไทยเรียงตามคนเล่น หรือเพิ่มเองด้วยโดเมน IP หรือลิงก์ cfx.re/join</p></div>
-        <div class="feat"><div class="ic"><svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V4.8c0-.4.4-.8.8-.8h4.4c.4 0 .8.4.8.8V7M6.5 7l.9 12.2c.1.8.7 1.3 1.5 1.3h6.2c.8 0 1.4-.5 1.5-1.3L17.5 7"/></svg></div><b>ล้างแคช FiveM</b><p>แก้อาการเกมเด้ง โหลดค้าง หรือพื้นที่เต็ม บอกขนาดก่อนลบทุกครั้ง</p></div>
-        <div class="feat"><div class="ic"><svg viewBox="0 0 24 24"><path d="M13 3 5 14h6l-1 7 8-11h-6l1-7Z"/></svg></div><b>เบา ไม่แย่งเกม</b><p>ตอนเล่นเกมโปรแกรมจะผ่อนแรงเอง ย่อหน้าต่างแล้วหยุดทำงานเบื้องหลังทั้งหมด</p></div>
-        <div class="feat"><div class="ic"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18c1.2 0 1.8-.9 1.8-1.8 0-.5-.2-.9-.5-1.2-.3-.3-.5-.8-.5-1.2 0-1 .8-1.8 1.8-1.8h2.1A4.3 4.3 0 0 0 21 10.7C21 6.4 17 3 12 3Z"/></svg></div><b>สองธีม สองภาษา</b><p>ขาว-เทามินิมอล หรือซากุระสีชมพู เลือกภาษาไทยหรืออังกฤษได้ อัปเดตเวอร์ชันใหม่ให้อัตโนมัติ</p></div>
+        <div class="feat panel"><div class="ic"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></div><b>รายชื่อเซิร์ฟทั้งหมด</b><p>เปิดมาเจอเซิร์ฟไทยเรียงตามคนเล่น พร้อมโลโก้จริง ค้นหาชื่อได้ ซ่อนเซิร์ฟส่วนตัวหรือเซิร์ฟเต็มได้</p></div>
+        <div class="feat panel"><div class="ic"><svg viewBox="0 0 24 24"><path d="M3 12h4l3-7 4 14 3-7h4"/></svg></div><b>สถานะเซิร์ฟชัดเจน</b><p>รู้ทันทีว่าเซิร์ฟพร้อมเข้าไหม<span class="chips"><span class="stc"><i></i>ออนไลน์</span><span class="stc" style="--c:var(--warn)"><i></i>ใกล้เต็ม</span><span class="stc" style="--c:var(--err)"><i></i>เต็ม</span></span></p></div>
+        <div class="feat panel"><div class="ic"><svg viewBox="0 0 24 24"><path d="M7 5.5v13a1 1 0 0 0 1.5.9l10.4-6.5a1 1 0 0 0 0-1.8L8.5 4.6A1 1 0 0 0 7 5.5Z"/></svg></div><b>เข้าเกมในคลิกเดียว</b><p>กด "เล่นเลย" หรือดับเบิลคลิกที่เซิร์ฟ เปิด FiveM และเชื่อมต่อให้อัตโนมัติ ไม่ต้องพิมพ์ connect ใน F8</p></div>
+        <div class="feat panel"><div class="ic"><svg viewBox="0 0 24 24"><path d="m12 3 2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6-4.5-4.2 6.1-.7Z"/></svg></div><b>เซิร์ฟของฉัน</b><p>เพิ่มเซิร์ฟส่วนตัวด้วย IP หรือลิงก์ cfx.re ไว้บนสุดของรายชื่อ จัดกลุ่มได้ และแจ้งเตือนเมื่อเซิร์ฟเต็มแล้วมีที่ว่าง</p></div>
+        <div class="feat panel"><div class="ic"><svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V4.8c0-.4.4-.8.8-.8h4.4c.4 0 .8.4.8.8V7M6.5 7l.9 12.2c.1.8.7 1.3 1.5 1.3h6.2c.8 0 1.4-.5 1.5-1.3L17.5 7"/></svg></div><b>ล้างแคช FiveM</b><p>แก้อาการเกมเด้ง โหลดค้าง หรือพื้นที่เต็ม บอกขนาดก่อนลบทุกครั้ง ไม่กระทบตัวเกมหรือบัญชี</p></div>
+        <div class="feat panel"><div class="ic"><svg viewBox="0 0 24 24"><path d="M13 3 5 14h6l-1 7 8-11h-6l1-7Z"/></svg></div><b>เบา ไม่แย่งเกม</b><p>ตอนเล่นเกมโปรแกรมผ่อนแรงเอง ย่อหน้าต่างแล้วหยุดทำงานเบื้องหลัง อัปเดตเวอร์ชันใหม่ให้อัตโนมัติ</p></div>
       </div>
     </div>
   </section>
 
   <section id="install">
     <div class="wrap">
-      <h2>วิธีติดตั้ง</h2>
+      <h2>วิธี<b>ติดตั้ง</b></h2>
       <p class="sub">ใช้เวลาไม่ถึงนาที</p>
       <div class="steps">
-        <div class="step"><b>ดาวน์โหลด</b><p>กดปุ่มดาวน์โหลดด้านบน จะได้ไฟล์ <code>FiveM-Launcher-Setup.exe</code></p></div>
-        <div class="step"><b>เปิดไฟล์ติดตั้ง</b><p>ดับเบิลคลิกไฟล์ แล้วกด “ถัดไป” ตามขั้นตอนจนติดตั้งเสร็จ</p></div>
-        <div class="step"><b>เพิ่มเซิร์ฟแล้วกดเล่น</b><p>กด “เพิ่มเซิร์ฟเวอร์” ใส่ที่อยู่เซิร์ฟ กด “ตรวจสอบ” แล้วบันทึก</p></div>
+        <div class="step panel"><b>ดาวน์โหลด</b><p>กดปุ่มดาวน์โหลดด้านบน จะได้ไฟล์ <code>FiveM-Launcher-Setup.exe</code></p></div>
+        <div class="step panel"><b>เปิดไฟล์ติดตั้ง</b><p>ดับเบิลคลิกไฟล์ แล้วกด "ถัดไป" ตามขั้นตอนจนติดตั้งเสร็จ</p></div>
+        <div class="step panel"><b>เลือกเซิร์ฟแล้วกดเล่น</b><p>เลือกเซิร์ฟจากรายชื่อ หรือกด "เพิ่มเซิร์ฟ / IP" เพื่อเก็บเซิร์ฟของคุณเอง</p></div>
       </div>
-      <div class="note"><svg viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 2 18a2 2 0 0 0 1.7 3h16.6A2 2 0 0 0 22 18L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg><span>ถ้า Windows ขึ้นหน้าจอสีน้ำเงิน <b>“Windows protected your PC”</b> ให้กด <b>More info</b> แล้วกด <b>Run anyway</b> — ที่ขึ้นแบบนี้เพราะโปรแกรมยังไม่มีลายเซ็นดิจิทัล (โปรแกรมเล็ก ๆ ส่วนใหญ่ก็เป็นแบบนี้)</span></div>
+      <div class="note"><svg viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 2 18a2 2 0 0 0 1.7 3h16.6A2 2 0 0 0 22 18L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg><span>ถ้า Windows ขึ้นหน้าจอสีน้ำเงิน <b>"Windows protected your PC"</b> ให้กด <b>More info</b> แล้วกด <b>Run anyway</b> — ที่ขึ้นแบบนี้เพราะโปรแกรมยังไม่มีลายเซ็นดิจิทัล (โปรแกรมเล็ก ๆ ส่วนใหญ่ก็เป็นแบบนี้)</span></div>
     </div>
   </section>
 
   <section id="faq">
     <div class="wrap">
-      <h2>คำถามที่พบบ่อย</h2>
+      <h2>คำถาม<b>ที่พบบ่อย</b></h2>
       <p class="sub">&nbsp;</p>
       <div class="faq">
-        <details><summary>ปลอดภัยไหม? โปรแกรมทำอะไรกับเครื่องบ้าง</summary><p>โปรแกรมติดตั้งในโฟลเดอร์ของผู้ใช้ ไม่ต้องใช้สิทธิ์ Admin และไม่แตะไฟล์ระบบ สิ่งที่ทำมีแค่อ่านสถานะเซิร์ฟที่คุณเพิ่มไว้ เปิด FiveM และลบโฟลเดอร์แคชของ FiveM เมื่อคุณสั่งเท่านั้น ข้อมูลเซิร์ฟเก็บอยู่ในเครื่องคุณ ไม่ส่งไปที่ไหน และโค้ดทั้งหมดเปิดให้ดูได้บน GitHub</p></details>
-        <details><summary>ต้องมีอะไรในเครื่องบ้าง?</summary><p>Windows 10 หรือ 11 (64-bit) และต้องติดตั้ง FiveM ไว้แล้ว โปรแกรมใช้ Microsoft Edge WebView2 ซึ่งมีมากับ Windows 11 และ Windows 10 ที่อัปเดตแล้ว ถ้าเครื่องไหนไม่มี ตัวติดตั้งจะพาไปดาวน์โหลดให้</p></details>
-        <details><summary>กดเล่นแล้วไม่เข้าเกม ทำยังไง?</summary><p>เช็กว่าติดตั้ง FiveM แล้วและเปิดเองได้ปกติ ถ้า Windows ถามว่าจะเปิดลิงก์ด้วยโปรแกรมไหน ให้เลือก FiveM ถ้ายังไม่ได้ ลองไปที่ ตั้งค่า → ตำแหน่ง FiveM แล้วเลือกไฟล์ FiveM.exe เอง</p></details>
-        <details><summary>ล้างแคชแล้วข้อมูลหายไหม?</summary><p>ไม่หาย จะลบเฉพาะไฟล์ชั่วคราวที่ FiveM โหลดจากเซิร์ฟ (crashes, cache, server-cache) ไม่กระทบตัวเกม การตั้งค่า หรือบัญชี ครั้งต่อไปที่เข้าเซิร์ฟจะโหลดนานขึ้นนิดหน่อย</p></details>
-        <details><summary>ถอนการติดตั้งยังไง?</summary><p>ไปที่ การตั้งค่า (Settings) → แอป (Apps) → ค้นหา FiveM Launcher → ถอนการติดตั้ง (Uninstall)</p></details>
+        <details class="panel"><summary>ปลอดภัยไหม? โปรแกรมทำอะไรกับเครื่องบ้าง</summary><p>โปรแกรมติดตั้งในโฟลเดอร์ของผู้ใช้ ไม่ต้องใช้สิทธิ์ Admin และไม่แตะไฟล์ระบบ สิ่งที่ทำมีแค่โหลดรายชื่อเซิร์ฟสาธารณะของ FiveM อ่านสถานะเซิร์ฟ เปิด FiveM และลบโฟลเดอร์แคชของ FiveM เมื่อคุณสั่งเท่านั้น ข้อมูลเซิร์ฟของคุณเก็บอยู่ในเครื่อง ไม่ส่งไปที่ไหน และโค้ดทั้งหมดเปิดให้ดูได้บน GitHub</p></details>
+        <details class="panel"><summary>ต้องมีอะไรในเครื่องบ้าง?</summary><p>Windows 10 หรือ 11 (64-bit) และต้องติดตั้ง FiveM ไว้แล้ว ถ้ายังไม่มี โปรแกรมจะขึ้นแถบแจ้งพร้อมปุ่มดาวน์โหลด FiveM ให้ โปรแกรมใช้ Microsoft Edge WebView2 ซึ่งมีมากับ Windows 11 และ Windows 10 ที่อัปเดตแล้ว</p></details>
+        <details class="panel"><summary>ทำไมบางเซิร์ฟขึ้น "ส่วนตัว" แล้วกดเข้าไม่ได้?</summary><p>เจ้าของเซิร์ฟตั้งไว้ไม่ให้เข้าผ่านรายชื่อของ FiveM (ในตัว FiveM เองก็กดเข้าไม่ได้) ให้ขอ IP หรือลิงก์จาก Discord ของเซิร์ฟ แล้ววางในแผงด้านซ้ายของเซิร์ฟนั้น โปรแกรมจะบันทึกไว้ใน "เซิร์ฟของฉัน" ให้กดเข้าได้ทุกครั้ง</p></details>
+        <details class="panel"><summary>กดเล่นแล้วไม่เข้าเกม ทำยังไง?</summary><p>เช็กว่าติดตั้ง FiveM แล้วและเปิดเองได้ปกติ ถ้า Windows ถามว่าจะเปิดลิงก์ด้วยโปรแกรมไหน ให้เลือก FiveM ถ้ายังไม่ได้ ลองไปที่ ตั้งค่า → ตำแหน่ง FiveM แล้วเลือกไฟล์ FiveM.exe เอง</p></details>
+        <details class="panel"><summary>ล้างแคชแล้วข้อมูลหายไหม?</summary><p>ไม่หาย จะลบเฉพาะไฟล์ชั่วคราวที่ FiveM โหลดจากเซิร์ฟ (crashes, cache, server-cache) ไม่กระทบตัวเกม การตั้งค่า หรือบัญชี ครั้งต่อไปที่เข้าเซิร์ฟจะโหลดนานขึ้นนิดหน่อย</p></details>
+        <details class="panel"><summary>ถอนการติดตั้งยังไง?</summary><p>ไปที่ การตั้งค่า (Settings) → แอป (Apps) → ค้นหา FiveM Launcher → ถอนการติดตั้ง (Uninstall)</p></details>
       </div>
     </div>
   </section>
 
   <div class="wrap">
-    <div class="cta">
-      <h2>พร้อมลุยแล้วใช่ไหม?</h2>
-      <p class="sub" style="color:rgba(255,255,255,.6)">ดาวน์โหลดฟรี ไม่มีโฆษณา</p>
+    <div class="cta panel">
+      <h2>พร้อม<b>ลุย</b>แล้วใช่ไหม?</h2>
+      <p class="sub">ดาวน์โหลดฟรี ไม่มีโฆษณา</p>
       <a class="dl" id="dlBtn2" href="#"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg><span>ดาวน์โหลด FiveM Launcher</span></a>
     </div>
   </div>

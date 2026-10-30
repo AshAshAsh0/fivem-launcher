@@ -1311,3 +1311,99 @@ html[data-motion='reduced'] .splash * { animation: none !important; }
   background: linear-gradient(90deg, rgba(46, 168, 255, .28), rgba(16, 58, 98, .75)); box-shadow: inset 0 0 0 1.5px rgba(46, 168, 255, .85), 0 0 20px -8px #2ea8ff; }
 [data-theme] .foot-upd .fu-ic { color: #2ea8ff; }
 [data-theme] .foot { padding-top: 4px; }
+
+/* ================= v11: จัดหน้าใหม่ให้โล่ง + สถานะเซิร์ฟชัดเจน ================= */
+/* แถบบน */
+.titlebar { padding: 12px 14px 8px 16px !important; }
+.brand-tag { display: none !important; }
+.brand-name { font-size: 17px !important; letter-spacing: .04em; }
+.mark.sm { width: 32px !important; height: 32px !important; }
+.titlebar .tabs { margin-left: 14px !important; }
+.win-ctrls { gap: 6px !important; align-items: center; }
+.wc-sep { width: 1px; height: 20px; background: rgba(255, 255, 255, .1); margin: 0 4px; }
+[data-theme] .wc { width: 34px; height: 34px; border-radius: 6px !important; display: grid; place-items: center; color: var(--ink-2) !important;
+  background: rgba(57, 60, 65, .35) !important; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .06) !important; transition: background .15s, color .15s, box-shadow .15s; }
+[data-theme] .wc svg { width: 16px; height: 16px; stroke-width: 2.2; }
+[data-theme] .wc:hover { color: #fff !important; background: rgba(57, 60, 65, .7) !important; }
+[data-theme] .wc-fivem { color: var(--accent) !important; }
+[data-theme] .wc-fivem svg { width: 19px; height: 19px; }
+[data-theme] .wc-fivem:hover { background: rgba(10, 174, 251, .18) !important; box-shadow: inset 0 0 0 1.5px rgba(10, 174, 251, .55) !important; }
+[data-theme] .wc-close:hover { background: rgba(240, 82, 82, .85) !important; box-shadow: none !important; color: #fff !important; }
+[data-theme] .wc:active { transform: translateY(1px); }
+
+/* หน้าหลัก: แถบเครื่องมือแถวเดียว */
+.scroll.split .toolbar { margin: 2px 0 8px !important; gap: 8px !important; }
+.scroll.split .toolbar .search { height: 42px; }
+.scroll.split .toolbar .seg button { height: 34px; }
+.scroll.split .toolbar .icon-btn { width: 42px; height: 42px; }
+.search { position: relative; }
+.q-clear { display: none; flex: none; width: 26px; height: 26px; border-radius: 6px; place-items: center; color: var(--muted); background: rgba(255, 255, 255, .06); }
+.q-clear svg { width: 13px; height: 13px; stroke-width: 2.6; }
+.q-clear:hover { color: #fff; background: rgba(240, 82, 82, .55); }
+.search.has .q-clear { display: grid; }
+.search.has .kbd { display: none; }
+.b-filters { margin: 0 0 8px !important; gap: 10px !important; }
+.b-fl { display: flex; align-items: center; gap: 12px; }
+.b-filters .b-meta { font-size: 12px; }
+.b-filters .seg.sm button { height: 26px !important; padding: 0 10px !important; font-size: 11.5px !important; }
+
+/* แถวเซิร์ฟ: ไอคอน | ชื่อ | สถานะ | ผู้เล่น | (เมนู) */
+.b-list { gap: 6px !important; }
+.b-row { grid-template-columns: 42px minmax(0, 1fr) 96px 132px !important; gap: 14px !important; padding: 9px 14px 9px 10px !important; min-height: 60px; }
+.b-row.mine { grid-template-columns: 42px minmax(0, 1fr) 96px 132px 34px !important; }
+.b-split.open .b-row { grid-template-columns: 38px minmax(0, 1fr) 86px 108px !important; gap: 10px !important; }
+.b-split.open .b-row.mine { grid-template-columns: 38px minmax(0, 1fr) 86px 108px 32px !important; }
+.b-ic, .b-split.open .b-ic { width: 42px !important; height: 42px !important; border-radius: 10px !important; }
+.b-split.open .b-ic { width: 38px !important; height: 38px !important; }
+.b-name { font-size: 14px !important; }
+.b-sub { font-size: 12px !important; opacity: .85; }
+.b-row.priv .b-name, .b-row.priv .b-ic { opacity: .7; }
+.b-st { display: flex; justify-content: flex-start; }
+.b-pl { min-width: 0; }
+.pl-n { display: flex; align-items: baseline; gap: 1px; font-family: var(--font-mono); font-size: 11.5px; color: var(--muted); margin-bottom: 5px; white-space: nowrap; }
+.pl-n b { color: var(--ink); font-size: 13.5px; font-weight: 700; }
+.b-pl .bar { height: 4px !important; margin: 0 !important; }
+.b-row.mine .more-btn { width: 32px !important; height: 32px !important; }
+.b-sec { margin-top: 10px !important; }
+
+/* ชิปสถานะ */
+.stc { --c: #34d399; display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 9px; border-radius: 6px; white-space: nowrap;
+  font: 600 11.5px 'Kanit', var(--font-body); letter-spacing: .02em; color: var(--c);
+  background: color-mix(in srgb, var(--c) 13%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 40%, transparent); }
+.stc i { width: 7px; height: 7px; border-radius: 50%; background: var(--c); box-shadow: 0 0 8px var(--c); }
+.stc-ok { --c: #34d399; }
+.stc-busy { --c: #f5a524; }
+.stc-full { --c: #f05252; }
+.stc-off { --c: #8b939c; }
+.stc-off i { box-shadow: none; }
+.stc-priv { --c: #f2c94c; }
+html[data-motion='full'] .stc-ok i { animation: stPulse 2s ease-in-out infinite; }
+@keyframes stPulse { 50% { box-shadow: 0 0 2px var(--c); opacity: .6; } }
+.sv-tags .stc { height: 24px; }
+
+/* แผงซ้าย: ขนาดพอดีขึ้น */
+.b-split.open { grid-template-columns: 316px minmax(0, 1fr) !important; }
+
+.b-row, .b-row.mine { grid-template-columns: 42px minmax(0, 1fr) 96px 132px 32px !important; }
+.b-split.open .b-row, .b-split.open .b-row.mine { grid-template-columns: 38px minmax(0, 1fr) 86px 104px 30px !important; }
+.b-direct { grid-template-columns: 42px minmax(0, 1fr) auto !important; }
+.b-row.offline .bar i, .b-row .bar i[style*="width:0%"] { min-width: 0 !important; }
+
+/* v11: หน้าตั้งค่าให้เข้าธีม + กระชับ */
+.set-head { margin: 4px 0 12px !important; }
+.set-head .h1 { font-size: 22px !important; }
+.sect-row { display: block !important; }
+[data-theme] .sect { padding: 20px 24px !important; margin-bottom: 12px !important; }
+[data-theme] .sect h3 { font-size: 15px; margin: 0 0 2px; }
+[data-theme] .sect .d { margin: 0 0 12px; font-size: 11.5px; }
+[data-theme] :is(.path-box, .metric, .cache-list, .about) { border-radius: 8px !important; background: rgba(57, 60, 65, .3) !important; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .06) !important; }
+[data-theme] .metric b { color: var(--accent); }
+[data-theme] .about { margin-top: 14px; }
+[data-theme] .about .mark { width: 40px; height: 40px; border-radius: 8px; }
+[data-theme] .about small { font-family: var(--font-mono); opacity: .6; }
+[data-theme] .cache-list { padding: 6px 16px !important; }
+
+.b-row, .b-row.mine { grid-template-columns: 42px minmax(0, 1fr) 108px 128px 32px !important; }
+.b-split.open .b-row, .b-split.open .b-row.mine { grid-template-columns: 38px minmax(0, 1fr) 100px 96px 30px !important; }
+.stc b { font-weight: 400; font-size: 11px; margin-right: -2px; }
+.b-split.open .stc { padding: 0 7px; font-size: 11px; gap: 5px; }
