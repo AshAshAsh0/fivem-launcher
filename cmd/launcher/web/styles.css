@@ -1152,3 +1152,8 @@ html[data-motion='reduced'] .splash * { animation: none !important; }
 [data-theme='hud'] .sv-pop { overflow: hidden; }
 .sv-head { align-items: flex-start; }
 .sv-title { padding-top: 44px; }
+.sv-links { display: flex; gap: 8px; flex-wrap: wrap; }
+.sv-discord { background: #5865f2 !important; color: #fff !important; box-shadow: 0 3px 0 #3c45b8 !important; }
+[data-theme='hud'] .sv-discord::after { display: none; }
+[data-theme='hud'] .sv-discord { border-radius: 6px; box-shadow: none !important; }
+[data-theme='hud'] .btn.sv-discord, [data-theme] .btn.sv-discord { background: #5865f2 !important; color: #fff !important; }

@@ -27,6 +27,7 @@
     check: '<svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>',
     signal: '<svg viewBox="0 0 24 24"><path d="M5 19v-3M10 19v-6M15 19v-9M20 19V6"/></svg>',
     clock: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+    globe: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9s-1.3 6.3-3.8 9c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3Z"/></svg>',
     trash: '<svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V4.8c0-.4.4-.8.8-.8h4.4c.4 0 .8.4.8.8V7M6.5 7l.9 12.2c.1.8.7 1.3 1.5 1.3h6.2c.8 0 1.4-.5 1.5-1.3L17.5 7"/></svg>',
     edit: '<svg viewBox="0 0 24 24"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4Z"/></svg>',
     copy: '<svg viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="3"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>',
@@ -783,6 +784,10 @@
           ${s.private
             ? `<p class="sv-note">เซิร์ฟนี้ตั้งเป็นส่วนตัว จึงเข้าจากรายชื่อไม่ได้ ต้องใช้ IP หรือลิงก์ที่เซิร์ฟแจกใน Discord — วางในช่องค้นหาแล้วกด “เข้าเลย”</p>`
             : `<div class="sv-addr"><code data-no-i18n>${esc(target)}</code><button class="btn btn-sm" id="svCopy">${I.copy || ''} คัดลอก</button></div>`}
+          ${s.discord || s.website ? `<div class="sv-links">
+            ${s.discord ? `<button class="btn btn-sm sv-discord" data-link="${esc(s.discord)}">Discord</button>` : ''}
+            ${s.website ? `<button class="btn btn-sm" data-link="${esc(s.website)}">${I.globe || ''} เว็บไซต์</button>` : ''}
+          </div>` : ''}
         </div>
         <div class="modal-foot">
           <button class="btn" data-close data-no-i18n>${isEN() ? 'Close' : 'ปิด'}</button>
@@ -794,6 +799,7 @@
       toast(`กำลังเข้า ${s.name}`);
       api.launch(target, state.settings.after).catch(() => toast('เปิด FiveM ไม่สำเร็จ', 'err'));
     });
+    $$('[data-link]', m).forEach((btn) => btn.addEventListener('click', () => api.openExternal(btn.dataset.link)));
     $('#svCopy', m)?.addEventListener('click', () => {
       try { navigator.clipboard.writeText(target); toast('คัดลอกที่อยู่แล้ว'); } catch { toast('คัดลอกไม่สำเร็จ', 'err'); }
     });

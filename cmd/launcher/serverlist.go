@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"sort"
 	"strings"
 	"sync"
@@ -33,6 +34,8 @@ type listServer struct {
 	Banner   string `json:"banner"`
 	Private  bool   `json:"private"`  // เซิร์ฟส่วนตัว: เข้าจากรายชื่อไม่ได้ ต้องเข้าผ่านช่องทางของเซิร์ฟเอง
 	Endpoint string `json:"endpoint"` // ที่อยู่ตรงสำหรับเชื่อมต่อ (ว่าง = เซิร์ฟซ่อน IP ต้องใช้ cfx.re/join)
+	Discord  string `json:"discord"`
+	Website  string `json:"website"`
 	search   string
 	isThai   bool
 }
@@ -172,7 +175,7 @@ func decodeListServer(msg []byte) *listServer {
 				}
 			})
 			switch k {
-			case "sv_projectName", "sv_projectDesc", "locale", "tags", "banner_detail", "banner_connecting", "sv_maxClients":
+			case "sv_projectName", "sv_projectDesc", "locale", "tags", "banner_detail", "banner_connecting", "sv_maxClients", "icon_url", "discord_link", "Discord", "discord", "Website", "website":
 				vars[k] = val
 			}
 		}
@@ -190,10 +193,25 @@ func decodeListServer(msg []byte) *listServer {
 	s.Locale = vars["locale"]
 	s.Tags = vars["tags"]
 	s.Tags = clip(s.Tags, 100)
-	// iconVersion = 0 จะไม่ถูกส่งมาใน protobuf (ค่าเริ่มต้น) แต่เซิร์ฟยังมีโลโก้ได้ → สร้างที่อยู่เสมอ
-	// เซิร์ฟที่ไม่มีโลโก้จะได้ 404 แล้วหน้าเว็บแสดงตัวอักษรแทน
-	_ = hasIcon
-	s.Icon = fmt.Sprintf("https://frontend.cfx-services.net/api/servers/icon/%s/%d.png", s.ID, iconVer)
+	// โลโก้: ระบบใหม่ของ Cfx ส่งที่อยู่รูปมาใน vars.icon_url (cfx-server-metadata) — ใช้อันนี้ก่อน
+	// ถ้าไม่มี ใช้ระบบเดิม (iconVersion) เฉพาะเซิร์ฟที่ระบุเวอร์ชันมา
+	if u := strings.TrimSpace(vars["icon_url"]); strings.HasPrefix(u, "https://") && len(u) < 500 {
+		s.Icon = u
+	} else if hasIcon && iconVer != 0 {
+		s.Icon = fmt.Sprintf("https://frontend.cfx-services.net/api/servers/icon/%s/%d.png", s.ID, iconVer)
+	}
+	for _, k := range []string{"discord_link", "Discord", "discord"} {
+		if d := cleanLink(vars[k], true); d != "" {
+			s.Discord = d
+			break
+		}
+	}
+	for _, k := range []string{"Website", "website"} {
+		if w := cleanLink(vars[k], false); w != "" {
+			s.Website = w
+			break
+		}
+	}
 	if b := vars["banner_detail"]; strings.HasPrefix(b, "https://") {
 		s.Banner = b
 	} else if b := vars["banner_connecting"]; strings.HasPrefix(b, "https://") {
@@ -205,6 +223,26 @@ func decodeListServer(msg []byte) *listServer {
 	s.isThai = strings.HasPrefix(strings.ToLower(s.Locale), "th") || hasThaiRune(s.Name) || hasThaiRune(s.Desc)
 	s.search = strings.ToLower(s.Name + " " + s.Desc + " " + s.Tags + " " + s.ID)
 	return s
+}
+
+// cleanLink รับเฉพาะลิงก์ http(s) ปกติ (discord = ต้องเป็นลิงก์เชิญ discord) — ใส่ https:// ให้ถ้าไม่มี
+func cleanLink(v string, discord bool) string {
+	v = strings.TrimSpace(v)
+	if v == "" || len(v) > 200 || strings.ContainsAny(v, " \t\n\"'<>") {
+		return ""
+	}
+	low := strings.ToLower(v)
+	if !strings.HasPrefix(low, "http://") && !strings.HasPrefix(low, "https://") {
+		v = "https://" + v
+		low = "https://" + low
+	}
+	if discord && !strings.Contains(low, "discord.gg/") && !strings.Contains(low, "discord.com/invite/") {
+		return ""
+	}
+	if u, err := url.Parse(v); err != nil || !strings.Contains(u.Hostname(), ".") || strings.Contains(u.Hostname(), ":") {
+		return ""
+	}
+	return v
 }
 
 // usableEndpoint คืนที่อยู่ที่เชื่อมต่อตรงได้ (IP:Port หรือ https URL) — ตัดค่าที่เซิร์ฟซ่อนไว้ทิ้ง
