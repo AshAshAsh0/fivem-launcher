@@ -159,7 +159,7 @@ func runUI(uninst bool, selfDir string) (ok bool) {
 	wv.SetHtml(uiHTML)
 	wv.Run()
 	if uninstDone {
-		scheduleSelfDelete(selfDir)
+		removeInstallDir(selfDir)
 	}
 	return true
 }

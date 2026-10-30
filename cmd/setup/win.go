@@ -199,7 +199,7 @@ func fallback(uninst bool, selfDir string) {
 		}
 		data := msg(L("ลบรายการเซิร์ฟเวอร์และการตั้งค่าที่บันทึกไว้ด้วยไหม?", "Also delete your saved servers and settings?"), mbYesNo|mbIconQ) == idYes
 		doUninstall(selfDir, data, noop)
-		scheduleSelfDelete(selfDir)
+		removeInstallDir(selfDir)
 		msg(L(appName+" ถูกถอนการติดตั้งแล้ว", appName+" has been uninstalled."), mbIconInfo)
 		return
 	}

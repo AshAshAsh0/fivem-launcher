@@ -14,7 +14,6 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
-	"syscall"
 	"time"
 
 	"golang.org/x/sys/windows/registry"
@@ -24,7 +23,7 @@ import (
 var appExeGz []byte
 
 // version ถูกแทนค่าตอน build ด้วย -ldflags "-X main.version=..."
-var version = "2.2.0"
+var version = "2.2.1"
 
 const (
 	appName   = "FiveM Launcher"
@@ -56,19 +55,6 @@ func isInstalled() bool {
 	return err == nil
 }
 
-func hidden(name string, args ...string) error {
-	c := exec.Command(name, args...)
-	c.SysProcAttr = &syscall.SysProcAttr{HideWindow: true, CreationFlags: 0x08000000} // CREATE_NO_WINDOW
-	return c.Run()
-}
-
-func psQuote(s string) string { return "'" + strings.ReplaceAll(s, "'", "''") + "'" }
-
-func killApp() {
-	_ = hidden("taskkill", "/F", "/IM", exeName)
-	time.Sleep(500 * time.Millisecond)
-}
-
 func hasWebView2() bool {
 	const guid = `{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}`
 	paths := []struct {
@@ -91,30 +77,6 @@ func hasWebView2() bool {
 		}
 	}
 	return false
-}
-
-func shortcuts(desktop, startMenu bool, target, dir string) {
-	folders := []string{}
-	if desktop {
-		folders = append(folders, "[Environment]::GetFolderPath('Desktop')")
-	}
-	if startMenu {
-		folders = append(folders, "[Environment]::GetFolderPath('Programs')")
-	}
-	if len(folders) == 0 {
-		return
-	}
-	script := fmt.Sprintf(`$ws=New-Object -ComObject WScript.Shell
-foreach($d in @(%s)){
- $s=$ws.CreateShortcut((Join-Path $d '%s.lnk')); $s.TargetPath=%s; $s.WorkingDirectory=%s; $s.IconLocation=%s+',0'; $s.Description='%s'; $s.Save() }`,
-		strings.Join(folders, ","), appName, psQuote(target), psQuote(dir), psQuote(target), appName)
-	_ = hidden("powershell", "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-Command", script)
-}
-
-func removeShortcuts() {
-	script := fmt.Sprintf(`foreach($d in @([Environment]::GetFolderPath('Desktop'), [Environment]::GetFolderPath('Programs'))){
- Remove-Item -LiteralPath (Join-Path $d '%s.lnk') -Force -ErrorAction SilentlyContinue }`, appName)
-	_ = hidden("powershell", "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-Command", script)
 }
 
 type installOpts struct {
@@ -199,13 +161,6 @@ func doUninstall(dir string, alsoData bool, progress func(int, string)) {
 	progress(100, L("ถอนการติดตั้งเรียบร้อย", "Uninstall complete"))
 }
 
-// ลบ Uninstall.exe + โฟลเดอร์หลังจากโปรแกรมนี้ปิด
-func scheduleSelfDelete(dir string) {
-	c := exec.Command("cmd", "/c", "ping 127.0.0.1 -n 3 >nul & rmdir /s /q \""+dir+"\"")
-	c.SysProcAttr = &syscall.SysProcAttr{HideWindow: true, CreationFlags: 0x08000000}
-	_ = c.Start()
-}
-
 func launchApp(target string) {
 	c := exec.Command(target)
 	c.Dir = filepath.Dir(target)
@@ -234,6 +189,18 @@ func main() {
 	if strings.EqualFold(filepath.Base(self), "Uninstall.exe") {
 		uninst = true
 	}
+	// โฟลเดอร์ที่จะถอนการติดตั้ง: ส่งมาทาง /dir= (ตอนรันจาก TEMP) หรือโฟลเดอร์ของ Uninstall.exe เอง
+	instDir := filepath.Dir(self)
+	fromTemp := false
+	for _, a := range os.Args[1:] {
+		if strings.HasPrefix(strings.ToLower(a), "/dir=") {
+			instDir = a[5:]
+			fromTemp = true
+		}
+	}
+	if uninst && !fromTemp && relaunchFromTemp(instDir) {
+		return
+	}
 	for _, a := range os.Args[1:] {
 		if strings.EqualFold(a, "/silent") || strings.EqualFold(a, "--silent") {
 			silentUpdate()
@@ -242,9 +209,9 @@ func main() {
 	}
 
 	if hasWebView2() {
-		if runUI(uninst, filepath.Dir(self)) {
+		if runUI(uninst, instDir) {
 			return
 		}
 	}
-	fallback(uninst, filepath.Dir(self))
+	fallback(uninst, instDir)
 }
