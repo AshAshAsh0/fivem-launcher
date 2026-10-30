@@ -63,8 +63,15 @@
     browse: { q: '', region: 'th', items: [], total: 0, players: 0, updated: 0, loading: false, error: null, loaded: false },
   };
 
+  // จำนวนเซิร์ฟที่บันทึกล่าสุด: ถ้าลดลงจะแนบที่มาไปด้วย (ตัวโปรแกรมจะสำรองไฟล์เดิม + จดบันทึกสาเหตุ)
+  let savedCount = 0;
   function persist() {
-    api.save({ version: 1, servers: state.servers, groups: state.groups, settings: state.settings });
+    const d = { version: 1, servers: state.servers, groups: state.groups, settings: state.settings };
+    if (state.servers.length < savedCount) {
+      try { d._why = `page=${state.page} ` + String(new Error().stack || '').split('\n').slice(2, 7).map((l) => l.trim()).join(' | '); } catch {}
+    }
+    savedCount = state.servers.length;
+    api.save(d);
   }
 
   // ---------- color ----------
@@ -938,6 +945,7 @@
         <div class="btn-row">
           <button class="btn" data-act="export">${I.download} ส่งออกข้อมูล</button>
           <button class="btn" data-act="import">${I.upload} นำเข้าข้อมูล</button>
+          ${api.listBackups ? `<button class="btn" data-act="backups">${I.refresh} กู้คืนข้อมูลสำรอง</button>` : ''}
           <button class="btn" data-act="reset" style="color:var(--danger)">${I.reset} รีเซ็ตทั้งหมด</button>
         </div>
         <div class="about"><div class="mark">${I.mark}</div><div><b>${esc(CFG.appName)} Launcher</b><small id="appInfo">เวอร์ชัน ${esc(state.version)}</small></div></div>
@@ -1062,6 +1070,7 @@
         toast(`นำเข้า ${d.servers.length} เซิร์ฟเวอร์แล้ว`);
       });
       $('[data-act="reset"]').addEventListener('click', confirmReset);
+      $('[data-act="backups"]')?.addEventListener('click', openBackups);
       $('[data-act="check-update"]').addEventListener('click', () => checkUpdate(true));
       $$('[data-act="report"]').forEach((b) => b.addEventListener('click', () => openReport(b.dataset.kind)));
       $('[data-act="website"]')?.addEventListener('click', () => {
@@ -1428,6 +1437,34 @@
     }, sec * 1000);
   }
 
+  // ---------- กู้คืนข้อมูลสำรอง ----------
+  async function openBackups() {
+    let list = [];
+    try { list = (await api.listBackups()) || []; } catch {}
+    const when = (t) => { try { return new Date(t).toLocaleString(isEN() ? 'en-GB' : 'th-TH', { dateStyle: 'medium', timeStyle: 'short' }); } catch { return ''; } };
+    const m = modal(`
+      <div class="modal sm">
+        <div class="modal-head"><h2>กู้คืนข้อมูลสำรอง</h2><button class="x-btn" data-close>${I.x}</button></div>
+        <div class="modal-body">
+          <p class="confirm-text">โปรแกรมจะสำรองลิสต์เดิมไว้อัตโนมัติทุกครั้งที่จำนวนเซิร์ฟลดลง (เก็บ 10 ครั้งล่าสุด) เลือกจุดที่ต้องการกู้คืน — การตั้งค่าปัจจุบันจะไม่เปลี่ยน</p>
+          ${list.length ? `<div class="bk-list">${list.map((b) => `
+            <button class="bk-item" data-bk="${esc(b.name)}">
+              <span><b data-no-i18n>${esc(when(b.time))}</b><small data-no-i18n>${esc((b.names || []).join(', '))}${b.servers > (b.names || []).length ? ' …' : ''}</small></span>
+              <span class="pill pill-mono">${b.servers} เซิร์ฟ</span>
+            </button>`).join('')}</div>` : '<div class="empty" style="min-height:120px"><div><b>ยังไม่มีข้อมูลสำรอง</b>จะเริ่มสำรองเมื่อมีการลบเซิร์ฟออกจากลิสต์</div></div>'}
+        </div>
+        <div class="modal-foot"><button class="btn" data-close>ปิด</button></div>
+      </div>`);
+    $$('[data-bk]', m).forEach((btn) => btn.addEventListener('click', async () => {
+      const d = await api.readBackup(btn.dataset.bk).catch(() => null);
+      if (!d || !Array.isArray(d.servers)) return toast('อ่านไฟล์สำรองไม่ได้', 'err');
+      state.servers = cleanServers(d.servers);
+      state.groups = cleanGroups(d.groups, state.servers);
+      persist(); closeModal(); go('home'); refreshAll();
+      toast(`กู้คืน ${state.servers.length} เซิร์ฟเวอร์แล้ว`);
+    }));
+  }
+
   // ---------- play ----------
   async function play(id) {
     const s = byId(id);
@@ -1540,6 +1577,7 @@
       state.servers = cleanServers(saved.servers);
       state.groups = cleanGroups(saved.groups, state.servers);
       state.settings = { ...DEFAULT_SETTINGS, ...(saved.settings || {}) };
+      savedCount = Array.isArray(saved.servers) ? saved.servers.length : 0;
     }
     applyPrefs();
     try { const inf = await api.info(); state.version = inf.version || ''; state.os = inf.os || ''; } catch {}

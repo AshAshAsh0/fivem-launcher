@@ -26,7 +26,7 @@ import (
 var webFS embed.FS
 
 // version ถูกแทนค่าตอน build ด้วย -ldflags "-X main.version=..."
-var version = "2.7.3"
+var version = "2.7.4"
 
 const (
 	appTitle = "FiveM Launcher"
@@ -218,6 +218,10 @@ func handle(method, raw string) (any, error) {
 		}
 		_ = os.MkdirAll(dataDir, 0o755)
 		return os.WriteFile(filepath.Join(dataDir, "wallpaper.jpg"), b, 0o644) == nil, nil
+	case "listBackups":
+		return listBackups(), nil
+	case "readBackup":
+		return readBackup(arg[string](args, 0)), nil
 	case "clearWallpaper":
 		_ = os.Remove(filepath.Join(dataDir, "wallpaper.jpg"))
 		return true, nil
@@ -405,13 +409,20 @@ func flushSave() {
 	if b == nil {
 		return
 	}
-	var v any
-	if json.Unmarshal(b, &v) == nil {
+	writeMu.Lock()
+	defer writeMu.Unlock()
+	var v map[string]any
+	if json.Unmarshal(b, &v) == nil && v != nil {
+		why, _ := v["_why"].(string)
+		delete(v, "_why")
+		p := filepath.Join(dataDir, "launcher-data.json")
+		guardShrink(p, v, why) // ถ้าเซิร์ฟลดลง: สำรองไฟล์เดิม + จดบันทึกสาเหตุ
 		if pretty, err := json.MarshalIndent(v, "", "  "); err == nil {
 			b = pretty
 		}
 	}
 	p := filepath.Join(dataDir, "launcher-data.json")
+	_ = os.MkdirAll(dataDir, 0o755)
 	if os.WriteFile(p+".tmp", b, 0o644) == nil {
 		_ = os.Rename(p+".tmp", p)
 	}

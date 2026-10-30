@@ -900,3 +900,11 @@ body.dnd .card * { pointer-events: none; }
 [data-theme='hud'] .search .kbd { background: rgba(255, 255, 255, .06); box-shadow: none; color: rgba(255, 255, 255, .5); }
 [data-theme='hud'] .input { background: rgba(57, 60, 65, .5) !important; box-shadow: none !important; }
 [data-theme='hud'] .input:focus { box-shadow: inset 0 0 0 1.5px rgba(10, 174, 251, .5) !important; }
+/* ---- กู้คืนข้อมูลสำรอง ---- */
+.bk-list { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; max-height: 320px; overflow: auto; }
+.bk-item { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border-radius: 12px; background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--line); text-align: left; }
+.bk-item:hover { box-shadow: inset 0 0 0 1.5px var(--strong); }
+.bk-item b { display: block; font-size: 14px; }
+.bk-item small { display: block; color: var(--muted); font-size: 12px; margin-top: 2px; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+[data-theme='hud'] .bk-item { border-radius: 6px; background: rgba(57, 60, 65, .35); box-shadow: none; }
+[data-theme='hud'] .bk-item:hover { box-shadow: inset 0 0 0 1.5px rgba(10, 174, 251, .5); background: rgba(10, 174, 251, .12); }

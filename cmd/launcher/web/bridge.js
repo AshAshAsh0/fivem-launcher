@@ -49,6 +49,8 @@
     installUpdate: (url, ver) => call('installUpdate', url, ver),
     setWallpaper: (b64) => call('setWallpaper', b64),
     clearWallpaper: () => call('clearWallpaper'),
+    listBackups: () => call('listBackups'),
+    readBackup: (n) => call('readBackup', n),
     wallpaperURL: (v) => `/wallpaper.jpg?v=${v}`,
   };
 
