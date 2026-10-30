@@ -1107,3 +1107,11 @@ body.dnd .srow * { pointer-events: none; }
 [data-theme='hud'] .sp-logo::after { content: ''; position: absolute; right: 0; bottom: 0; width: 14px; height: 14px; background: var(--accent); clip-path: polygon(100% 0, 100% 100%, 0 100%); border-radius: 0 0 12px 0; }
 [data-theme='sakura'] .sp-title, [data-theme='sakura'] .sp-status { font-family: 'Mali', 'Kanit', sans-serif; }
 html[data-motion='reduced'] .splash * { animation: none !important; }
+
+/* v4: หน้าเดียวเลือกเซิร์ฟ + ปุ่มตั้งค่า */
+.brand { cursor: pointer; }
+.b-row:not(.skel) { user-select: none; }
+.b-direct .b-ic { background: var(--accent); color: var(--accent-ink); }
+.b-direct .b-ic svg { width: 24px; height: 24px; }
+.b-direct { box-shadow: inset 0 0 0 2px var(--strong), 0 2px 0 var(--line); }
+[data-theme='hud'] .b-direct .b-ic { background: rgba(10, 174, 251, .14); color: var(--accent); }

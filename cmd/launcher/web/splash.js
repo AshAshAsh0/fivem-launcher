@@ -7,8 +7,8 @@
   const en = lang === 'en';
   const v = (q.get('v') || '').replace(/[^0-9.]/g, '');
   const T = en
-    ? { s0: 'Starting up', s1: 'Loading your servers', s2: 'Looking for FiveM', s3: 'Checking server status', s4: 'Ready', tip: 'Tip: double-click a server to join instantly' }
-    : { s0: 'กำลังเริ่มต้น', s1: 'กำลังโหลดลิสต์เซิร์ฟ', s2: 'กำลังตรวจหา FiveM', s3: 'กำลังเช็กสถานะเซิร์ฟ', s4: 'พร้อมแล้ว', tip: 'ทิป: ดับเบิลคลิกที่เซิร์ฟเพื่อเข้าเกมได้ทันที' };
+    ? { s0: 'Starting up', s1: 'Loading settings', s2: 'Looking for FiveM', s3: 'Loading server list', s4: 'Ready', tip: 'Tip: double-click a server to join instantly' }
+    : { s0: 'กำลังเริ่มต้น', s1: 'กำลังโหลดการตั้งค่า', s2: 'กำลังตรวจหา FiveM', s3: 'กำลังโหลดรายชื่อเซิร์ฟ', s4: 'พร้อมแล้ว', tip: 'ทิป: ดับเบิลคลิกที่เซิร์ฟเพื่อเข้าเกมได้ทันที' };
   const MIN = 1000, t0 = performance.now();
   let pct = 0, shown = 0, raf = 0, label = -1;
   const marks = [[0, 0]]; // [เปอร์เซ็นต์ที่แถบต้องถึง, ขั้น] — ข้อความเปลี่ยนตามแถบ ไม่กระโดดล้ำหน้า

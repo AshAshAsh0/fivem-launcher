@@ -50,7 +50,7 @@
     servers: [],
     groups: [],
     settings: { ...DEFAULT_SETTINGS },
-    page: 'home',
+    page: 'browse',
     filter: 'all',
     q: '',
     refreshing: false,
@@ -255,6 +255,7 @@
 
   // ---------- navigation ----------
   function go(page) {
+    if (page !== 'settings') page = 'browse'; // หน้าหลักคือรายชื่อเซิร์ฟ เหลือแค่หน้าตั้งค่าแยกออกไป
     closeMenu();
     closeModal();
     state.page = page;
@@ -696,12 +697,12 @@
   function browseHTML() {
     const B = state.browse;
     const title = isEN()
-      ? `<h1 class="h1">Browse <span class="sq">servers${SQUIGGLE}</span></h1>`
-      : `<h1 class="h1">ค้นหา<span class="sq">เซิร์ฟ${SQUIGGLE}</span></h1>`;
+      ? `<h1 class="h1">Choose a <span class="sq">server${SQUIGGLE}</span></h1>`
+      : `<h1 class="h1">เลือก<span class="sq">เซิร์ฟ${SQUIGGLE}</span></h1>`;
     return `
-      <div class="page-head"><div>${title}<p class="sub">จากรายชื่อเซิร์ฟสาธารณะของ FiveM</p></div></div>
+      <div class="page-head"><div>${title}<p class="sub">เลือกเซิร์ฟแล้วกดเล่น หรือดับเบิลคลิกเพื่อเข้าทันที</p></div></div>
       <div class="toolbar">
-        <label class="search">${I.search}<input id="bq" placeholder="พิมพ์ชื่อเซิร์ฟ หรือแนวเซิร์ฟ เช่น roleplay" value="${esc(B.q)}" spellcheck="false"></label>
+        <label class="search">${I.search}<input id="bq" placeholder="พิมพ์ชื่อเซิร์ฟ แนวเซิร์ฟ หรือวาง IP / ลิงก์ cfx.re" value="${esc(B.q)}" spellcheck="false"></label>
         <div class="seg" id="bRegion">
           <button data-r="th" class="${B.region === 'th' ? 'on' : ''}">เซิร์ฟไทย</button>
           <button data-r="all" class="${B.region === 'all' ? 'on' : ''}">ทั้งหมด</button>
@@ -716,7 +717,6 @@
   function browseRow(s) {
     const p = s.max ? Math.min(100, Math.round((s.players / s.max) * 100)) : 0;
     const sub = s.desc || s.tags.split(',').map((t) => t.trim()).filter(Boolean).slice(0, 6).join(' · ') || joinOf(s.id);
-    const added = inList(s);
     return `<div class="b-row" data-id="${esc(s.id)}">
       <div class="b-ic">${s.icon ? `<img src="${esc(s.icon)}" alt="" loading="lazy">` : ''}<span>${esc(initial(s.name))}</span></div>
       <div class="b-main"><div class="b-name" title="${esc(s.name)}">${s.private ? '<span class="b-lock">🔒 ส่วนตัว</span>' : ''}<span data-no-i18n>${esc(s.name)}</span></div><div class="b-sub" title="${esc(sub)}" data-no-i18n>${esc(sub)}</div></div>
@@ -724,10 +724,31 @@
       <div class="b-act">
         ${s.private
           ? `<button class="btn btn-sm" data-b="private" title="เซิร์ฟนี้ตั้งเป็นส่วนตัว">ทำไมเข้าไม่ได้?</button>`
-          : `<button class="btn btn-sm" data-b="play" title="เข้าเซิร์ฟนี้เลย">${I.play} เล่น</button>
-        ${added ? `<button class="btn btn-sm" disabled>${I.check} อยู่ในลิสต์แล้ว</button>` : `<button class="btn btn-sm btn-dark" data-b="add">${I.plus} เพิ่ม</button>`}`}
+          : `<button class="btn btn-sm btn-dark b-play" data-b="play" title="เข้าเซิร์ฟนี้เลย">${I.play} เล่น</button>`}
       </div>
     </div>`;
+  }
+
+  // ช่องค้นหาเป็นที่อยู่เซิร์ฟ (IP:พอร์ต, โดเมน, ลิงก์ cfx.re, คำสั่ง connect) → เข้าได้ตรง ๆ
+  function directTarget(q) {
+    let t = String(q || '').trim().replace(/^connect\s+/i, '');
+    if (!t || /\s/.test(t)) return '';
+    if (/^(https?:\/\/)?cfx\.re\/join\/[a-z0-9]{3,12}\/?$/i.test(t)) return t;
+    if (/^\d{1,3}(\.\d{1,3}){3}(:\d{2,5})?$/.test(t)) return t;
+    if (/^(https?:\/\/)?[a-z0-9-]+(\.[a-z0-9-]+)+(:\d{2,5})?(\/\S*)?$/i.test(t) && /\.[a-z]{2,}(:|\/|$)/i.test(t)) return t;
+    return '';
+  }
+  function directRow(t) {
+    return `<div class="b-row b-direct" data-direct="1">
+      <div class="b-ic">${I.bolt}</div>
+      <div class="b-main"><div class="b-name">เข้าเซิร์ฟจากที่อยู่นี้โดยตรง</div><div class="b-sub" data-no-i18n>${esc(t)}</div></div>
+      <div class="b-pl"></div>
+      <div class="b-act"><button class="btn btn-sm btn-dark b-play" data-b="direct">${I.play} เข้าเลย</button></div>
+    </div>`;
+  }
+  function joinDirect(t) {
+    toast(`กำลังเข้า ${t}`);
+    api.launch(t, state.settings.after).catch(() => toast('ที่อยู่ไม่ถูกต้อง หรือเปิด FiveM ไม่สำเร็จ', 'err'));
   }
 
   function browseSkeleton() {
@@ -745,29 +766,35 @@
       $('#bRetry').onclick = () => loadBrowse(true, true);
       return;
     }
+    const direct = directTarget(B.q);
+    const bindDirect = () => {
+      list.querySelector('[data-direct]')?.addEventListener('dblclick', () => joinDirect(direct));
+      list.querySelector('[data-b="direct"]')?.addEventListener('click', () => joinDirect(direct));
+    };
     if (B.loading && !B.items.length) {
       $('#bMeta').textContent = 'กำลังโหลดรายชื่อเซิร์ฟ... ครั้งแรกอาจใช้เวลาสักครู่';
-      list.innerHTML = browseSkeleton();
+      list.innerHTML = (direct ? directRow(direct) : '') + browseSkeleton();
+      bindDirect();
       $('#bMore').innerHTML = '';
       return;
     }
     const t = B.updated ? new Date(B.updated * 1000).toLocaleTimeString(isEN() ? 'en-GB' : 'th-TH', { hour: '2-digit', minute: '2-digit' }) : '';
     $('#bMeta').textContent = `พบ ${fmtNum(B.total)} เซิร์ฟ · ผู้เล่นรวม ${fmtNum(B.players)} · อัปเดตเมื่อ ${t}`;
-    list.innerHTML = B.items.length ? B.items.map(browseRow).join('') : `<div class="empty"><div><div class="em-mark">${I.search}</div><b>ไม่พบเซิร์ฟที่ตรงกับคำค้น</b>ลองพิมพ์คำอื่น หรือเปลี่ยนเป็น “ทั้งหมด”</div></div>`;
+    list.innerHTML = (direct ? directRow(direct) : '') + (B.items.length ? B.items.map(browseRow).join('') : direct ? '' : `<div class="empty"><div><div class="em-mark">${I.search}</div><b>ไม่พบเซิร์ฟที่ตรงกับคำค้น</b>ลองพิมพ์คำอื่น เปลี่ยนเป็น “ทั้งหมด” หรือวาง IP / ลิงก์ cfx.re ของเซิร์ฟ</div></div>`);
+    bindDirect();
     $('#bMore').innerHTML = B.items.length < B.total ? `<button class="btn" id="bMoreBtn" ${B.loading ? 'disabled' : ''}>แสดงเพิ่ม</button>` : '';
     $('#bMoreBtn')?.addEventListener('click', () => loadBrowse(false));
     list.querySelectorAll('.b-row').forEach((row) => {
       const s = B.items.find((x) => x.id === row.dataset.id);
       row.querySelector('[data-b="private"]')?.addEventListener('click', () => privateInfo(s));
-      const playBtn = row.querySelector('[data-b="play"]');
-      if (playBtn) playBtn.onclick = () => {
-        const keys = [norm(joinOf(s.id)), s.endpoint ? norm(s.endpoint) : null].filter(Boolean);
-        const mine = state.servers.find((x) => x.cfxId === s.id || keys.includes(norm(x.connect)) || keys.includes(norm(x.address)));
-        if (mine) { mine.lastPlayed = Date.now(); persist(); }
+      if (!s) return;
+      const join = () => {
         toast(`กำลังเข้า ${s.name}`);
         api.launch(targetOf(s), state.settings.after).catch(() => toast('เปิด FiveM ไม่สำเร็จ', 'err'));
       };
-      row.querySelector('[data-b="add"]')?.addEventListener('click', () => addFromBrowse(s));
+      const playBtn = row.querySelector('[data-b="play"]');
+      if (playBtn) playBtn.onclick = (e) => { e.stopPropagation(); join(); };
+      row.ondblclick = (e) => { if (e.target.closest('button')) return; s.private ? privateInfo(s) : join(); };
     });
   }
 
@@ -797,7 +824,7 @@
         <div class="modal-head"><h2>🔒 เซิร์ฟส่วนตัว</h2><button class="x-btn" data-close>${I.x}</button></div>
         <div class="modal-body">
           <p class="confirm-text"><b style="color:var(--ink)">${esc(s.name)}</b> ตั้งค่าเป็นเซิร์ฟส่วนตัว จึงเข้าจากรายชื่อของ FiveM ไม่ได้ (ปุ่ม Connect ในตัว FiveM เองก็กดไม่ได้เช่นกัน)</p>
-          <p class="confirm-text" style="margin-top:12px">ต้องเข้าผ่านช่องทางของเซิร์ฟเอง เช่น Launcher เฉพาะของเซิร์ฟ หรือลิงก์/IP ที่แจกใน Discord ของเซิร์ฟ — ถ้ามีที่อยู่แล้ว กด “เพิ่มเซิร์ฟเวอร์” ที่หน้าหลักแล้ววางที่อยู่นั้นได้เลย</p>
+          <p class="confirm-text" style="margin-top:12px">ต้องเข้าผ่านช่องทางของเซิร์ฟเอง เช่น Launcher เฉพาะของเซิร์ฟ หรือลิงก์/IP ที่แจกใน Discord ของเซิร์ฟ — ถ้ามีที่อยู่แล้ว วาง IP หรือลิงก์นั้นในช่องค้นหาด้านบน แล้วกด “เข้าเลย” ได้ทันที</p>
         </div>
         <div class="modal-foot"><button class="btn btn-dark" data-close>เข้าใจแล้ว</button></div>
       </div>`);
@@ -830,6 +857,7 @@
   function bindBrowse() {
     const B = state.browse;
     let t;
+    $('#bq').addEventListener('keydown', (e) => { if (e.key === 'Enter' && directTarget(B.q)) joinDirect(directTarget(B.q)); });
     $('#bq').addEventListener('input', (e) => {
       B.q = e.target.value;
       clearTimeout(t);
@@ -907,7 +935,6 @@
 
       <div class="sect-row">
         <section class="sect"><h3>หลังกดเล่น</h3><p class="d">ให้ Launcher ทำอะไรหลังเปิดเกม</p>${seg('after', [['minimize', 'ย่อหน้าต่าง'], ['quit', 'ปิดโปรแกรม'], ['none', 'ไม่ทำอะไร']], S.after)}</section>
-        <section class="sect"><h3>รีเฟรชสถานะอัตโนมัติ</h3><p class="d">อัปเดตจำนวนผู้เล่นและปิงทุก ๆ</p>${seg('refresh', [[0, 'ปิด'], [15, '15 วิ'], [30, '30 วิ'], [60, '60 วิ']], S.refresh)}</section>
       </div>
 
       <section class="sect">
@@ -1544,7 +1571,8 @@
 
   // ---------- global ----------
   function bindGlobal() {
-    $$('.nav-btn').forEach((b) => b.addEventListener('click', () => go(b.dataset.page)));
+    $$('.nav-btn').forEach((b) => b.addEventListener('click', () => go(state.page === 'settings' ? 'browse' : 'settings')));
+    $('.brand')?.addEventListener('click', () => { if (state.page !== 'browse') go('browse'); });
     $('#btnMin').addEventListener('click', () => api.minimize());
     $('#btnClose').addEventListener('click', () => api.close());
     $('.titlebar').addEventListener('dblclick', (e) => { if (!e.target.closest('button')) api.toggleMax(); });
@@ -1564,11 +1592,10 @@
       if (e.key === 'Escape') { closeMenu(); closeModal(); }
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f') {
         e.preventDefault();
-        if (state.page === 'settings') go('home');
+        if (state.page === 'settings') go('browse');
         setTimeout(() => { const q = $('#q') || $('#bq'); q?.focus(); q?.select(); }, 30);
       }
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'n') { e.preventDefault(); openServerModal(); }
-      if (e.key === 'F5') { e.preventDefault(); refreshAll(true); }
+      if (e.key === 'F5') { e.preventDefault(); if (state.page === 'browse') loadBrowse(true, true); }
     });
     api.onVisibility?.((v) => { state.visible = v.visible; if (v.visible) refreshAll(); });
     document.addEventListener('visibilitychange', () => { state.visible = !document.hidden; });
@@ -1594,13 +1621,12 @@
     try { state.fivem = await api.fivemStatus(state.settings.fivemPath); } catch {}
     api.setPerfMode?.(state.settings.perf);
     bindGlobal();
-    let startPage = 'home';
-    try { startPage = sessionStorage.getItem('fl-page') || 'home'; sessionStorage.removeItem('fl-page'); } catch {}
-    go(['home', 'browse', 'favorites', 'settings'].includes(startPage) ? startPage : 'home');
-    restartAuto();
+    let startPage = 'browse';
+    try { startPage = sessionStorage.getItem('fl-page') || 'browse'; sessionStorage.removeItem('fl-page'); } catch {}
     S.step(3, 75);
-    // รอผลสถานะเซิร์ฟสักครู่ (เซิร์ฟที่ไม่ตอบจะไม่ทำให้รอนาน) แล้วปิดหน้า loading
-    await Promise.race([refreshAll(), new Promise((r) => setTimeout(r, 1800))]).catch(() => {});
+    go(startPage === 'settings' ? 'settings' : 'browse');
+    // รอรายชื่อเซิร์ฟสักครู่ (ถ้าเน็ตช้า หน้ารายชื่อจะโชว์โครงโหลดต่อเอง) แล้วปิดหน้า loading
+    await new Promise((r) => { const t0 = Date.now(); const w = () => (state.browse.loaded || state.browse.error || Date.now() - t0 > 2500 ? r() : setTimeout(w, 80)); w(); });
     S.done();
     setTimeout(() => checkUpdate(false), 4000);
   }
