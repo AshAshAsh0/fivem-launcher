@@ -1241,3 +1241,19 @@ html[data-motion='reduced'] .splash * { animation: none !important; }
 .sv-note.ok { background: rgba(47, 210, 127, .12) !important; color: #4be39a !important; }
 .sv-side .sv-lock.b-mine { position: absolute; left: 14px; top: 14px; z-index: 2; background: rgba(10, 20, 30, .7); }
 .sv-links .pill-bell { height: 30px; }
+
+/* v8: หน้าต่างเพิ่มเซิร์ฟแบบย่อ + กลุ่มในเซิร์ฟของฉัน */
+.add-pop { width: min(520px, calc(100vw - 60px)); }
+.add-pop .modal-body { padding-bottom: 14px; }
+.add-pop .row { display: flex; gap: 10px; }
+.add-pop .row .input { flex: 1; min-width: 0; height: 46px; font-family: var(--font-mono); font-size: 13px; }
+.add-pop #fCheck { height: 46px; flex: none; }
+.add-pop .hint { font-size: 12px; margin-top: 6px; }
+.add-pop .preview { margin: 0; }
+.add-pop .pv-banner { height: 92px; }
+.mine-grp { display: flex; align-items: center; gap: 8px; margin: 4px 2px 0; font: 600 12.5px var(--font-head); color: var(--ink-2); }
+.mine-grp i { font: 600 11px var(--font-mono); font-style: normal; color: var(--accent); background: rgba(10, 174, 251, .1); border-radius: 6px; padding: 1px 7px; }
+.mine-grp::after { content: ''; flex: 1; height: 1px; background: rgba(255, 255, 255, .07); order: 5; }
+.mine-grp .grp-more { order: 6; width: 28px; height: 28px; }
+.mine-grp-empty { padding: 10px 14px; border-radius: 10px; border: 1px dashed rgba(255, 255, 255, .1); color: var(--muted); font-size: 12.5px; }
+.menu-layer { z-index: 90; }

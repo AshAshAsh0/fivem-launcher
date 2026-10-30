@@ -838,7 +838,16 @@
     if (t && !list.length) return '';
     const head = `<div class="b-sec mine-head"><span>เซิร์ฟของฉัน</span><button class="btn btn-sm" data-b="add-mine">${I.plus} เพิ่มเซิร์ฟ / IP</button></div>`;
     if (!list.length) return head + `<button class="mine-empty" data-b="add-mine">${I.plus}<span><b>เพิ่มเซิร์ฟของคุณ</b><small>ใส่ IP หรือลิงก์ของเซิร์ฟ (รวมเซิร์ฟส่วนตัว) แล้วจะอยู่ตรงนี้ กดเข้าได้ทุกครั้ง</small></span></button>`;
-    return head + list.map(mineRow).join('');
+    if (!state.groups.length) return head + list.map(mineRow).join('');
+    const ids = new Set(state.groups.map((g) => g.id));
+    const grpHead = (g, n) => `<div class="mine-grp"><span data-no-i18n>${esc(g.name)}</span><i>${n}</i>${`<button class="grp-more" data-grp="menu" data-gid="${g.id}" title="จัดการกลุ่ม">${I.more}</button>`}</div>`;
+    const parts = state.groups.map((g) => {
+      const items = list.filter((s) => s.group === g.id);
+      if (t && !items.length) return '';
+      return grpHead(g, items.length) + (items.length ? items.map(mineRow).join('') : '<div class="mine-grp-empty">ยังไม่มีเซิร์ฟในกลุ่มนี้ — กด ⋯ ที่เซิร์ฟแล้วเลือกกลุ่ม</div>');
+    }).join('');
+    const loose = list.filter((s) => !s.group || !ids.has(s.group));
+    return head + parts + (loose.length ? `<div class="mine-grp"><span>ไม่ได้จัดกลุ่ม</span><i>${loose.length}</i></div>` + loose.map(mineRow).join('') : '');
   }
   function mineRow(s) {
     const S = st(s), p = loadPct(s), logo = logoOf(s), sel = state.browse.sel === 'm:' + s.id;
@@ -851,6 +860,7 @@
   }
   function bindMine(root) {
     $$('[data-b="add-mine"]', root).forEach((b) => (b.onclick = () => openServerModal()));
+    $$('[data-grp="menu"]', root).forEach((b) => (b.onclick = (e) => { e.stopPropagation(); groupMenu(b, groupById(b.dataset.gid)); }));
     $$('.b-row[data-mid]', root).forEach((row) => {
       const s = byId(row.dataset.mid);
       if (!s) return;
@@ -902,14 +912,12 @@
         <div class="sv-links">
           ${bellHTML(s)}
           ${s.discord ? `<button class="btn btn-sm sv-discord" data-link="${esc(normUrl(s.discord))}">Discord</button>` : ''}
-          <button class="btn btn-sm" id="svEdit">${I.edit} แก้ไข</button>
           <button class="btn btn-sm" id="svDel" style="color:var(--danger)">${I.trash} ลบ</button>
         </div>
       </div>
       <div class="sv-foot"><button class="btn btn-dark btn-lg sv-play" id="svPlay">${I.play} ${S.online ? 'เล่นเลย' : 'ลองเข้า'}</button></div>`, 'm:' + s.id);
     if (!side) return;
     $('#svPlay', side).onclick = () => play(s.id);
-    $('#svEdit', side).onclick = () => openServerModal(s);
     $('#svDel', side).onclick = () => confirmDelete(s);
     $$('[data-link]', side).forEach((b) => (b.onclick = () => api.openExternal(b.dataset.link)));
     $$('[data-act="watch"]', side).forEach((b) => (b.onclick = () => toggleWatch(s)));
@@ -1367,25 +1375,15 @@
     const cur = s.group && groupById(s.group) ? s.group : '';
     const mark = (on) => (on ? I.check : '<i class="mk"></i>');
     const groups = state.groups.length
-      ? `<hr><div class="menu-label">ย้ายไปกลุ่ม</div>
+      ? `<div class="menu-label">ย้ายไปกลุ่ม</div>
          ${state.groups.map((g) => `<button data-m="grp" data-g="${g.id}">${mark(cur === g.id)} <span data-no-i18n>${esc(g.name)}</span></button>`).join('')}
-         <button data-m="grp" data-g="">${mark(!cur)} ไม่ได้จัดกลุ่ม</button>
-         <button data-m="newgrp">${I.folder2} กลุ่มใหม่...</button>`
-      : `<button data-m="newgrp">${I.folder2} ย้ายไปกลุ่มใหม่...</button>`;
+         ${cur ? `<button data-m="grp" data-g="">${mark(false)} ไม่ได้จัดกลุ่ม</button>` : ''}`
+      : '';
     showMenu(anchor, `
-      <button data-m="edit">${I.edit} แก้ไข</button>
-      <button data-m="copy">${I.copy} คัดลอกที่อยู่</button>
-      ${s.discord ? `<button data-m="discord">${I.discord} เปิด Discord</button>` : ''}
-      <button data-m="refresh">${I.refresh} รีเฟรชเซิร์ฟนี้</button>
-      ${state.watching[s.id] ? `<button data-m="watch">🔔 ยกเลิกการแจ้งเตือน</button>` : bellKind(s) ? `<button data-m="watch">🔔 ${bellKind(s) === 'online' ? 'แจ้งเตือนเมื่อเซิร์ฟเปิด' : 'แจ้งเตือนเมื่อมีที่ว่าง'}</button>` : ''}
       ${groups}
+      <button data-m="newgrp">${I.folder2} กลุ่มใหม่...</button>
       <hr><button data-m="del" class="danger">${I.trash} ลบเซิร์ฟเวอร์</button>`, async (k, b) => {
-      if (k === 'edit') openServerModal(s);
-      if (k === 'copy') { try { await navigator.clipboard.writeText(s.connect || s.address); toast('คัดลอกที่อยู่แล้ว'); } catch { toast('คัดลอกไม่สำเร็จ', 'err'); } }
-      if (k === 'discord') api.openExternal(normUrl(s.discord));
-      if (k === 'refresh') { await refreshOne(s, true); persist(); updateHomeParts(); }
       if (k === 'del') confirmDelete(s);
-      if (k === 'watch') toggleWatch(s);
       if (k === 'grp') { s.group = b.dataset.g || null; persist(); updateHomeParts(); }
       if (k === 'newgrp') groupModal(null, s);
     });
@@ -1423,76 +1421,39 @@
   function closeModal() { $('#modalRoot').innerHTML = ''; }
 
   // ---------- add / edit server ----------
+  // หน้าต่างเพิ่มเซิร์ฟ: เหลือแค่ช่องที่อยู่ + การ์ดตัวอย่าง (ชื่อ/โลโก้/แบนเนอร์ดึงจากเซิร์ฟเอง)
   function openServerModal(existing) {
     const d = existing
-      ? { ...existing, fetched: existing.status ? { ...existing.status, name: existing.name, logo: existing.logo, banner: existing.banner } : null }
-      : { address: '', name: '', category: '', desc: '', bannerUrl: '', logoUrl: '', discord: '', tone: 'auto', autoTone: null, logo: null, banner: null, fetched: null };
-    const cats = CFG.categories;
-
+      ? { ...existing, fetched: existing.status ? { ...existing.status, name: existing.name } : null }
+      : { address: '', name: '', logo: null, banner: null, autoTone: null, tone: 'auto', fetched: null };
     const m = modal(`
-      <div class="modal">
-        <div class="modal-head"><h2>${existing ? 'แก้ไขเซิร์ฟเวอร์' : 'เพิ่มเซิร์ฟเวอร์ใหม่'}</h2><button class="x-btn" data-close>${I.x}</button></div>
+      <div class="modal add-pop">
+        <div class="modal-head"><h2>${existing ? 'แก้ไขที่อยู่เซิร์ฟ' : 'เพิ่มเซิร์ฟเวอร์'}</h2><button class="x-btn" data-close>${I.x}</button></div>
         <div class="modal-body">
-          <div class="field">
+          <div class="field" style="margin-bottom:12px">
             <label>ที่อยู่เซิร์ฟเวอร์</label>
-            <div class="row"><input class="input" id="fAddr" placeholder="play.yourserver.com หรือ 127.0.0.1:30120" value="${esc(d.address)}" spellcheck="false"><button class="btn" id="fCheck" style="height:50px">${I.bolt} ตรวจสอบ</button></div>
-            <div class="hint" id="fHint">รองรับโดเมนทุกแบบ (เช่น play.yourserver.com), IP:Port (ไม่ใส่พอร์ต = 30120), ลิงก์แบบมี path (เช่น https://play.city.co.th/server1), คำสั่ง connect จาก F8 และลิงก์/โค้ด cfx.re/join</div>
+            <div class="row"><input class="input" id="fAddr" placeholder="เช่น 103.91.190.199:30120 หรือ cfx.re/join/abc123" value="${esc(d.address)}" spellcheck="false"><button class="btn" id="fCheck">${I.bolt} ตรวจสอบ</button></div>
+            <div class="hint" id="fHint">ใส่ IP:พอร์ต, โดเมน หรือลิงก์ cfx.re/join แล้วกด “ตรวจสอบ”</div>
           </div>
           <div class="preview" id="fPreview"></div>
-          <div class="field"><label>ชื่อเซิร์ฟเวอร์</label><input class="input" id="fName" placeholder="เช่น เมืองหลวง RP" value="${esc(d.name)}"></div>
-          <div class="field"><label>หมวดหมู่ <small>เลือก 1 อย่าง</small></label>
-            <div class="chip-grid" id="fCats">${cats.map((c) => `<button class="chip-opt ${d.category === c ? 'on' : ''}" data-c="${esc(c)}">${esc(c)}</button>`).join('')}</div>
-          </div>
-          <div class="field"><label>คำอธิบาย <small>ไม่บังคับ</small></label><textarea class="input" id="fDesc" placeholder="บอกสั้น ๆ ว่าเซิร์ฟเวอร์นี้เป็นแบบไหน">${esc(d.desc)}</textarea></div>
-          <div class="cols-2">
-            <div class="field" style="margin-bottom:0"><label>รูปแบนเนอร์ (URL) <small>ไม่บังคับ</small></label><input class="input" id="fBanner" placeholder="https://.../banner.gif" value="${esc(d.bannerUrl)}" spellcheck="false"></div>
-            <div class="field" style="margin-bottom:0"><label>รูปโลโก้ (URL) <small>ไม่บังคับ</small></label><input class="input" id="fLogo" placeholder="https://.../logo.gif" value="${esc(d.logoUrl)}" spellcheck="false"></div>
-          </div>
-          <div class="hint" style="margin-bottom:18px">รองรับ PNG, JPG, WEBP และ GIF แบบขยับได้ — เว้นว่างไว้จะใช้แบนเนอร์/โลโก้ที่ดึงจากเซิร์ฟเวอร์</div>
-          <div class="field"><label>ลิงก์ Discord <small>ไม่บังคับ</small></label><input class="input" id="fDiscord" placeholder="discord.gg/yourserver" value="${esc(d.discord)}" spellcheck="false"></div>
-          <div class="field" style="margin-bottom:4px"><label>โทนการ์ด <span class="tone-now" id="fToneNow"></span></label>
-            <div class="swatches" id="fTones"></div>
-          </div>
         </div>
         <div class="modal-foot"><button class="btn" data-close>ยกเลิก</button><button class="btn btn-dark" id="fSave">${I.check} บันทึก</button></div>
       </div>`);
-
     const el = (id) => $(`#${id}`, m);
 
     function renderPreview() {
-      const f = d.fetched;
-      const logo = d.logoUrl || d.logo;
-      const banner = d.bannerUrl || d.banner;
-      const t = d.tone !== 'auto' ? d.tone : d.autoTone || '#2c2c3a';
+      const f = d.fetched, logo = d.logoUrl || d.logo, banner = d.bannerUrl || d.banner;
+      const t = d.tone && d.tone !== 'auto' ? d.tone : d.autoTone || '#2c2c3a';
       el('fPreview').setAttribute('style', toneStyle(t));
-      const bannerInner = banner ? `<img src="${esc(banner)}" alt="">` : logo ? `<img class="blur-logo" src="${esc(logo)}" alt="">` : '';
       el('fPreview').innerHTML = `
-        <div class="pv-banner" style="${banner || logo ? `background:${t}` : ''}">${bannerInner}</div>
+        <div class="pv-banner" style="${banner || logo ? `background:${t}` : ''}">${banner ? `<img src="${esc(banner)}" alt="">` : logo ? `<img class="blur-logo" src="${esc(logo)}" alt="">` : ''}</div>
         <div class="pv-row">
           <div class="pv-logo ${logo ? 'has' : ''}">${logo ? `<img src="${esc(logo)}" alt="">` : '?'}</div>
           <div class="pv-info">
-            <b>${esc(el('fName')?.value || f?.name || 'ชื่อเซิร์ฟเวอร์')}</b>
+            <b data-no-i18n>${esc(f?.name || d.name || 'ชื่อเซิร์ฟเวอร์')}</b>
             ${f ? (f.online ? `<span class="pill pill-ok" style="margin-top:4px">ออนไลน์ · ${fmtNum(f.players)}/${fmtNum(f.max)}</span>` : '<span class="pill pill-off" style="margin-top:4px">ออฟไลน์</span>') : '<span>กด “ตรวจสอบ” เพื่อดึงชื่อ โลโก้ และแบนเนอร์</span>'}
           </div>
-          ${d.logo && !d.logoUrl ? `<button class="btn btn-sm" id="fRmLogo">${I.trash} ลบโลโก้</button>` : ''}
         </div>`;
-      el('fRmLogo')?.addEventListener('click', () => { d.logo = null; d.autoTone = null; renderPreview(); renderTones(); });
-    }
-
-    function renderTones() {
-      const cur = d.tone;
-      const autoC = d.autoTone || '#2c2c3a';
-      const isCustom = cur !== 'auto' && !CFG.tones.includes(cur);
-      el('fTones').innerHTML = `
-        <button class="swatch auto ${cur === 'auto' ? 'on' : ''}" data-t="auto" title="อัตโนมัติจากโลโก้"></button>
-        ${CFG.tones.map((c) => `<button class="swatch ${cur === c ? 'on' : ''}" data-t="${c}" style="--c:${c}"></button>`).join('')}
-        <label class="swatch custom ${isCustom ? 'on' : ''}" style="--c:${isCustom ? cur : 'transparent'}" title="เลือกสีเอง">+<input type="color" value="${isCustom ? cur : '#ec6fa3'}"></label>`;
-      const now = cur === 'auto' ? autoC : cur;
-      el('fToneNow').innerHTML = `<i style="--c:${now}"></i>${cur === 'auto' ? 'อัตโนมัติ' : 'กำหนดเอง'} — <code>${now}</code>`;
-      el('fTones').querySelectorAll('[data-t]').forEach((b) => b.addEventListener('click', () => { d.tone = b.dataset.t; renderTones(); renderPreview(); }));
-      const ci = el('fTones').querySelector('input[type=color]');
-      ci.addEventListener('input', () => { d.tone = ci.value; el('fToneNow').innerHTML = `<i style="--c:${ci.value}"></i>กำหนดเอง — <code>${ci.value}</code>`; renderPreview(); });
-      ci.addEventListener('change', () => renderTones());
     }
 
     async function check() {
@@ -1507,79 +1468,49 @@
       btn.innerHTML = `${I.bolt} ตรวจสอบ`;
       const hint = el('fHint');
       if (!r.ok) { hint.className = 'hint err'; hint.textContent = r.error || 'ตรวจสอบไม่สำเร็จ'; return; }
-      d.fetched = r;
-      d.connect = r.connect; d.display = r.display;
+      d.fetched = r; d.connect = r.connect; d.display = r.display; d.checkedAddr = addr;
       if (r.online) {
         if (r.logo) d.logo = r.logo;
         if (r.banner) d.banner = r.banner;
-        if (!el('fName').value.trim() && r.name) el('fName').value = r.name;
-        if (!el('fDesc').value.trim() && r.desc && r.desc.length < 140) el('fDesc').value = r.desc;
-        hint.className = 'hint ok';
-        hint.textContent = `ออนไลน์ · ${fmtNum(r.players)}/${fmtNum(r.max)} ผู้เล่น · ${r.ping} ms · ${r.logo ? 'พบโลโก้' : 'ไม่พบโลโก้'} · ${r.banner ? 'พบแบนเนอร์' : 'ไม่พบแบนเนอร์'} — ${r.connect}`;
+        if (r.name) d.name = r.name;
+        if (r.desc && !d.desc) d.desc = r.desc.slice(0, 300);
         if (d.logo) d.autoTone = await dominantColor(d.logo);
+        hint.className = 'hint ok';
+        hint.textContent = `ออนไลน์ · ${fmtNum(r.players)}/${fmtNum(r.max)} ผู้เล่น · ${r.ping} ms`;
       } else {
         hint.className = 'hint err';
-        hint.textContent = `ออฟไลน์ หรือเชื่อมต่อไม่ได้ — ${r.error || ''} (ยังบันทึกได้)`;
+        hint.textContent = 'ออฟไลน์ หรือเชื่อมต่อไม่ได้ (ยังบันทึกได้)';
       }
-      renderPreview(); renderTones();
+      renderPreview();
     }
 
     el('fCheck').addEventListener('click', check);
     el('fAddr').addEventListener('keydown', (e) => { if (e.key === 'Enter') check(); });
-    el('fName').addEventListener('input', () => { const b = $('.pv-info b', m); if (b) b.textContent = el('fName').value || d.fetched?.name || 'ชื่อเซิร์ฟเวอร์'; });
-    el('fCats').querySelectorAll('[data-c]').forEach((b) => b.addEventListener('click', () => {
-      d.category = d.category === b.dataset.c ? '' : b.dataset.c;
-      el('fCats').querySelectorAll('[data-c]').forEach((x) => x.classList.toggle('on', x.dataset.c === d.category));
-    }));
-    let imgT;
-    const onImg = () => {
-      clearTimeout(imgT);
-      imgT = setTimeout(async () => {
-        d.bannerUrl = el('fBanner').value.trim();
-        d.logoUrl = el('fLogo').value.trim();
-        if (d.logoUrl) d.autoTone = (await dominantColor(d.logoUrl)) || d.autoTone;
-        else if (d.logo) d.autoTone = await dominantColor(d.logo);
-        renderPreview(); renderTones();
-      }, 450);
-    };
-    el('fBanner').addEventListener('input', onImg);
-    el('fLogo').addEventListener('input', onImg);
-
     el('fSave').addEventListener('click', async () => {
       const address = el('fAddr').value.trim();
       if (!address) { el('fAddr').focus(); el('fHint').className = 'hint err'; el('fHint').textContent = 'กรุณาใส่ที่อยู่เซิร์ฟเวอร์'; return; }
-      const needsCheck = !d.fetched || address !== d.address;
+      const checked = d.fetched && d.checkedAddr === address;
+      const changed = !existing || address !== existing.address;
       const rec = {
-        id: existing?.id || uid(),
+        ...(existing || { id: uid(), category: '', desc: '', bannerUrl: '', logoUrl: '', discord: '', tone: 'auto', fav: false, group: null, addedAt: Date.now(), lastPlayed: null }),
         address,
-        connect: needsCheck ? address : d.connect || address,
-        display: needsCheck ? address : d.display || address,
-        name: el('fName').value.trim() || d.fetched?.name || address,
-        category: d.category || '',
-        desc: el('fDesc').value.trim(),
-        bannerUrl: el('fBanner').value.trim(),
-        logoUrl: el('fLogo').value.trim(),
-        discord: el('fDiscord').value.trim(),
-        tone: d.tone,
-        autoTone: d.autoTone,
-        logo: d.logo || null,
-        banner: d.banner || null,
-        fav: existing?.fav || false,
-        addedAt: existing?.addedAt || Date.now(),
-        lastPlayed: existing?.lastPlayed || null,
-        status: d.fetched && !needsCheck ? { online: d.fetched.online, players: d.fetched.players, max: d.fetched.max, ping: d.fetched.ping, checkedAt: Date.now() } : existing?.status || null,
+        connect: checked ? d.connect || address : changed ? address : existing.connect,
+        display: checked ? d.display || address : changed ? address : existing.display,
+        name: (checked && d.fetched.name) || (!changed && existing?.name) || d.name || address,
+        desc: d.desc || existing?.desc || '',
+        logo: d.logo || null, banner: d.banner || null, autoTone: d.autoTone || null,
+        status: checked ? { online: d.fetched.online, players: d.fetched.players || 0, max: d.fetched.max || 0, ping: d.fetched.ping ?? null, checkedAt: Date.now() } : existing?.status || null,
       };
       if (existing) Object.assign(existing, rec);
-      else state.servers.push(rec);
+      else state.servers.unshift(rec);
       persist();
       closeModal();
       updateHomeParts();
-      toast(existing ? 'บันทึกการแก้ไขแล้ว' : 'เพิ่มเซิร์ฟเวอร์แล้ว');
-      if (needsCheck) { await refreshOne(existing || rec, true); updateHomeParts(); }
+      toast(existing ? 'บันทึกแล้ว' : 'เพิ่มเซิร์ฟเวอร์แล้ว');
+      if (!checked) { await refreshOne(existing || rec, true); persist(); updateHomeParts(); }
     });
 
     renderPreview();
-    renderTones();
     setTimeout(() => el('fAddr').focus(), 60);
   }
 
