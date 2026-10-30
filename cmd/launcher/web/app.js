@@ -318,7 +318,7 @@
         <div class="dt-logo" style="background:${t}">${logo ? `<img src="${esc(logo)}" alt="">` : `<span>${esc(initial(s.name))}</span>`}</div>
         <div class="dt-title">
           <span class="badge soft" ${s.category && tag === s.category ? 'data-no-i18n' : ''}>${esc(tag)}</span>
-          <h2 class="dt-name" title="${esc(s.name)}" data-no-i18n>${esc(s.name)}</h2>
+          <h2 class="dt-name${[...String(s.name)].length > 26 ? ' xlong' : [...String(s.name)].length > 16 ? ' long' : ''}" title="${esc(s.name)}" data-no-i18n>${esc(s.name)}</h2>
           <div class="dt-addr" data-no-i18n>${esc(s.display || s.address)}</div>
         </div>
       </div>
