@@ -1271,3 +1271,43 @@ html[data-motion='reduced'] .splash * { animation: none !important; }
 .fivem-miss span { flex: 1; min-width: 0; }
 .fivem-miss b { display: block; font-size: 13.5px; color: #ffb3b3; }
 .fivem-miss small { display: block; font-size: 12px; color: var(--muted); }
+
+/* ================= v10: แจ้งเตือนแบบ HUD + ส่วนท้ายเหลือแค่เวอร์ชัน ================= */
+.toasts { gap: 10px; }
+[data-theme] .toast {
+  --tc: #0aaefb; --tbg: rgba(10, 60, 95, .72);
+  position: relative; display: flex; align-items: center; gap: 16px; min-width: 300px; max-width: 420px;
+  padding: 12px 18px 12px 14px; border: 0; border-radius: 12px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--tc) 30%, rgba(12, 14, 17, .92)), var(--tbg));
+  box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--tc) 85%, transparent), 0 0 24px -8px var(--tc), 0 14px 30px -14px rgba(0, 0, 0, .8);
+  backdrop-filter: blur(6px);
+  font-family: 'Kanit', var(--font-body); color: #fff;
+}
+.toast.ok { --tc: #34d399; --tbg: rgba(16, 70, 52, .72); }
+.toast.err { --tc: #f05252; --tbg: rgba(95, 20, 24, .72); }
+.toast.info { --tc: #2ea8ff; --tbg: rgba(16, 58, 98, .72); }
+.toast.warn { --tc: #f5a524; --tbg: rgba(96, 60, 14, .72); }
+[data-theme] .toast .ti {
+  position: relative; flex: none; width: 34px; height: 34px; border-radius: 6px; margin: 0 4px 0 6px;
+  background: color-mix(in srgb, var(--tc) 22%, rgba(0, 0, 0, .4)); color: var(--tc);
+  box-shadow: inset 0 0 0 1.5px var(--tc), 0 0 14px -2px var(--tc);
+  transform: rotate(45deg); display: grid; place-items: center;
+}
+[data-theme] .toast .ti svg { transform: rotate(-45deg); width: 18px; height: 18px; stroke: currentColor; stroke-width: 3; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.toast .tx { display: flex; flex-direction: column; min-width: 0; }
+.toast .tx b { font-weight: 600; font-size: 12.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--tc); line-height: 1.3; }
+.toast .tx span { font-weight: 500; font-size: 13.5px; line-height: 1.35; color: #fff; word-break: break-word; }
+.toast.upd .tx b { display: none; }
+
+/* ส่วนท้าย: ไม่มีแถบพื้นหลัง เหลือแค่ตัวหนังสือจาง ๆ ชิดขวา */
+[data-theme] .foot { background: none !important; box-shadow: none !important; padding: 0 18px 8px; margin: 0; min-height: 0; justify-content: flex-end; }
+[data-theme] .foot::before { display: none !important; }
+.foot .made { margin: 0 0 0 auto; order: 9; font-size: 11.5px; opacity: .35; text-align: right; }
+.foot .made b { font-weight: 500; }
+.foot .foot-upd { margin-right: auto; }
+.toasts { bottom: 38px !important; right: 22px !important; }
+/* แถบมีเวอร์ชันใหม่ แบบเดียวกับแจ้งเตือน (ฟ้า) */
+[data-theme] .foot-upd { border-radius: 10px; padding: 5px 6px 5px 12px; font-family: 'Kanit', var(--font-body); font-weight: 500; color: #fff;
+  background: linear-gradient(90deg, rgba(46, 168, 255, .28), rgba(16, 58, 98, .75)); box-shadow: inset 0 0 0 1.5px rgba(46, 168, 255, .85), 0 0 20px -8px #2ea8ff; }
+[data-theme] .foot-upd .fu-ic { color: #2ea8ff; }
+[data-theme] .foot { padding-top: 4px; }

@@ -198,12 +198,21 @@
   const initial = (name) => (String(name || '?').trim()[0] || '?').toUpperCase();
 
   // ---------- toast ----------
+  // แจ้งเตือนแบบ HUD: ok = สำเร็จ (เขียว), err = ผิดพลาด (แดง), info = ข้อมูล (ฟ้า), warn = คำเตือน (ส้ม)
+  const TOAST = {
+    ok: { cls: 'ok', t: 'สำเร็จ', ic: '<svg viewBox="0 0 24 24"><path d="m6 12.5 4 4 8-9"/></svg>' },
+    err: { cls: 'err', t: 'ผิดพลาด', ic: '<svg viewBox="0 0 24 24"><path d="M12 6.5v7M12 17.5v.01"/></svg>' },
+    info: { cls: 'info', t: 'ข้อมูล', ic: '<svg viewBox="0 0 24 24"><path d="M12 10.5v7M12 6.5v.01"/></svg>' },
+    warn: { cls: 'warn', t: 'คำเตือน', ic: '<svg viewBox="0 0 24 24"><path d="M12 6.5v7M12 17.5v.01"/></svg>' },
+  };
   function toast(msg, type = 'ok') {
+    const k = TOAST[type] || TOAST.ok;
     const el = document.createElement('div');
-    el.className = `toast ${type === 'err' ? 'err' : ''}`;
-    el.innerHTML = `<span class="ti">${type === 'err' ? I.x : I.check}</span><span>${esc(msg)}</span>`;
+    el.className = `toast ${k.cls}`;
+    el.innerHTML = `<span class="ti">${k.ic}</span><span class="tx"><b>${k.t}</b><span>${esc(msg)}</span></span>`;
     $('#toasts').appendChild(el);
-    setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 320); }, 2600);
+    while ($('#toasts').children.length > 4) $('#toasts').firstChild.remove();
+    setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 320); }, type === 'err' || type === 'warn' ? 4200 : 2800);
   }
 
   // ---------- theme / prefs ----------
@@ -766,7 +775,7 @@
   }
   function joinDirect(t) {
     warnNoFiveM();
-    toast(`กำลังเข้า ${t}`);
+    toast(`กำลังเข้า ${t}`, 'info');
     api.launch(t, state.settings.after).catch(() => toast('ที่อยู่ไม่ถูกต้อง หรือเปิด FiveM ไม่สำเร็จ', 'err'));
   }
 
@@ -824,12 +833,12 @@
     $('#svGoMine', side)?.addEventListener('click', () => { if (mineOf) { $('#bq').value = ''; state.browse.q = ''; drawBrowse(); mineSide(mineOf); $('#bList').closest('.b-col').scrollTop = 0; } });
     $('#svPlay', side)?.addEventListener('click', () => {
       warnNoFiveM();
-      toast(`กำลังเข้า ${s.name}`);
+      toast(`กำลังเข้า ${s.name}`, 'info');
       api.launch(target, state.settings.after).catch(() => toast('เปิด FiveM ไม่สำเร็จ', 'err'));
     });
     $$('[data-link]', side).forEach((btn) => btn.addEventListener('click', () => api.openExternal(btn.dataset.link)));
     $('#svCopy', side)?.addEventListener('click', () => {
-      try { navigator.clipboard.writeText(target); toast('คัดลอกที่อยู่แล้ว'); } catch { toast('คัดลอกไม่สำเร็จ', 'err'); }
+      navigator.clipboard.writeText(target).then(() => toast('คัดลอกที่อยู่แล้ว'), () => toast('คัดลอกไม่สำเร็จ', 'err'));
     });
     const ping = $('#svPing', side);
     if (s.private) { ping.textContent = '—'; return; }
@@ -929,7 +938,7 @@
     $('#svDel', side).onclick = () => confirmDelete(s);
     $$('[data-link]', side).forEach((b) => (b.onclick = () => api.openExternal(b.dataset.link)));
     $$('[data-act="watch"]', side).forEach((b) => (b.onclick = () => toggleWatch(s)));
-    $('#svCopy', side).onclick = () => { try { navigator.clipboard.writeText(s.connect || s.address); toast('คัดลอกที่อยู่แล้ว'); } catch { toast('คัดลอกไม่สำเร็จ', 'err'); } };
+    $('#svCopy', side).onclick = () => { navigator.clipboard.writeText(s.connect || s.address).then(() => toast('คัดลอกที่อยู่แล้ว'), () => toast('คัดลอกไม่สำเร็จ', 'err')); };
   }
   // เซิร์ฟส่วนตัวจากรายชื่อ: ใส่ IP ที่ได้จาก Discord ของเซิร์ฟ แล้วบันทึกเข้า "เซิร์ฟของฉัน" (ใช้ชื่อ/โลโก้ของเซิร์ฟนั้น)
   async function savePrivate(s, addr) {
@@ -995,7 +1004,7 @@
       row.querySelector('[data-b="private"]')?.addEventListener('click', (e) => { e.stopPropagation(); serverPopup(s); });
       const join = () => {
         warnNoFiveM();
-        toast(`กำลังเข้า ${s.name}`);
+        toast(`กำลังเข้า ${s.name}`, 'info');
         api.launch(targetOf(s), state.settings.after).catch(() => toast('เปิด FiveM ไม่สำเร็จ', 'err'));
       };
       const playBtn = row.querySelector('[data-b="play"]');
@@ -1345,7 +1354,7 @@
     if (rerender) render();
   }
 
-  function openFiveMOnly() { api.openFiveM(); toast('กำลังเปิด FiveM'); }
+  function openFiveMOnly() { api.openFiveM(); toast('กำลังเปิด FiveM', 'info'); }
   function bindCards(detailOnly = false) {
     const scope = detailOnly ? $('#detailWrap') : document;
     if (!scope) return;
@@ -1621,14 +1630,14 @@
   }
 
   // ---------- play ----------
-  function warnNoFiveM() { if (state.fivem && state.fivem.found === false) toast('ไม่พบ FiveM ในเครื่อง — กำลังลองเปิดผ่านลิงก์ fivem:// (ถ้าไม่ขึ้น ให้ติดตั้ง FiveM ก่อน)', 'err'); }
+  function warnNoFiveM() { if (state.fivem && state.fivem.found === false) toast('ไม่พบ FiveM ในเครื่อง — กำลังลองเปิดผ่านลิงก์ fivem:// (ถ้าไม่ขึ้น ให้ติดตั้ง FiveM ก่อน)', 'warn'); }
   async function play(id) {
     const s = byId(id);
     if (!s) return;
     warnNoFiveM();
     s.lastPlayed = Date.now();
     persist();
-    toast(`กำลังเข้า ${s.name}`);
+    toast(`กำลังเข้า ${s.name}`, 'info');
     try {
       // ถ้ามีเซิร์ฟที่รอแจ้งเตือนอยู่ จะย่อหน้าต่างแทนการปิดโปรแกรม (ไม่งั้นการแจ้งเตือนจะหายไป)
       const after = state.settings.after === 'quit' && Object.keys(state.watching).length ? 'minimize' : state.settings.after;
