@@ -26,7 +26,7 @@ import (
 var webFS embed.FS
 
 // version ถูกแทนค่าตอน build ด้วย -ldflags "-X main.version=..."
-var version = "2.7.0"
+var version = "2.7.1"
 
 const (
 	appTitle = "FiveM Launcher"
@@ -104,7 +104,7 @@ func main() {
 		case strings.Contains(string(b), `"theme": "sakura"`):
 			bg = "FFFBECF1"
 		case strings.Contains(string(b), `"theme": "hud"`):
-			bg = "FF0D1013"
+			bg = "FF0B0C0E"
 		}
 	}
 	os.Setenv("WEBVIEW2_DEFAULT_BACKGROUND_COLOR", bg)

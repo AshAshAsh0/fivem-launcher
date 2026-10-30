@@ -6,3 +6,6 @@
 @font-face { font-family: 'Mali'; font-weight: 400 600; font-display: block; src: url('Mali-Medium.woff') format('woff'); }
 @font-face { font-family: 'Mali'; font-weight: 700 900; font-display: block; src: url('Mali-Bold.woff') format('woff'); }
 @font-face { font-family: 'JetBrains Mono'; font-weight: 100 800; font-display: block; src: url('JetBrainsMonowght.woff') format('woff'); }
+@font-face { font-family: 'Kanit'; font-weight: 300 400; font-display: block; src: url('Kanit-Regular.woff') format('woff'); }
+@font-face { font-family: 'Kanit'; font-weight: 500; font-display: block; src: url('Kanit-Medium.woff') format('woff'); }
+@font-face { font-family: 'Kanit'; font-weight: 600 900; font-display: block; src: url('Kanit-SemiBold.woff') format('woff'); }

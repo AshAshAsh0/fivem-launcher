@@ -212,7 +212,7 @@
       const c = document.createElement('canvas');
       c.width = w; c.height = h;
       const ctx = c.getContext('2d');
-      ctx.fillStyle = '#06111b'; ctx.fillRect(0, 0, w, h);
+      ctx.fillStyle = '#0b0c0e'; ctx.fillRect(0, 0, w, h);
       ctx.filter = 'blur(12px) brightness(.8) saturate(1.2)';
       ctx.drawImage(img, -40, -40, w + 80, h + 80);
       return c.toDataURL('image/jpeg', 0.84).split(',')[1];
@@ -863,7 +863,7 @@
           <button class="theme-opt ${S.theme === 'hud' ? 'on' : ''}" data-theme-pick="hud">
             <span class="check">${I.check}</span>
             <div class="mini hud"><span class="t"></span><span class="a"></span><span class="b"></span><span class="c"></span></div>
-            <div class="theme-meta"><div><b>HUD</b><small>กระจกน้ำเงินเข้ม ฟ้านีออน สไตล์ UI ในเกม</small></div><span class="pill pill-hud">เกมมิ่ง</span></div>
+            <div class="theme-meta"><div><b>HUD</b><small>เทาดำโปร่ง ฟ้านีออน สไตล์เมนูในเกม</small></div><span class="pill pill-hud">เกมมิ่ง</span></div>
           </button>
         </div>
       </section>

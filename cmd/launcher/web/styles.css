@@ -712,180 +712,184 @@ body.dnd .card * { pointer-events: none; }
 .menu .mk { display: inline-block; width: 18px; }
 .menu button:disabled { opacity: .4; }
 
-/* ================= THEME: HUD (กระจกน้ำเงินเข้ม ฟ้านีออน สไตล์ UI ในเกม) ================= */
+/* ================= THEME: HUD (ตามเมนูในเกม: เทาดำโปร่ง 2 ชั้น ฟ้า #0AAEFB) ================= */
 [data-theme='hud'] {
-  --bg: #06111b;
-  --grid: rgba(90, 170, 230, 0.04);
-  --rail: linear-gradient(180deg, rgba(14, 34, 52, .9), rgba(7, 19, 31, .92));
-  --surface: rgba(11, 27, 41, 0.86);
-  --surface-2: rgba(18, 40, 60, 0.9);
-  --surface-3: #15304a;
-  --ink: #eef6fb;
-  --ink-2: #b6cada;
-  --muted: #6f8ea6;
-  --line: rgba(80, 165, 225, 0.16);
-  --line-2: rgba(80, 170, 235, 0.32);
-  --strong: #1fa8f5;
-  --accent: #1fa8f5;
+  --font-head: 'Kanit', 'Prompt', 'Leelawadee UI', sans-serif;
+  --font-body: 'Kanit', 'Anuphan', 'Leelawadee UI', sans-serif;
+  --bg: #0b0c0e;
+  --grid: rgba(255, 255, 255, 0.025);
+  --rail: transparent;
+  --surface: rgba(20, 22, 25, .82);
+  --surface-2: rgba(57, 60, 65, .35);
+  --surface-3: rgba(57, 60, 65, .5);
+  --ink: #ffffff;
+  --ink-2: rgba(255, 255, 255, .78);
+  --muted: rgba(255, 255, 255, .5);
+  --line: rgba(255, 255, 255, .07);
+  --line-2: rgba(255, 255, 255, .12);
+  --strong: #0aaefb;
+  --accent: #0aaefb;
   --accent-ink: #ffffff;
-  --accent-soft: #0f3550;
-  --accent-2: #6fd3ff;
-  --sel-bg: linear-gradient(180deg, #0d2d46, #0f3f63);
-  --glass: linear-gradient(180deg, rgba(15, 35, 54, .84), rgba(7, 20, 33, .9));
-  --edge: inset 0 0 0 1px rgba(90, 175, 235, .2);
+  --accent-soft: rgba(10, 174, 251, .1);
+  --accent-2: #63cfff;
   --ok: #2fd27f;
-  --ok-ink: #03250f;
+  --ok-ink: #04230f;
   --danger: #f05a5a;
   --btn-shadow: none;
-  --card-shadow: 0 20px 44px -26px rgba(0, 0, 0, 0.95);
+  --card-shadow: none;
   --pop-shadow: none;
-  --radius-xl: 6px;
-  --radius-lg: 6px;
-  --radius-md: 4px;
-  --squiggle: #1fa8f5;
-  --cut: 14px;
-  --cur-default: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'%3E%3Cpath d='M5 3l15 9.5-6.6 1.4 3.9 7.4-3 1.6-3.9-7.5L5 20z' fill='%231fa8f5' stroke='%2306111b' stroke-width='1.6' stroke-linejoin='round'/%3E%3C/svg%3E") 5 3, default;
-  --cur-pointer: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30'%3E%3Cpath d='M5 3l15 9.5-6.6 1.4 3.9 7.4-3 1.6-3.9-7.5L5 20z' fill='%231fa8f5' stroke='%2306111b' stroke-width='1.6' stroke-linejoin='round'/%3E%3Cpath d='M23 18l4 4-4 4-4-4z' fill='%2306111b' stroke='%231fa8f5' stroke-width='1.8'/%3E%3C/svg%3E") 5 3, pointer;
+  --radius-xl: 17px;
+  --radius-lg: 17px;
+  --radius-md: 8px;
+  --squiggle: #0aaefb;
+  --frame: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cpath d='M17 0H83A17 17 0 0 1 100 17V85L85 100H17A17 17 0 0 1 0 83V17A17 17 0 0 1 17 0Z' fill='rgba(20,22,25,.5)'/%3E%3Cpath d='M18 6H82A12 12 0 0 1 94 18V82L82 94H18A12 12 0 0 1 6 82V18A12 12 0 0 1 18 6Z' fill='rgba(20,22,25,.82)'/%3E%3C/svg%3E");
+  --frame-sel: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cpath d='M17 0H83A17 17 0 0 1 100 17V85L85 100H17A17 17 0 0 1 0 83V17A17 17 0 0 1 17 0Z' fill='rgba(20,22,25,.5)'/%3E%3Cpath d='M18 6H82A12 12 0 0 1 94 18V82L82 94H18A12 12 0 0 1 6 82V18A12 12 0 0 1 18 6Z' fill='rgba(20,22,25,.82)'/%3E%3Cpath d='M18 6.75H82A11.25 11.25 0 0 1 93.25 18V81.7L81.7 93.25H18A11.25 11.25 0 0 1 6.75 82V18A11.25 11.25 0 0 1 18 6.75Z' fill='rgba(10,174,251,.1)' stroke='rgba(10,174,251,.55)' stroke-width='1.5'/%3E%3Cpath d='M94 94H86L94 85Z' fill='%230AAEFB'/%3E%3C/svg%3E");
+  --item: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cpath d='M6 0H34A6 6 0 0 1 40 6V26L26 40H6A6 6 0 0 1 0 34V6A6 6 0 0 1 6 0Z' fill='rgba(57,60,65,.35)'/%3E%3Cpath d='M6 .75H34A5.25 5.25 0 0 1 39.25 6V25.7L25.7 39.25H6A5.25 5.25 0 0 1 .75 34V6A5.25 5.25 0 0 1 6 .75Z' fill='none' stroke='rgba(255,255,255,.06)' stroke-width='1.5'/%3E%3C/svg%3E");
+  --item-sel: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cpath d='M6 0H34A6 6 0 0 1 40 6V26L26 40H6A6 6 0 0 1 0 34V6A6 6 0 0 1 6 0Z' fill='rgba(10,174,251,.2)'/%3E%3Cpath d='M6 .75H34A5.25 5.25 0 0 1 39.25 6V25.7L25.7 39.25H6A5.25 5.25 0 0 1 .75 34V6A5.25 5.25 0 0 1 6 .75Z' fill='none' stroke='rgba(10,174,251,.5)' stroke-width='1.5'/%3E%3Cpath d='M40 40H32L40 31Z' fill='%230AAEFB'/%3E%3C/svg%3E");
+  --item-red: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cpath d='M6 0H34A6 6 0 0 1 40 6V26L26 40H6A6 6 0 0 1 0 34V6A6 6 0 0 1 6 0Z' fill='rgba(240,90,90,.16)'/%3E%3Cpath d='M6 .75H34A5.25 5.25 0 0 1 39.25 6V25.7L25.7 39.25H6A5.25 5.25 0 0 1 .75 34V6A5.25 5.25 0 0 1 6 .75Z' fill='none' stroke='rgba(240,90,90,.55)' stroke-width='1.5'/%3E%3Cpath d='M40 40H32L40 31Z' fill='%23f05a5a'/%3E%3C/svg%3E");
+  --item-field: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cpath d='M6 0H34A6 6 0 0 1 40 6V26L26 40H6A6 6 0 0 1 0 34V6A6 6 0 0 1 6 0Z' fill='rgba(8,9,11,.55)'/%3E%3Cpath d='M6 .75H34A5.25 5.25 0 0 1 39.25 6V25.7L25.7 39.25H6A5.25 5.25 0 0 1 .75 34V6A5.25 5.25 0 0 1 6 .75Z' fill='none' stroke='rgba(255,255,255,.08)' stroke-width='1.5'/%3E%3C/svg%3E");
+  --item-focus: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cpath d='M6 0H34A6 6 0 0 1 40 6V26L26 40H6A6 6 0 0 1 0 34V6A6 6 0 0 1 6 0Z' fill='rgba(8,9,11,.55)'/%3E%3Cpath d='M6 .75H34A5.25 5.25 0 0 1 39.25 6V25.7L25.7 39.25H6A5.25 5.25 0 0 1 .75 34V6A5.25 5.25 0 0 1 6 .75Z' fill='none' stroke='rgba(10,174,251,.6)' stroke-width='1.5'/%3E%3Cpath d='M40 40H32L40 31Z' fill='%230AAEFB'/%3E%3C/svg%3E");
+  --cur-default: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'%3E%3Cpath d='M5 3l15 9.5-6.6 1.4 3.9 7.4-3 1.6-3.9-7.5L5 20z' fill='%230aaefb' stroke='%230b0c0e' stroke-width='1.6' stroke-linejoin='round'/%3E%3C/svg%3E") 5 3, default;
+  --cur-pointer: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30'%3E%3Cpath d='M5 3l15 9.5-6.6 1.4 3.9 7.4-3 1.6-3.9-7.5L5 20z' fill='%230aaefb' stroke='%230b0c0e' stroke-width='1.6' stroke-linejoin='round'/%3E%3Cpath d='M27 27h-7l7-8z' fill='%230aaefb'/%3E%3C/svg%3E") 5 3, pointer;
   color-scheme: dark;
 }
 [data-theme='hud'] .shell {
   background-color: var(--bg);
-  background-image:
-    radial-gradient(1200px 600px at 75% -10%, rgba(31, 168, 245, .16), transparent 60%),
-    radial-gradient(900px 500px at 0% 110%, rgba(31, 120, 200, .14), transparent 60%),
-    linear-gradient(var(--grid) 1px, transparent 1px),
-    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
-  background-size: auto, auto, 34px 34px, 34px 34px;
+  background-image: radial-gradient(1100px 620px at 70% -10%, rgba(10, 174, 251, .08), transparent 60%), linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: auto, 34px 34px, 34px 34px;
 }
-/* รูปพื้นหลังของผู้ใช้ (เบลอ+มืดไว้แล้ว) */
-[data-theme='hud'][data-wall] .shell { background-image: linear-gradient(rgba(4, 12, 20, .12), rgba(4, 12, 20, .38)), var(--wall); background-size: cover; background-position: center; }
+[data-theme='hud'][data-wall] .shell { background-image: linear-gradient(rgba(6, 7, 9, .15), rgba(6, 7, 9, .4)), var(--wall); background-size: cover; background-position: center; }
 
-/* ---- แผงกระจก ---- */
-[data-theme='hud'] :is(.hero, .card, .stat-line, .search, .seg, .sect, .menu, .modal, .b-row, .theme-opt, .foot-upd, .foot) {
-  background: var(--glass);
-  box-shadow: var(--edge), var(--card-shadow);
-}
-[data-theme='hud'] .side { background: var(--rail); box-shadow: var(--edge); border-radius: 6px; }
-[data-theme='hud'] :is(.hero, .card, .sect, .theme-opt, .b-row, .stat, .search, .seg, .menu, .empty, .grp-empty, .path-box) { border-radius: 6px; }
-
-/* ---- ตัวอักษร: พิมพ์ใหญ่ ห่างนิด ๆ ---- */
-[data-theme='hud'] :is(.h1, .stat .lbl, .grp-name, .sect h3, .modal-head h2, .card-name, .hero-title, .brand-name) { text-transform: uppercase; letter-spacing: .03em; }
-[data-theme='hud'] :is(.btn, .seg button, .chip-opt) { text-transform: uppercase; letter-spacing: .06em; font-size: 12.5px; }
-[data-theme='hud'] .h1 .sq, [data-theme='hud'] .stat .num small { color: var(--accent); opacity: 1; }
-[data-theme='hud'] .sub, [data-theme='hud'] .hero-desc { color: var(--muted); }
-
-/* ---- ทรงตรง ไม่เอียง ---- */
-[data-theme='hud'] :is(.mark, .badge, .tilt-card, .hero-logo, .em-mark, .chip-opt.on) { transform: none; }
-[data-theme='hud'] .hero:hover .tilt-card { transform: translateY(-3px); }
-[data-theme='hud'] .tilt-card { border: 1px solid rgba(31, 168, 245, .55); border-radius: 4px; box-shadow: 0 0 34px -12px rgba(31, 168, 245, .55); }
-[data-theme='hud'] .hero-logo { border-radius: 6px; border: 2px solid #0b2236; box-shadow: 0 0 0 1px rgba(31, 168, 245, .55), 0 10px 22px -8px rgba(0, 0, 0, .7); }
-
-/* ---- มุมตัดเฉียง (ขวาล่าง) + ขอบฟ้า: แผงใหญ่และปุ่มหลัก ---- */
-[data-theme='hud'] :is(.hero, .stat-dark, .btn-dark, .modal) {
+/* ---- แผง 2 ชั้น: กรอบนอกโปร่ง + แผงในเข้ม มุมโค้ง ตัดเฉียงเฉพาะขวาล่าง ---- */
+[data-theme='hud'] :is(.side, .hero, .card, .stat, .sect, .modal, .menu, .b-row, .theme-opt, .foot, .empty, .grp-empty) {
   position: relative; isolation: isolate;
-  background: rgba(31, 168, 245, .75);
-  box-shadow: none;
-  clip-path: polygon(0 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%);
+  background: none !important; box-shadow: none !important; border: 0 !important; border-radius: 17px;
 }
-[data-theme='hud'] :is(.hero, .stat-dark, .btn-dark, .modal)::before {
-  content: ''; position: absolute; inset: 1px; z-index: -1; pointer-events: none;
-  background: var(--glass);
-  clip-path: polygon(0 0, 100% 0, 100% calc(100% - var(--cut) + .4px), calc(100% - var(--cut) + .4px) 100%, 0 100%);
+[data-theme='hud'] :is(.side, .hero, .card, .stat, .sect, .modal, .menu, .b-row, .theme-opt, .foot, .empty, .grp-empty)::before {
+  content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  border-style: solid; border-width: 20px 24px 24px 20px;
+  border-image: var(--frame) 20 24 24 20 fill / 20px 24px 24px 20px stretch;
+  transition: opacity .2s;
 }
-[data-theme='hud'] :is(.hero, .modal) { --cut: 26px; background: rgba(31, 168, 245, .55); }
-[data-theme='hud'] .btn-dark { --cut: 10px; color: #fff; }
-[data-theme='hud'] .btn-dark::before, [data-theme='hud'] .stat-dark::before { background: var(--sel-bg); }
-[data-theme='hud'] .btn-dark:hover { filter: brightness(1.2); }
-[data-theme='hud'] .btn-dark:active { transform: translateY(1px); box-shadow: none; }
-[data-theme='hud'] .stat-dark { --cut: 18px; color: #fff; }
+[data-theme='hud'] :is(.card:hover, .b-row:hover, .theme-opt.on, .stat-dark)::before { border-image-source: var(--frame-sel); }
+[data-theme='hud'] .card, [data-theme='hud'] .b-row { transition: transform .2s; }
+[data-theme='hud'] .card:hover { transform: translateY(-2px); }
+[data-theme='hud'] .side { margin: 12px 0 12px 12px; }
+[data-theme='hud'] .hero { padding: 32px 34px 30px; }
+[data-theme='hud'] .card { padding: 14px 14px 20px; }
+[data-theme='hud'] :is(.empty, .grp-empty) { color: var(--muted); }
+
+/* ---- ตัวอักษร Kanit หัวข้อพิมพ์ใหญ่ ---- */
+[data-theme='hud'] body { font-family: var(--font-body); }
+[data-theme='hud'] :is(.h1, .hero-title, .card-name, .grp-name, .sect h3, .modal-head h2, .stat .lbl, .brand-name, .b-name, .pv-info b, .theme-meta b) { font-family: 'Kanit', var(--font-head); font-weight: 600; text-transform: uppercase; letter-spacing: .01em; }
+[data-theme='hud'] .h1 { font-weight: 600; }
+[data-theme='hud'] .stat .num { font-family: 'Kanit', var(--font-head); font-weight: 600; }
+[data-theme='hud'] .h1 .sq, [data-theme='hud'] .stat .num small { color: var(--accent); opacity: 1; }
+[data-theme='hud'] :is(.sub, .stat .cap, .sect .d) { color: var(--muted); text-transform: uppercase; font-size: 12px; letter-spacing: .03em; }
+[data-theme='hud'] :is(.btn, .seg button, .chip-opt, .menu button) { font-family: 'Kanit', var(--font-body); font-weight: 500; }
+
+/* ---- ไม่เอียง ---- */
+[data-theme='hud'] :is(.mark, .badge, .tilt-card, .hero-logo, .em-mark, .chip-opt.on) { transform: none !important; }
+[data-theme='hud'] .tilt-card { border: 0; border-radius: 12px; box-shadow: 0 0 0 1.5px rgba(10, 174, 251, .5), 0 18px 40px -18px rgba(0, 0, 0, .8); }
+[data-theme='hud'] .hero-logo { border-radius: 12px; border: 3px solid #141619; box-shadow: 0 12px 24px -10px rgba(0, 0, 0, .8); }
+[data-theme='hud'] .card .banner { border-radius: 10px; }
+[data-theme='hud'] .card .logo { border-radius: 10px; border-color: #15171a; }
+
+/* ---- กล่องไอคอน: ฟ้าจาง ไม่มีขอบ ---- */
+[data-theme='hud'] :is(.mark, .stat .ico, .em-mark) { background: rgba(10, 174, 251, .1) !important; color: var(--accent) !important; box-shadow: none !important; border-radius: 8px; }
+[data-theme='hud'] .stat .ico { width: 36px; height: 36px; }
+[data-theme='hud'] .badge { background: rgba(10, 174, 251, .1); color: var(--accent); box-shadow: none; border-radius: 6px; text-transform: uppercase; font-family: 'Kanit', var(--font-head); font-weight: 500; }
+[data-theme='hud'] .badge.soft { background: rgba(10, 174, 251, .1); color: var(--accent); box-shadow: none; }
+[data-theme='hud'] .brand-tag { background: rgba(10, 174, 251, .1); color: var(--accent); border: 0; box-shadow: none; transform: none; border-radius: 6px; text-transform: uppercase; font-family: 'Kanit', var(--font-head); font-weight: 500; }
+
+/* ---- ปุ่ม/ช่อง: เทาจาง ไม่มีขอบ / เลือกอยู่ = ฟ้า 20% ขอบฟ้า + สามเหลี่ยมมุม ---- */
+[data-theme='hud'] :is(.btn, .icon-btn, .more-btn, .wc-theme, .seg button, .chip-opt, .nav-btn, .grp-tog, .grp-more, .search) {
+  position: relative; isolation: isolate; background: none !important; box-shadow: none !important; border-radius: 6px; filter: none;
+}
+[data-theme='hud'] :is(.btn, .icon-btn, .more-btn, .wc-theme, .seg button, .chip-opt, .grp-tog, .grp-more, .search)::after,
+[data-theme='hud'] .nav-btn:is(:hover, .active)::after {
+  content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  border-style: solid; border-width: 8px 16px 16px 8px;
+  border-image: var(--item) 8 16 16 8 fill / 8px 16px 16px 8px stretch;
+}
+[data-theme='hud'] :is(.btn-dark, .btn-tone, .seg button.on, .chip-opt.on, .nav-btn.active)::after { border-image-source: var(--item-sel) !important; }
+[data-theme='hud'] .btn-danger::after { border-image-source: var(--item-red) !important; }
+[data-theme='hud'] .search::after { border-image-source: var(--item-field); }
+[data-theme='hud'] .search:focus-within::after { border-image-source: var(--item-focus); }
+[data-theme='hud'] :is(.btn, .icon-btn, .more-btn, .wc-theme, .seg button, .chip-opt, .grp-tog, .grp-more):hover::after { filter: brightness(1.45); }
+[data-theme='hud'] :is(.btn, .icon-btn, .more-btn):active { transform: translateY(1px); }
+[data-theme='hud'] :is(.btn-dark, .btn-tone) { color: #fff !important; }
+[data-theme='hud'] .btn-danger { color: #ff8c8c; }
+[data-theme='hud'] :is(.icon-btn, .more-btn, .wc-theme, .grp-tog, .grp-more) { color: var(--ink-2); }
+[data-theme='hud'] .nav-btn { border-radius: 8px; color: var(--muted); }
+[data-theme='hud'] .nav-btn.active { color: #fff; }
+[data-theme='hud'] .nav-btn.active::before { display: none; }
+[data-theme='hud'] .nav-btn:hover:not(.active)::after { opacity: .9; }
+[data-theme='hud'] .wc { border-radius: 8px; box-shadow: none; }
+[data-theme='hud'] .seg { background: none; box-shadow: none; padding: 0; gap: 6px; }
+[data-theme='hud'] .seg button { color: var(--ink-2); }
+[data-theme='hud'] .seg button.on { color: #fff; }
+[data-theme='hud'] .chip-opt { color: var(--ink-2); }
+[data-theme='hud'] .chip-opt.on { color: #fff; }
+[data-theme='hud'] .search { border-radius: 8px; }
+[data-theme='hud'] .input { color: var(--ink); }
+[data-theme='hud'] textarea.input { border-radius: 8px; }
+[data-theme='hud'] .kbd { background: transparent; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .12); border-radius: 4px; }
+
+/* ---- ชิป/สถานะ ---- */
+[data-theme='hud'] .pill { border-radius: 6px; font-family: 'Kanit', var(--font-body); font-weight: 500; }
+[data-theme='hud'] :is(.pill-mono, .pill-off) { background: rgba(57, 60, 65, .45); color: var(--ink-2); box-shadow: none; }
+[data-theme='hud'] .pill-ok { background: rgba(47, 210, 127, .16); color: #4be39a; box-shadow: none; }
+[data-theme='hud'] .pill-tone { border-radius: 6px; }
+[data-theme='hud'] :is(.b-lock, .pill-bell.on) { background: rgba(242, 205, 107, .14); color: #f2cd6b; box-shadow: none; }
+[data-theme='hud'] .warn-box { background: rgba(242, 205, 107, .1); color: #f2cd6b; }
+[data-theme='hud'] .hint.ok { color: #4be39a; }
+
+/* ---- แถบผู้เล่น: เส้นบาง ---- */
+[data-theme='hud'] .bar { height: 6px; border-radius: 4px; background: rgba(57, 60, 65, .5); box-shadow: none; }
+[data-theme='hud'] .bar i { border-radius: 4px; background-image: none; }
+
+/* ---- กลุ่ม ---- */
+[data-theme='hud'] .grp-count { background: rgba(10, 174, 251, .1); color: var(--accent); box-shadow: none; border-radius: 6px; font-family: 'Kanit', var(--font-body); font-weight: 500; }
+[data-theme='hud'] .grp-head::after { background: rgba(255, 255, 255, .08); }
+
+/* ---- เมนู / หน้าต่าง ---- */
+[data-theme='hud'] .overlay { background: rgba(0, 0, 0, .5); backdrop-filter: blur(3px); }
 [data-theme='hud'] .modal { animation: none; }
-
-/* ---- สถานะเลือกอยู่: พื้นน้ำเงินไล่เฉด ขอบฟ้า + สามเหลี่ยมมุมขวาล่าง ---- */
-[data-theme='hud'] :is(.nav-btn.active, .seg button.on, .chip-opt.on, .mark, .badge:not(.soft), .em-mark, .theme-opt.on) {
-  background: linear-gradient(to top left, var(--accent) 50%, transparent 50%) right bottom / 10px 10px no-repeat, var(--sel-bg);
-  color: #fff;
-  box-shadow: inset 0 0 0 1px var(--accent), 0 0 20px -6px rgba(31, 168, 245, .6);
+[data-theme='hud'] .modal-head, [data-theme='hud'] .modal-foot { background: transparent; border-color: rgba(255, 255, 255, .06); }
+[data-theme='hud'] .menu { position: absolute; padding: 10px; border-radius: 14px; }
+[data-theme='hud'] .menu button { position: relative; isolation: isolate; border-radius: 6px; }
+[data-theme='hud'] .menu button:hover { background: none; }
+[data-theme='hud'] .menu button:hover::after {
+  content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  border-style: solid; border-width: 8px 16px 16px 8px; border-image: var(--item-sel) 8 16 16 8 fill / 8px 16px 16px 8px stretch;
 }
-[data-theme='hud'] .nav-btn { border-radius: 4px; }
-[data-theme='hud'] .nav-btn.active::before { background: var(--accent); width: 4px; height: 18px; border-radius: 0; left: -14px; }
-[data-theme='hud'] .mark { border-radius: 4px; color: var(--accent); }
-[data-theme='hud'] .badge { border-radius: 3px; text-transform: uppercase; letter-spacing: .05em; }
-[data-theme='hud'] .badge.soft { background: rgba(31, 168, 245, .1); color: var(--accent); box-shadow: inset 0 0 0 1px rgba(31, 168, 245, .45); }
-[data-theme='hud'] .stat .ico { background: rgba(31, 168, 245, .12); color: var(--accent); box-shadow: inset 0 0 0 1px rgba(31, 168, 245, .5); border-radius: 4px; }
-[data-theme='hud'] .stat-line { border: 0; }
-[data-theme='hud'] .brand-tag { background: rgba(31, 168, 245, .1); color: var(--accent); border: 1px solid rgba(31, 168, 245, .5); box-shadow: none; transform: none; border-radius: 3px; text-transform: uppercase; letter-spacing: .08em; }
-
-/* ---- ปุ่มทั่วไป ---- */
-[data-theme='hud'] .btn { border-radius: 4px; }
-[data-theme='hud'] .btn:not(.btn-tone):not(.btn-dark):not(.btn-danger) { background: rgba(255, 255, 255, .04); box-shadow: inset 0 0 0 1px var(--line-2); color: var(--ink); }
-[data-theme='hud'] .btn:not(.btn-dark):hover { filter: brightness(1.2); }
-[data-theme='hud'] .btn-tone { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .16), 0 0 20px -8px var(--tone); }
-[data-theme='hud'] .btn-tone:active { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .16); }
-[data-theme='hud'] .btn-danger { background: rgba(240, 90, 90, .12); color: #ff8a8a; box-shadow: inset 0 0 0 1px #f05a5a; }
-[data-theme='hud'] :is(.icon-btn, .more-btn, .wc-theme, .grp-tog, .grp-more) { border-radius: 4px; background: rgba(255, 255, 255, .04); box-shadow: inset 0 0 0 1px var(--line-2); color: var(--ink-2); }
-[data-theme='hud'] .wc { border-radius: 4px; }
-[data-theme='hud'] .seg button { border-radius: 3px; }
-[data-theme='hud'] .chip-opt { border-radius: 4px; }
-[data-theme='hud'] .chip-opt:not(.on) { background: rgba(255, 255, 255, .04); box-shadow: inset 0 0 0 1px var(--line-2); }
-[data-theme='hud'] .search:focus-within { box-shadow: inset 0 0 0 1px var(--accent), 0 0 20px -8px rgba(31, 168, 245, .7); }
-[data-theme='hud'] .kbd { background: transparent; box-shadow: inset 0 0 0 1px var(--line-2); border-radius: 3px; }
-
-/* ---- การ์ดเซิร์ฟ: แสงฟ้าไล่จากล่างเมื่อชี้ + ขีดฟ้าด้านล่าง ---- */
-[data-theme='hud'] .card { overflow: hidden; }
-[data-theme='hud'] .card .banner { border-radius: 4px; }
-[data-theme='hud'] .card .logo { border-radius: 4px; border-color: #0b2236; box-shadow: 0 0 0 1px rgba(31, 168, 245, .45), 0 8px 18px -8px rgba(0, 0, 0, .7); }
-[data-theme='hud'] .card::after {
-  content: ''; position: absolute; left: 50%; bottom: 0; width: 46%; height: 3px; transform: translateX(-50%);
-  background: var(--accent); box-shadow: 0 0 14px 1px rgba(31, 168, 245, .7); opacity: .55; transition: opacity .2s, width .25s;
-}
-[data-theme='hud'] .card.offline::after { background: #8aa0b2; box-shadow: none; opacity: .35; }
-[data-theme='hud'] .card:hover {
-  background: linear-gradient(0deg, rgba(31, 168, 245, .26), transparent 55%), var(--glass);
-  box-shadow: inset 0 0 0 1px rgba(31, 168, 245, .75), 0 0 30px -10px rgba(31, 168, 245, .55);
-}
-[data-theme='hud'] .card:hover::after { opacity: 1; width: 64%; }
-[data-theme='hud'] .b-row:hover { background: linear-gradient(0deg, rgba(31, 168, 245, .18), transparent 70%), var(--glass); box-shadow: inset 0 0 0 1px rgba(31, 168, 245, .6); }
-
-/* ---- แถบความคืบหน้า: เส้นบาง เหลี่ยม ---- */
-[data-theme='hud'] .bar { height: 6px; border-radius: 0; background: rgba(255, 255, 255, .08); box-shadow: none; }
-[data-theme='hud'] .bar i { border-radius: 0; background-image: none; box-shadow: 0 0 10px -1px var(--barc, var(--ok)); }
-
-/* ---- ป้าย/ชิป ---- */
-[data-theme='hud'] .pill { border-radius: 3px; }
-[data-theme='hud'] :is(.pill-mono, .pill-off) { background: rgba(255, 255, 255, .05); color: var(--ink-2); box-shadow: inset 0 0 0 1px var(--line-2); }
-[data-theme='hud'] .pill-ok { box-shadow: 0 0 12px -3px rgba(47, 210, 127, .7); }
-
-/* ---- ตัวเลขในกรอบข้าวหลามตัด ---- */
-[data-theme='hud'] .grp-count {
-  position: relative; isolation: isolate; display: grid; place-items: center;
-  width: 30px; height: 30px; padding: 0; border-radius: 0;
-  background: var(--accent); box-shadow: none; color: #fff; font-size: 11.5px;
-  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
-}
-[data-theme='hud'] .grp-count::before { content: ''; position: absolute; inset: 1.5px; z-index: -1; background: var(--sel-bg); clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
-[data-theme='hud'] .grp-head::after { background: linear-gradient(90deg, rgba(31, 168, 245, .5), rgba(31, 168, 245, .05)); }
-
-/* ---- เมนู / หน้าต่าง / ฟอร์ม ---- */
-[data-theme='hud'] .overlay { background: rgba(2, 8, 14, .6); backdrop-filter: blur(3px); }
-[data-theme='hud'] .modal { background: rgba(31, 168, 245, .55); }
-[data-theme='hud'] .modal-foot, [data-theme='hud'] .modal-head { background: transparent; }
-[data-theme='hud'] :is(.input, textarea, select) { background: rgba(2, 10, 18, .55); color: var(--ink); border-radius: 4px; box-shadow: inset 0 0 0 1px var(--line-2); }
-[data-theme='hud'] :is(.input, textarea):focus { box-shadow: inset 0 0 0 1px var(--accent), 0 0 18px -8px rgba(31, 168, 245, .7); }
-[data-theme='hud'] .menu { background: linear-gradient(180deg, rgba(15, 35, 54, .97), rgba(8, 21, 34, .98)); }
-[data-theme='hud'] .menu button { border-radius: 3px; }
-[data-theme='hud'] .menu button:hover { background: linear-gradient(90deg, rgba(31, 168, 245, .28), rgba(31, 168, 245, .04)); }
-[data-theme='hud'] .warn-box { background: rgba(242, 205, 107, .1); color: #f2cd6b; box-shadow: inset 0 0 0 1px rgba(242, 205, 107, .35); }
-[data-theme='hud'] :is(.b-lock, .pill-bell.on) { background: rgba(242, 205, 107, .12); color: #f2cd6b; box-shadow: inset 0 0 0 1px rgba(242, 205, 107, .4); }
-[data-theme='hud'] .hint.ok { color: #3fe08f; }
-[data-theme='hud'] :is(.empty, .grp-empty) { border: 1px dashed rgba(31, 168, 245, .35); }
-[data-theme='hud'] .foot { border-radius: 6px; }
-[data-theme='hud'] .theme-opt.on .check { border-color: #0b2236; }
+[data-theme='hud'] .menu hr { border-color: rgba(255, 255, 255, .07); }
+[data-theme='hud'] .theme-opt.on .check { border-color: #141619; }
+[data-theme='hud'] .foot { margin-bottom: 4px; }
 
 /* ---- ตัวอย่างธีมในหน้าตั้งค่า ---- */
-.mini.hud { background: linear-gradient(160deg, #0b2033, #06111b); } .mini.hud .t { background: #e8f3fa; width: 80%; } .mini.hud .a { background: rgba(255,255,255,.05); box-shadow: inset 0 0 0 1px rgba(80,170,235,.35); } .mini.hud .b { background: linear-gradient(to top left, #1fa8f5 50%, transparent 50%) right bottom / 9px 9px no-repeat, linear-gradient(180deg, #0d2d46, #0f3f63); box-shadow: inset 0 0 0 1px #1fa8f5; } .mini.hud .c { background: #1fa8f5; }
-.mini.hud .a, .mini.hud .b, .mini.hud .t, .mini.hud .c { border-radius: 2px; }
-.pill-hud { background: rgba(31,168,245,.12); color: #1fa8f5; box-shadow: inset 0 0 0 1px #1fa8f5; text-transform: uppercase; letter-spacing: .06em; border-radius: 3px; }
+.mini.hud { background: #15171a; } .mini.hud .t { background: #fff; width: 60%; } .mini.hud .a { background: rgba(57,60,65,.6); } .mini.hud .b { background: linear-gradient(to top left, #0aaefb 50%, transparent 50%) right bottom / 8px 9px no-repeat, rgba(10,174,251,.22); box-shadow: inset 0 0 0 1.5px rgba(10,174,251,.55); } .mini.hud .c { background: #0aaefb; width: 40%; }
+.mini.hud .a, .mini.hud .b { border-radius: 6px; }
+.pill-hud { background: rgba(10,174,251,.12); color: #0aaefb; box-shadow: none; text-transform: uppercase; border-radius: 6px; font-family: 'Kanit', var(--font-body); font-weight: 500; }
 
 /* ---- รูปพื้นหลัง (หน้าตั้งค่า) ---- */
 .wall-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-.wall-prev { width: 148px; height: 84px; border-radius: 6px; background: var(--surface-3) center / cover; box-shadow: inset 0 0 0 1px var(--line-2); display: grid; place-items: center; color: var(--muted); font-size: 12px; flex: none; }
+.wall-prev { width: 148px; height: 84px; border-radius: 10px; background: var(--surface-3) center / cover; box-shadow: inset 0 0 0 1px var(--line-2); display: grid; place-items: center; color: var(--muted); font-size: 12px; flex: none; }
+/* ---- HUD: ช่องกรอก (input ใช้ ::after ไม่ได้) ---- */
+[data-theme='hud'] .input { background: rgba(57, 60, 65, .45) !important; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .13) !important; border-radius: 6px; }
+[data-theme='hud'] .input:focus { box-shadow: inset 0 0 0 1.5px rgba(10, 174, 251, .6), 0 0 0 3px rgba(10, 174, 251, .1) !important; }
+[data-theme='hud'] .input::placeholder { color: rgba(255, 255, 255, .35); }
+/* ---- HUD: สถานะบนแบนเนอร์ให้อ่านง่าย ---- */
+[data-theme='hud'] .pill-ok { background: rgba(10, 32, 20, .88); color: #4be39a; }
+[data-theme='hud'] .pill-off { background: rgba(14, 16, 19, .85); }
+[data-theme='hud'] .fav-btn { background: rgba(14, 16, 19, .8); color: #fff; border-radius: 8px; box-shadow: none; }
+[data-theme='hud'] .fav-btn.on { color: #ff5a86; }
+/* ---- HUD: แจ้งเตือน + ปุ่มปิด ---- */
+[data-theme='hud'] .toast { background: rgba(20, 22, 25, .92); color: #fff; border-radius: 10px; box-shadow: inset 0 0 0 1.5px rgba(10, 174, 251, .5), 0 14px 30px -12px rgba(0, 0, 0, .8); font-family: 'Kanit', var(--font-body); font-weight: 500; }
+[data-theme='hud'] .toast svg, [data-theme='hud'] .toast .ic { color: var(--accent); }
+[data-theme='hud'] .x-btn { border-radius: 8px; background: rgba(57, 60, 65, .4); box-shadow: none; color: var(--ink-2); }
+[data-theme='hud'] .toast .ti { border-radius: 6px; background: rgba(10, 174, 251, .18); color: var(--accent); }
+[data-theme='hud'] .toast.err { box-shadow: inset 0 0 0 1.5px rgba(240, 90, 90, .55), 0 14px 30px -12px rgba(0, 0, 0, .8); }
+[data-theme='hud'] .toast.err .ti { background: rgba(240, 90, 90, .18); color: #ff8c8c; }
+[data-theme='hud'] .menu { background: rgba(17, 19, 22, .96) !important; clip-path: polygon(0 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%); box-shadow: none !important; }
