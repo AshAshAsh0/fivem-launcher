@@ -26,6 +26,7 @@
     x: '<svg viewBox="0 0 24 24"><path d="m7 7 10 10M17 7 7 17"/></svg>',
     check: '<svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>',
     signal: '<svg viewBox="0 0 24 24"><path d="M5 19v-3M10 19v-6M15 19v-9M20 19V6"/></svg>',
+    clock: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
     trash: '<svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V4.8c0-.4.4-.8.8-.8h4.4c.4 0 .8.4.8.8V7M6.5 7l.9 12.2c.1.8.7 1.3 1.5 1.3h6.2c.8 0 1.4-.5 1.5-1.3L17.5 7"/></svg>',
     edit: '<svg viewBox="0 0 24 24"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4Z"/></svg>',
     copy: '<svg viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="3"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>',
@@ -209,6 +210,19 @@
     api.setLang?.(state.settings.lang);
   }
   const isEN = () => state.settings.lang === 'en';
+  // เวลาที่เล่นล่าสุดแบบสั้น ๆ เช่น "3 ชม." / "3h"
+  function ago(t) {
+    const m = Math.max(0, Math.floor((Date.now() - t) / 60000)), en = isEN();
+    if (m < 1) return en ? 'just now' : 'เมื่อกี้';
+    if (m < 60) return en ? `${m}m ago` : `${m} นาทีก่อน`;
+    const h = Math.floor(m / 60);
+    if (h < 24) return en ? `${h}h ago` : `${h} ชม.ก่อน`;
+    const d = Math.floor(h / 24);
+    if (d < 30) return en ? `${d}d ago` : `${d} วันก่อน`;
+    const mo = Math.floor(d / 30);
+    return en ? `${mo}mo ago` : `${mo} เดือนก่อน`;
+  }
+  const lastHTML = (s) => s.lastPlayed ? `<span class="pill pill-mono js-last" title="เล่นล่าสุด" data-no-i18n>${I.clock} ${ago(s.lastPlayed)}</span>` : '';
 
   // ---------- navigation ----------
   function go(page) {
@@ -256,7 +270,7 @@
     const t = toneOf(s), S = st(s), p = loadPct(s), logo = logoOf(s), banner = bannerOf(s);
     return `<section class="hero" style="${toneStyle(t)}">
       <div style="min-width:0">
-        <span class="badge soft">เซิร์ฟของคุณ ✦</span>
+        <span class="badge soft">${s.lastPlayed ? 'เล่นล่าสุด ✦' : 'เซิร์ฟของคุณ ✦'}</span>
         <h2 class="hero-title${[...String(s.name)].length > 34 ? ' xlong' : [...String(s.name)].length > 20 ? ' long' : ''}" data-no-i18n title="${esc(s.name)}">${esc(s.name)}</h2>
         <div class="hero-chips">
           <span class="js-st">${S.online ? '<span class="pill pill-ok">ออนไลน์</span>' : '<span class="pill pill-off">ออฟไลน์</span>'}</span>
@@ -336,7 +350,7 @@
   function cardHTML(s, i) {
     const t = toneOf(s), S = st(s), p = loadPct(s), logo = logoOf(s), banner = bannerOf(s);
     const full = S.online && S.max && S.players >= S.max;
-    return `<article class="card ${S.online ? '' : 'offline'}" ${state.page === 'home' ? 'draggable="true"' : ''} style="${toneStyle(t)};--i:${i}" data-id="${s.id}" data-bell="${bellKind(s)}|${state.watching[s.id] || ''}">
+    return `<article class="card ${S.online ? '' : 'offline'}" ${state.page === 'home' && state.filter !== 'recent' ? 'draggable="true"' : ''} style="${toneStyle(t)};--i:${i}" data-id="${s.id}" data-bell="${bellKind(s)}|${state.watching[s.id] || ''}">
       <div class="banner">
         ${banner ? `<img class="bimg" src="${esc(banner)}" alt="">` : logo ? `<img class="blur-logo" src="${esc(logo)}" alt="">` : ''}
         <span class="js-st">${S.online ? '<span class="pill pill-ok">ออนไลน์</span>' : '<span class="pill pill-off">ออฟไลน์</span>'}</span>
@@ -350,6 +364,7 @@
         <div class="bar"><i class="js-bar" style="width:${p}%;--barc:${barColor(p)}"></i></div>
         <div class="chips">
           <span class="pill pill-mono js-ping">${I.signal} ${S.ping != null ? `${S.ping}ms` : '—'}</span>
+          ${lastHTML(s)}
           ${s.category ? `<span class="pill pill-tone">${esc(s.category)}</span>` : ''}
           ${bellHTML(s)}
         </div>
@@ -363,13 +378,16 @@
 
   function filtered(favOnly) {
     const q = state.q.trim().toLowerCase();
-    return state.servers.filter((s) => {
+    const recent = !favOnly && state.filter === 'recent';
+    const out = state.servers.filter((s) => {
+      if (recent && !s.lastPlayed) return false;
       if (favOnly && !s.fav) return false;
       if (!favOnly && state.filter === 'online' && !st(s).online) return false;
       if (!favOnly && state.filter === 'fav' && !s.fav) return false;
       if (q && ![s.name, s.display, s.address, s.category, s.desc].join(' ').toLowerCase().includes(q)) return false;
       return true;
     });
+    return recent ? out.sort((a, b) => b.lastPlayed - a.lastPlayed) : out;
   }
 
   function gridHTML(favOnly) {
@@ -377,10 +395,13 @@
     if (!state.servers.length) {
       return `<div class="empty"><div><div class="em-mark">${I.mark}</div><b>ลิสต์ยังว่างอยู่</b>กด “เพิ่มเซิร์ฟเวอร์” เพื่อเริ่มต้น หรือหาเซิร์ฟจากรายชื่อของ FiveM<div style="margin-top:16px"><button class="btn" data-act="go-browse">${I.search} ค้นหาเซิร์ฟ</button></div></div></div>`;
     }
+    if (!list.length && !favOnly && state.filter === 'recent' && !state.q.trim()) {
+      return `<div class="empty"><div><div class="em-mark">${I.clock}</div><b>ยังไม่ได้เล่นเซิร์ฟไหนเลย</b>กดเล่นเซิร์ฟสักตัว แล้วจะขึ้นที่นี่ เรียงจากเล่นล่าสุด</div></div>`;
+    }
     if (!list.length) {
       return `<div class="empty"><div><div class="em-mark">${favOnly ? I.heart : I.search}</div><b>${favOnly && !state.q ? 'ยังไม่มีเซิร์ฟโปรด' : 'ไม่พบเซิร์ฟเวอร์'}</b>${favOnly && !state.q ? 'กดหัวใจบนการ์ดเพื่อเพิ่มเข้าลิสต์นี้' : 'ลองเปลี่ยนคำค้นหรือตัวกรองดู'}</div></div>`;
     }
-    if (favOnly || !state.groups.length) return `<div class="grid" data-gid="">${list.map(cardHTML).join('')}</div>`;
+    if (favOnly || !state.groups.length || state.filter === 'recent') return `<div class="grid" data-gid="">${list.map(cardHTML).join('')}</div>`;
     // แบ่งตามกลุ่ม
     const ids = new Set(state.groups.map((g) => g.id));
     const searching = !!state.q.trim() || state.filter !== 'all';
@@ -574,6 +595,7 @@
           <button data-f="all" class="${state.filter === 'all' ? 'on' : ''}">ทั้งหมด</button>
           <button data-f="online" class="${state.filter === 'online' ? 'on' : ''}">ออนไลน์</button>
           <button data-f="fav" class="${state.filter === 'fav' ? 'on' : ''}">โปรด</button>
+          <button data-f="recent" class="${state.filter === 'recent' ? 'on' : ''}">ล่าสุด</button>
         </div>`}
         ${favOnly ? '' : `<button class="icon-btn" data-act="new-group" title="สร้างกลุ่ม">${I.folder2}</button>`}
         <button class="icon-btn ${state.refreshing ? 'spin' : ''}" data-act="refresh" id="btnRefresh" title="รีเฟรชสถานะ">${I.refresh}</button>
@@ -588,6 +610,7 @@
     set('.js-st', (el) => { el.innerHTML = S.online ? '<span class="pill pill-ok">ออนไลน์</span>' : '<span class="pill pill-off">ออฟไลน์</span>'; });
     set('.js-pl', (el) => { el.textContent = fmtNum(S.players); });
     set('.js-max', (el) => { el.textContent = fmtNum(S.max); });
+    if (s.lastPlayed) set('.js-last', (el) => { el.innerHTML = `${I.clock} ${ago(s.lastPlayed)}`; });
     set('.js-pct', (el) => { el.textContent = `${isCard && full ? 'เต็ม · ' : ''}${p}%`; el.style.color = pctColor(p); });
     set('.js-bar', (el) => { el.style.width = `${p}%`; el.style.setProperty('--barc', barColor(p)); });
     set('.js-ping', (el) => { el.innerHTML = isCard ? `${I.signal} ${S.ping != null ? `${S.ping}ms` : '—'}` : S.ping != null ? `<span class="pill pill-mono">${I.signal} ${S.ping}ms</span>` : ''; });
@@ -702,6 +725,9 @@
       row.querySelector('[data-b="private"]')?.addEventListener('click', () => privateInfo(s));
       const playBtn = row.querySelector('[data-b="play"]');
       if (playBtn) playBtn.onclick = () => {
+        const keys = [norm(joinOf(s.id)), s.endpoint ? norm(s.endpoint) : null].filter(Boolean);
+        const mine = state.servers.find((x) => x.cfxId === s.id || keys.includes(norm(x.connect)) || keys.includes(norm(x.address)));
+        if (mine) { mine.lastPlayed = Date.now(); persist(); }
         toast(`กำลังเข้า ${s.name}`);
         api.launch(targetOf(s), state.settings.after).catch(() => toast('เปิด FiveM ไม่สำเร็จ', 'err'));
       };
