@@ -30,6 +30,7 @@ type listServer struct {
 	Tags     string `json:"tags"`
 	Icon     string `json:"icon"`
 	Banner   string `json:"banner"`
+	Endpoint string `json:"endpoint"` // ที่อยู่ตรงสำหรับเชื่อมต่อ (ว่าง = เซิร์ฟซ่อน IP ต้องใช้ cfx.re/join)
 	search   string
 	isThai   bool
 }
@@ -136,6 +137,10 @@ func decodeListServer(msg []byte) *listServer {
 			hostname = string(d)
 		case f == 11 && wt == 0:
 			iconVer, hasIcon = int32(v), true
+		case f == 18 && wt == 2:
+			if s.Endpoint == "" {
+				s.Endpoint = usableEndpoint(string(d))
+			}
 		case f == 12 && wt == 2:
 			var k, val string
 			_ = pbFields(d, func(f2, wt2 int, _ uint64, d2 []byte) {
@@ -178,6 +183,25 @@ func decodeListServer(msg []byte) *listServer {
 	s.isThai = strings.HasPrefix(strings.ToLower(s.Locale), "th") || hasThaiRune(s.Name) || hasThaiRune(s.Desc)
 	s.search = strings.ToLower(s.Name + " " + s.Desc + " " + s.Tags + " " + s.ID)
 	return s
+}
+
+// usableEndpoint คืนที่อยู่ที่เชื่อมต่อตรงได้ (IP:Port หรือ https URL) — ตัดค่าที่เซิร์ฟซ่อนไว้ทิ้ง
+func usableEndpoint(e string) string {
+	e = strings.TrimSpace(e)
+	low := strings.ToLower(e)
+	if e == "" || strings.Contains(low, "placeholder") || strings.Contains(low, "private") || strings.Contains(low, "cfx.re") {
+		return ""
+	}
+	if strings.HasPrefix(low, "https://") || strings.HasPrefix(low, "http://") {
+		return strings.TrimRight(e, "/")
+	}
+	if host, port, ok := strings.Cut(e, ":"); ok && host != "" && port != "" && !strings.ContainsAny(e, " /") {
+		if host == "0.0.0.0" || strings.HasPrefix(host, "127.") || strings.HasPrefix(host, "10.") || strings.HasPrefix(host, "192.168.") {
+			return ""
+		}
+		return e
+	}
+	return ""
 }
 
 // clip ตัดข้อความตามจำนวนตัวอักษร (ไม่ตัดกลางตัวอักษรไทย)

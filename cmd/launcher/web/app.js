@@ -362,7 +362,13 @@
 
   // ---------- BROWSE (รายชื่อเซิร์ฟสาธารณะ) ----------
   const joinOf = (id) => `cfx.re/join/${id}`;
-  const inList = (id) => state.servers.some((x) => String(x.connect || x.address).toLowerCase() === joinOf(id).toLowerCase());
+  // ใช้ที่อยู่ตรงของเซิร์ฟถ้ามี (ไม่ต้องผ่านระบบลิงก์ cfx.re) ไม่งั้นใช้ cfx.re/join
+  const targetOf = (s) => s.endpoint || joinOf(s.id);
+  const norm = (x) => String(x || '').toLowerCase().replace(/^https?:\/\//, '').replace(/:30120$/, '').replace(/\/+$/, '');
+  const inList = (s) => {
+    const keys = [norm(joinOf(s.id)), s.endpoint ? norm(s.endpoint) : null].filter(Boolean);
+    return state.servers.some((x) => keys.includes(norm(x.connect)) || keys.includes(norm(x.address)) || x.cfxId === s.id);
+  };
 
   function browseHTML() {
     const B = state.browse;
@@ -387,7 +393,7 @@
   function browseRow(s) {
     const p = s.max ? Math.min(100, Math.round((s.players / s.max) * 100)) : 0;
     const sub = s.desc || s.tags.split(',').map((t) => t.trim()).filter(Boolean).slice(0, 6).join(' · ') || joinOf(s.id);
-    const added = inList(s.id);
+    const added = inList(s);
     return `<div class="b-row" data-id="${esc(s.id)}">
       <div class="b-ic">${s.icon ? `<img src="${esc(s.icon)}" alt="" loading="lazy" onerror="this.remove()">` : ''}<span>${esc(initial(s.name))}</span></div>
       <div class="b-main"><div class="b-name" title="${esc(s.name)}">${esc(s.name)}</div><div class="b-sub" title="${esc(sub)}">${esc(sub)}</div></div>
@@ -429,7 +435,7 @@
       const s = B.items.find((x) => x.id === row.dataset.id);
       row.querySelector('[data-b="play"]').onclick = () => {
         toast(`กำลังเข้า ${s.name}`);
-        api.launch(joinOf(s.id), state.settings.after).catch(() => toast('เปิด FiveM ไม่สำเร็จ', 'err'));
+        api.launch(targetOf(s), state.settings.after).catch(() => toast('เปิด FiveM ไม่สำเร็จ', 'err'));
       };
       row.querySelector('[data-b="add"]')?.addEventListener('click', () => addFromBrowse(s));
     });
@@ -455,16 +461,24 @@
     drawBrowse();
   }
 
+  const adding = new Set();
   async function addFromBrowse(s) {
-    if (inList(s.id)) return;
+    if (inList(s) || adding.has(s.id)) return;
+    adding.add(s.id);
+    const t = targetOf(s);
     const rec = {
-      id: uid(), address: joinOf(s.id), connect: joinOf(s.id), display: joinOf(s.id),
+      id: uid(), address: t, connect: t, display: t.replace(/^https?:\/\//, ''), cfxId: s.id,
       name: s.name, category: '', desc: '', bannerUrl: '', logoUrl: '', discord: '',
       tone: 'auto', autoTone: null, logo: null, banner: s.banner || null, fav: false,
       addedAt: Date.now(), lastPlayed: null,
       status: { online: true, players: s.players, max: s.max, ping: null, checkedAt: Date.now() },
     };
+    if (s.icon) {
+      try { rec.logo = (await api.fetchImage(s.icon)) || null; } catch {}
+      if (rec.logo) rec.autoTone = await dominantColor(rec.logo);
+    }
     state.servers.push(rec);
+    adding.delete(s.id);
     persist();
     toast(`เพิ่ม ${s.name} แล้ว`);
     drawBrowse();
