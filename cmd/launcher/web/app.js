@@ -33,6 +33,8 @@
     upload: '<svg viewBox="0 0 24 24"><path d="M12 20V9M7 14l5-5 5 5M5 4h14"/></svg>',
     reset: '<svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.3-5.7"/><path d="M4 4v5h5"/></svg>',
     folder2: '<svg viewBox="0 0 24 24"><path d="M3.5 7.5A2 2 0 0 1 5.5 5.5h4l2 2h7a2 2 0 0 1 2 2v7.5a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2Z"/><path d="M12 11v5M9.5 13.5h5"/></svg>',
+    sliders: '<svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>',
+    gamepad: '<svg viewBox="0 0 24 24"><path d="M7.5 7h9a4.5 4.5 0 0 1 4.4 5.4l-.9 4.3a2.3 2.3 0 0 1-4 1l-1.6-1.9h-5l-1.6 1.9a2.3 2.3 0 0 1-4-1l-.9-4.3A4.5 4.5 0 0 1 7.5 7Z"/><path d="M8 10.5v3M6.5 12h3"/><circle cx="15.5" cy="11" r=".6" fill="currentColor"/><circle cx="17" cy="13" r=".6" fill="currentColor"/></svg>',
     filter: '<svg viewBox="0 0 24 24"><path d="M4 6.5h16M7 12h10M10 17.5h4"/></svg>',
     star: '<svg viewBox="0 0 24 24"><path d="m12 3.8 2.5 5.1 5.6.8-4 3.9 1 5.6-5.1-2.7-5 2.7 1-5.6-4.1-3.9 5.6-.8Z"/></svg>',
     sparkle: '<svg viewBox="0 0 24 24"><path d="M12 3c.6 4.6 2.4 6.4 7 7-4.6.6-6.4 2.4-7 7-.6-4.6-2.4-6.4-7-7 4.6-.6 6.4-2.4 7-7Z" fill="currentColor" stroke="none"/></svg>',
@@ -240,7 +242,8 @@
     closeModal();
     state.page = page;
     $$('.nav-btn').forEach((b) => b.classList.toggle('active', b.dataset.page === page));
-    $('#scroll').classList.toggle('split', page === 'browse');
+    $('#scroll').classList.toggle('split', true);
+    $('#scroll').classList.toggle('set', page === 'settings');
     render(true);
     $('#scroll').scrollTop = 0;
   }
@@ -739,77 +742,66 @@
   function seg(name, opts, cur) {
     return `<div class="seg sm" data-setting="${name}">${opts.map(([v, l]) => `<button data-v="${v}" class="${String(cur) === String(v) ? 'on' : ''}">${l}</button>`).join('')}</div>`;
   }
+  // หน้าตั้งค่า: เมนูหมวดด้านซ้าย (แบบเมนูในเกม) + แผงเนื้อหาด้านขวา
+  const SET_TABS = [
+    ['general', 'ทั่วไป', 'ภาษา · หลังกดเล่น', 'sliders'],
+    ['fivem', 'FiveM', 'ตำแหน่งเกม · ล้างแคช', 'gamepad'],
+    ['perf', 'ประสิทธิภาพ', 'ทรัพยากร · การเคลื่อนไหว', 'bolt'],
+    ['data', 'ข้อมูลของคุณ', 'สำรอง · กู้คืน · รีเซ็ต', 'folder'],
+    ['about', 'เกี่ยวกับ', 'อัปเดต · ช่วยเหลือ', 'sparkle'],
+  ];
+  let setTab = 'general';
+  const sect = (tab, title, desc, body, ic) => `<section class="sect" data-tab="${tab}"><div class="st-head"><i class="st-ic">${I[ic] || I.sliders}</i><div><h3>${title}</h3><p class="d">${desc}</p></div></div>${body}</section>`;
   function settingsHTML() {
     const S = state.settings;
+    const nav = SET_TABS.map(([k, l, d, ic]) => `<button class="set-tab ${setTab === k ? 'on' : ''}" data-tab="${k}"><i class="st-ic">${I[ic]}</i><span><b>${l}</b><small>${d}</small></span></button>`).join('');
     return `
-      <div class="page-head set-head"><h1 class="h1">ตั้ง<span class="sq">ค่า</span></h1></div>
+      <div class="set-wrap" data-on="${setTab}">
+        <nav class="set-nav">
+          <div class="b-sec"><div class="sh-ic">${I.sliders}</div><div class="sh-t"><p data-no-i18n>${isEN() ? 'Launcher<span>settings</span>' : 'ตั้งค่า<span>Launcher</span>'}</p><small>เลือกหมวดที่ต้องการ</small></div></div>
+          <div class="set-tabs">${nav}</div>
+          <div class="about"><div class="mark">${I.mark}</div><div><b>${esc(CFG.appName)} Launcher</b><small id="appInfo">เวอร์ชัน ${esc(state.version)}</small></div></div>
+        </nav>
+        <div class="set-body">
+          ${sect('general', `ภาษา${isEN() ? '' : ' <span class="st-en" data-no-i18n>· Language</span>'}`, 'เลือกภาษาที่ใช้ในโปรแกรม', `<div data-no-i18n>${seg('lang', [['th', 'ไทย'], ['en', 'English']], S.lang)}</div>`, 'globe')}
+          ${sect('general', 'หลังกดเล่น', 'ให้ Launcher ทำอะไรหลังเปิดเกม', seg('after', [['minimize', 'ย่อหน้าต่าง'], ['quit', 'ปิดโปรแกรม'], ['none', 'ไม่ทำอะไร']], S.after), 'play')}
 
-      <section class="sect">
-        <h3>ภาษา${isEN() ? '' : ' <span style="opacity:.45;font-weight:600" data-no-i18n>· Language</span>'}</h3>
-        <p class="d">เลือกภาษาที่ใช้ในโปรแกรม</p>
-        <div data-no-i18n>${seg('lang', [['th', 'ไทย'], ['en', 'English']], S.lang)}</div>
-      </section>
+          ${sect('fivem', 'ตำแหน่ง FiveM', 'โปรแกรมจะค้นหา FiveM.exe ให้อัตโนมัติ หากติดตั้งไว้ที่อื่นสามารถเลือกไฟล์เองได้', `
+            <div class="path-box">${state.fivem.found ? '<span class="stc stc-ok"><i></i><span>พบแล้ว</span></span>' : '<span class="stc stc-full"><i></i><span>ไม่พบ</span></span>'}<code title="${esc(state.fivem.path)}">${esc(state.fivem.path || '—')}</code></div>
+            ${state.fivem.found ? '' : '<div class="warn-box">ไม่พบ FiveM.exe — ตอนกดเล่นจะเปิดผ่านลิงก์ fivem:// แทน (ต้องติดตั้ง FiveM ก่อน)</div>'}
+            <div class="btn-row">
+              <button class="btn" data-act="pick-fivem">${I.folder} เลือกไฟล์ FiveM.exe</button>
+              <button class="btn" data-act="dl-fivem">${I.ext} ดาวน์โหลด FiveM</button>
+            </div>`, 'gamepad')}
+          ${sect('fivem', 'ล้างแคช FiveM', 'แก้อาการเกมเด้ง โหลดเข้าเซิร์ฟค้าง หรือพื้นที่เต็ม — ลบ crashes, data/cache, server-cache และ server-cache-priv (ต้องปิด FiveM ก่อน)',
+            '<div id="cacheBox"><div class="cache-list"><div class="cache-item none"><span class="nm">กำลังสแกน...</span></div></div></div>', 'trash')}
 
-      <section class="sect">
-        <h3>ตำแหน่ง FiveM</h3>
-        <p class="d">โปรแกรมจะค้นหา FiveM.exe ให้อัตโนมัติ หากติดตั้งไว้ที่อื่นสามารถเลือกไฟล์เองได้</p>
-        <div class="path-box">${state.fivem.found ? '<span class="pill pill-ok">พบแล้ว</span>' : '<span class="pill pill-off">ไม่พบ</span>'}<code title="${esc(state.fivem.path)}">${esc(state.fivem.path || '—')}</code></div>
-        ${state.fivem.found ? '' : '<div class="warn-box">ไม่พบ FiveM.exe — ตอนกดเล่นจะเปิดผ่านลิงก์ fivem:// แทน (ต้องติดตั้ง FiveM ก่อน)</div>'}
-        <div class="btn-row">
-          <button class="btn" data-act="pick-fivem">${I.folder} เลือกไฟล์ FiveM.exe</button>
-          <button class="btn" data-act="dl-fivem">${I.ext} ดาวน์โหลด FiveM</button>
+          ${sect('perf', 'การใช้ทรัพยากร', 'โปรแกรมจะทำงานเต็มที่เฉพาะตอนคุณกำลังใช้อยู่ — ไปเล่นเกมหรือเปิดโปรแกรมอื่น จะผ่อนแรงลงเอง และตอนย่อหน้าต่างจะหยุดรีเฟรชทั้งหมด คืนหน่วยความจำและยกความสำคัญของ CPU ให้เกม', `
+            ${seg('perf', [['eco', 'ประหยัดสุด'], ['balanced', 'สมดุล (แนะนำ)'], ['full', 'เต็มที่']], S.perf)}
+            <div class="metrics"><div class="metric">CPU <b id="mCpu">—</b></div><div class="metric">RAM <b id="mRam">—</b></div></div>`, 'bolt')}
+          ${sect('perf', 'เอฟเฟกต์การเคลื่อนไหว', 'เต็ม = แอนิเมชันและแสงวิ่งบนปุ่มเล่นครบ / ลด = ปิดการเคลื่อนไหวทั้งหมด เหมาะกับคนที่เวียนหัวง่าย', seg('motion', [['full', 'เต็ม (ลื่นสุด)'], ['reduced', 'ลด']], S.motion), 'sparkle')}
+
+          ${sect('data', 'ข้อมูลของคุณ', 'สำรองลิสต์เซิร์ฟเวอร์และการตั้งค่าไว้เป็นไฟล์ หรือย้ายไปเครื่องอื่น', `
+            <div class="btn-row">
+              <button class="btn" data-act="export">${I.download} ส่งออกข้อมูล</button>
+              <button class="btn" data-act="import">${I.upload} นำเข้าข้อมูล</button>
+              ${api.listBackups ? `<button class="btn" data-act="backups">${I.refresh} กู้คืนข้อมูลสำรอง</button>` : ''}
+            </div>`, 'folder')}
+          ${sect('data', 'รีเซ็ตทั้งหมด', 'ลบลิสต์เซิร์ฟเวอร์และการตั้งค่าทั้งหมด กลับเป็นเหมือนเพิ่งติดตั้ง (ไฟล์สำรองยังอยู่)', `<div class="btn-row"><button class="btn btn-danger" data-act="reset">${I.reset} รีเซ็ตทั้งหมด</button></div>`, 'reset')}
+
+          ${sect('about', 'การอัปเดต', 'โปรแกรมจะตรวจหาเวอร์ชันใหม่ให้อัตโนมัติทุกครั้งที่เปิด', `
+            <div class="btn-row" style="align-items:center">
+              <button class="btn" data-act="check-update">${I.refresh} ตรวจหาเวอร์ชันใหม่</button>
+              <span class="sub" id="updStatus" style="margin:0">เวอร์ชัน ${esc(state.version)}</span>
+            </div>`, 'download')}
+          ${CFG.updateRepo ? sect('about', 'ช่วยเหลือ', 'เจอปัญหา หรืออยากได้ฟีเจอร์อะไร บอกผู้พัฒนาได้ที่นี่ (ต้องมีบัญชี GitHub ฟรี)', `
+            <div class="btn-row">
+              <button class="btn" data-act="report" data-kind="bug">${I.x} แจ้งปัญหา</button>
+              <button class="btn" data-act="report" data-kind="idea">${I.sparkle} เสนอฟีเจอร์</button>
+              <button class="btn" data-act="website">${I.ext} เว็บไซต์</button>
+            </div>`, 'ext') : ''}
         </div>
-      </section>
-
-      <div class="sect-row">
-        <section class="sect"><h3>หลังกดเล่น</h3><p class="d">ให้ Launcher ทำอะไรหลังเปิดเกม</p>${seg('after', [['minimize', 'ย่อหน้าต่าง'], ['quit', 'ปิดโปรแกรม'], ['none', 'ไม่ทำอะไร']], S.after)}</section>
-      </div>
-
-      <section class="sect">
-        <h3>การใช้ทรัพยากร</h3>
-        <p class="d">โปรแกรมจะทำงานเต็มที่เฉพาะตอนคุณกำลังใช้อยู่ — ไปเล่นเกมหรือเปิดโปรแกรมอื่น จะผ่อนแรงลงเอง และตอนย่อหน้าต่างจะหยุดรีเฟรชทั้งหมด คืนหน่วยความจำและยกความสำคัญของ CPU ให้เกม</p>
-        ${seg('perf', [['eco', 'ประหยัดสุด'], ['balanced', 'สมดุล (แนะนำ)'], ['full', 'เต็มที่']], S.perf)}
-        <div class="metrics"><div class="metric">CPU <b id="mCpu">—</b></div><div class="metric">RAM <b id="mRam">—</b></div></div>
-      </section>
-
-      <section class="sect"><h3>เอฟเฟกต์การเคลื่อนไหว</h3><p class="d">เต็ม = แอนิเมชันและแสงวิ่งบนปุ่มเล่นครบ / ลด = ปิดการเคลื่อนไหวทั้งหมด เหมาะกับคนที่เวียนหัวง่าย</p>${seg('motion', [['full', 'เต็ม (ลื่นสุด)'], ['reduced', 'ลด']], S.motion)}</section>
-
-      <section class="sect">
-        <h3>ล้างแคช FiveM</h3>
-        <p class="d">แก้อาการเกมเด้ง โหลดเข้าเซิร์ฟค้าง หรือพื้นที่เต็ม — ลบ crashes, data/cache, server-cache และ server-cache-priv (ต้องปิด FiveM ก่อน)</p>
-        <div id="cacheBox"><div class="cache-list"><div class="cache-item none"><span class="nm">กำลังสแกน...</span></div></div></div>
-      </section>
-
-      <section class="sect">
-        <h3>การอัปเดต</h3>
-        <p class="d">โปรแกรมจะตรวจหาเวอร์ชันใหม่ให้อัตโนมัติทุกครั้งที่เปิด</p>
-        <div class="btn-row" style="align-items:center">
-          <button class="btn" data-act="check-update">${I.refresh} ตรวจหาเวอร์ชันใหม่</button>
-          <span class="sub" id="updStatus" style="margin:0">เวอร์ชัน ${esc(state.version)}</span>
-        </div>
-      </section>
-
-      ${CFG.updateRepo ? `<section class="sect">
-        <h3>ช่วยเหลือ</h3>
-        <p class="d">เจอปัญหา หรืออยากได้ฟีเจอร์อะไร บอกผู้พัฒนาได้ที่นี่ (ต้องมีบัญชี GitHub ฟรี)</p>
-        <div class="btn-row">
-          <button class="btn" data-act="report" data-kind="bug">${I.x} แจ้งปัญหา</button>
-          <button class="btn" data-act="report" data-kind="idea">${I.sparkle} เสนอฟีเจอร์</button>
-          <button class="btn" data-act="website">${I.ext} เว็บไซต์</button>
-        </div>
-      </section>` : ''}
-
-      <section class="sect">
-        <h3>ข้อมูลของคุณ</h3>
-        <p class="d">สำรองลิสต์เซิร์ฟเวอร์และการตั้งค่าไว้เป็นไฟล์ หรือย้ายไปเครื่องอื่น</p>
-        <div class="btn-row">
-          <button class="btn" data-act="export">${I.download} ส่งออกข้อมูล</button>
-          <button class="btn" data-act="import">${I.upload} นำเข้าข้อมูล</button>
-          ${api.listBackups ? `<button class="btn" data-act="backups">${I.refresh} กู้คืนข้อมูลสำรอง</button>` : ''}
-          <button class="btn" data-act="reset" style="color:var(--danger)">${I.reset} รีเซ็ตทั้งหมด</button>
-        </div>
-        <div class="about"><div class="mark">${I.mark}</div><div><b>${esc(CFG.appName)} Launcher</b><small id="appInfo">เวอร์ชัน ${esc(state.version)}</small></div></div>
-      </section>`;
+      </div>`;
   }
 
   async function loadCache() {
@@ -870,6 +862,12 @@
   function bindView() {
     if (state.page === 'browse') { bindBrowse(); return; }
     if (state.page === 'settings') {
+      $$('.set-tab').forEach((b) => (b.onclick = () => {
+        setTab = b.dataset.tab;
+        $('.set-wrap').dataset.on = setTab;
+        $$('.set-tab').forEach((x) => x.classList.toggle('on', x === b));
+        $('.set-body').scrollTop = 0;
+      }));
       $$('[data-setting]').forEach((g) => g.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => {
         const key = g.dataset.setting;
         const val = key === 'refresh' ? Number(b.dataset.v) : b.dataset.v;
