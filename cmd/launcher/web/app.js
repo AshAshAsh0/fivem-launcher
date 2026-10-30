@@ -718,7 +718,7 @@
     const p = s.max ? Math.min(100, Math.round((s.players / s.max) * 100)) : 0;
     const sub = s.desc || s.tags.split(',').map((t) => t.trim()).filter(Boolean).slice(0, 6).join(' · ') || joinOf(s.id);
     return `<div class="b-row" data-id="${esc(s.id)}">
-      <div class="b-ic">${s.icon ? `<img src="${esc(s.icon)}" alt="" loading="lazy">` : ''}<span>${esc(initial(s.name))}</span></div>
+      <div class="b-ic"><span>${esc(initial(s.name))}</span>${s.icon ? `<img src="${esc(imgSrc(s.icon))}" alt="" loading="lazy">` : ''}</div>
       <div class="b-main"><div class="b-name" title="${esc(s.name)}">${s.private ? '<span class="b-lock">🔒 ส่วนตัว</span>' : ''}<span data-no-i18n>${esc(s.name)}</span></div><div class="b-sub" title="${esc(sub)}" data-no-i18n>${esc(sub)}</div></div>
       <div class="b-pl"><div><b>${fmtNum(s.players)}</b> / ${fmtNum(s.max)}</div><div class="bar"><i style="width:${p}%;--barc:${barColor(p)}"></i></div></div>
       <div class="b-act">
@@ -749,6 +749,61 @@
   function joinDirect(t) {
     toast(`กำลังเข้า ${t}`);
     api.launch(t, state.settings.after).catch(() => toast('ที่อยู่ไม่ถูกต้อง หรือเปิด FiveM ไม่สำเร็จ', 'err'));
+  }
+
+  const imgSrc = (u) => (api.img ? api.img(u) : u);
+
+  // ป๊อปอัปรายละเอียดเซิร์ฟ (คลิกที่แถว)
+  function serverPopup(s) {
+    const p = s.max ? Math.min(100, Math.round((s.players / s.max) * 100)) : 0;
+    const tags = s.tags.split(',').map((t) => t.trim()).filter(Boolean).slice(0, 8);
+    const target = targetOf(s);
+    const m = modal(`
+      <div class="modal sv-pop">
+        <div class="sv-banner">
+          ${s.banner ? `<img src="${esc(imgSrc(s.banner))}" alt="">` : s.icon ? `<img class="blur" src="${esc(imgSrc(s.icon))}" alt="">` : ''}
+          <button class="x-btn" data-close>${I.x}</button>
+          ${s.private ? '<span class="b-lock sv-lock">🔒 ส่วนตัว</span>' : ''}
+        </div>
+        <div class="sv-head">
+          <div class="sv-ic"><span>${esc(initial(s.name))}</span>${s.icon ? `<img src="${esc(imgSrc(s.icon))}" alt="">` : ''}</div>
+          <div class="sv-title">
+            <h2 data-no-i18n title="${esc(s.name)}">${esc(s.name)}</h2>
+            <div class="sv-tags">${s.locale ? `<span class="pill pill-mono" data-no-i18n>${esc(s.locale.replace('_', '-'))}</span>` : ''}${tags.map((t) => `<span class="pill pill-mono" data-no-i18n>${esc(t)}</span>`).join('')}</div>
+          </div>
+        </div>
+        <div class="modal-body sv-body">
+          <div class="sv-stats">
+            <div><span class="lbl">จำนวนผู้เล่น</span><b>${fmtNum(s.players)}<small>/${fmtNum(s.max)}</small></b></div>
+            <div><span class="lbl">ปิง</span><b id="svPing">…</b></div>
+            <div><span class="lbl">ความจุ</span><b style="color:${pctColor(p)}">${p}%</b></div>
+          </div>
+          <div class="bar"><i style="width:${p}%;--barc:${barColor(p)}"></i></div>
+          ${s.desc ? `<p class="sv-desc" data-no-i18n>${esc(s.desc)}</p>` : ''}
+          ${s.private
+            ? `<p class="sv-note">เซิร์ฟนี้ตั้งเป็นส่วนตัว จึงเข้าจากรายชื่อไม่ได้ ต้องใช้ IP หรือลิงก์ที่เซิร์ฟแจกใน Discord — วางในช่องค้นหาแล้วกด “เข้าเลย”</p>`
+            : `<div class="sv-addr"><code data-no-i18n>${esc(target)}</code><button class="btn btn-sm" id="svCopy">${I.copy || ''} คัดลอก</button></div>`}
+        </div>
+        <div class="modal-foot">
+          <button class="btn" data-close data-no-i18n>${isEN() ? 'Close' : 'ปิด'}</button>
+          ${s.private ? '' : `<button class="btn btn-dark btn-lg sv-play" id="svPlay">${I.play} เล่นเลย</button>`}
+        </div>
+      </div>`);
+    $('#svPlay', m)?.addEventListener('click', () => {
+      closeModal();
+      toast(`กำลังเข้า ${s.name}`);
+      api.launch(target, state.settings.after).catch(() => toast('เปิด FiveM ไม่สำเร็จ', 'err'));
+    });
+    $('#svCopy', m)?.addEventListener('click', () => {
+      try { navigator.clipboard.writeText(target); toast('คัดลอกที่อยู่แล้ว'); } catch { toast('คัดลอกไม่สำเร็จ', 'err'); }
+    });
+    // ปิงจริงของเซิร์ฟ (ถามตอนเปิดป๊อปอัป)
+    if (!s.private) {
+      api.query(target, {}).then((r) => {
+        const el = $('#svPing', m);
+        if (el) el.innerHTML = r && r.online && r.ping != null ? `${r.ping}<small>ms</small>` : '—';
+      }).catch(() => { const el = $('#svPing', m); if (el) el.textContent = '—'; });
+    } else { const el = $('#svPing', m); if (el) el.textContent = '—'; }
   }
 
   function browseSkeleton() {
@@ -794,7 +849,17 @@
       };
       const playBtn = row.querySelector('[data-b="play"]');
       if (playBtn) playBtn.onclick = (e) => { e.stopPropagation(); join(); };
-      row.ondblclick = (e) => { if (e.target.closest('button')) return; s.private ? privateInfo(s) : join(); };
+      let clickT = 0;
+      row.onclick = (e) => {
+        if (e.target.closest('button')) return;
+        clearTimeout(clickT);
+        clickT = setTimeout(() => serverPopup(s), 230);
+      };
+      row.ondblclick = (e) => {
+        if (e.target.closest('button')) return;
+        clearTimeout(clickT);
+        s.private ? serverPopup(s) : join();
+      };
     });
   }
 
@@ -1486,7 +1551,7 @@
               <span class="pill pill-mono">${b.servers} เซิร์ฟ</span>
             </button>`).join('')}</div>` : '<div class="empty" style="min-height:120px"><div><b>ยังไม่มีข้อมูลสำรอง</b>จะเริ่มสำรองเมื่อมีการลบเซิร์ฟออกจากลิสต์</div></div>'}
         </div>
-        <div class="modal-foot"><button class="btn" data-close>ปิด</button></div>
+        <div class="modal-foot"><button class="btn" data-close data-no-i18n>${isEN() ? 'Close' : 'ปิด'}</button></div>
       </div>`);
     $$('[data-bk]', m).forEach((btn) => btn.addEventListener('click', async () => {
       const d = await api.readBackup(btn.dataset.bk).catch(() => null);

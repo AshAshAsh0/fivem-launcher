@@ -66,9 +66,10 @@
     async setPerfMode() {}, async info() { return { version: '2.1.0' }; },
     async setLang() {}, async watchStart() { return []; }, async watchStop() { return []; }, async watchList() { return []; },
     async browse(o) {
+      const demoIcon = (i) => { const h = (i * 47) % 360; return 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="hsl(${h},80%,60%)"/><stop offset="1" stop-color="hsl(${(h + 60) % 360},70%,35%)"/></linearGradient></defs><rect width="64" height="64" fill="url(#g)"/><circle cx="44" cy="20" r="10" fill="rgba(255,255,255,.35)"/><path d="M10 52 28 24l10 14 6-8 10 22z" fill="rgba(255,255,255,.55)"/></svg>`); };
       await wait(o.offset ? 300 : 900);
       const names = ['เมืองหลวง RP', 'Bangkok Life', 'SCHOOL CITY', 'Neon Drift', 'โรงเรียนมัธยม RP', 'Sakura Town', 'Thai Police RP', 'Racing Club TH'];
-      window.__demoList ||= Array.from({ length: 140 }, (_, i) => ({ id: 'srv' + i, name: names[i % names.length] + (i > 7 ? ' #' + i : ''), desc: i % 3 ? '' : 'Roleplay เมืองไทย เปิด 24 ชม.', players: Math.max(0, 1800 - i * 13), max: 2048, locale: i % 4 ? 'th-TH' : 'en-US', tags: 'roleplay,thai,economy', icon: '', banner: '', private: i % 5 === 1 }));
+      window.__demoList ||= Array.from({ length: 140 }, (_, i) => ({ id: 'srv' + i, name: names[i % names.length] + (i > 7 ? ' #' + i : ''), desc: i % 3 ? '' : 'Roleplay เมืองไทย เปิด 24 ชม.', players: Math.max(0, 1800 - i * 13), max: 2048, locale: i % 4 ? 'th-TH' : 'en-US', tags: 'roleplay,thai,economy', icon: demoIcon(i), banner: i % 2 ? '' : demoIcon(i + 3), private: i % 5 === 1 }));
       const q = (o.q || '').toLowerCase();
       const all = window.__demoList.filter((s) => (o.region !== 'th' || s.locale === 'th-TH') && (!q || (s.name + s.desc + s.tags).toLowerCase().includes(q)));
       return { items: all.slice(o.offset, o.offset + o.limit), total: all.length, players: all.reduce((a, s) => a + s.players, 0), all: 140, updated: Date.now() / 1000 };
@@ -76,6 +77,7 @@
     async checkUpdate() { return { available: true, version: '2.2.0', url: '#' }; }, async installUpdate() { await wait(800); throw new Error('preview'); },
     async exportData() { return false; }, async importData() { return null; },
     async setWallpaper(b64) { try { localStorage.setItem('fl-demo-wall', 'data:image/jpeg;base64,' + b64); return true; } catch { return false; } },
+    img: (u) => u,
     async listBackups() { return [{ name: 'launcher-data-20261030-162217.json', time: Date.now() - 600000, servers: 3, names: ['NEON CITY RP', 'WHITE CITY', 'SHARK COMMUNITY'] }]; },
     async readBackup() { return { version: 1, servers: [{ id: 'rest1', name: 'RESTORED CITY', address: 'cfx.re/join/rest01' }, { id: 'rest2', name: 'RESTORED TOWN', address: '5.6.7.8:30120' }], groups: [] }; },
     async clearWallpaper() { try { localStorage.removeItem('fl-demo-wall'); } catch {} return true; },

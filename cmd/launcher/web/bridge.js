@@ -50,6 +50,7 @@
     setWallpaper: (b64) => call('setWallpaper', b64),
     clearWallpaper: () => call('clearWallpaper'),
     listBackups: () => call('listBackups'),
+    img: (u) => (u && /^https:\/\//i.test(u) ? '/img?u=' + encodeURIComponent(u) : u),
     readBackup: (n) => call('readBackup', n),
     wallpaperURL: (v) => `/wallpaper.jpg?v=${v}`,
   };

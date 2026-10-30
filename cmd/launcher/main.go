@@ -26,7 +26,7 @@ import (
 var webFS embed.FS
 
 // version ถูกแทนค่าตอน build ด้วย -ldflags "-X main.version=..."
-var version = "3.0.0"
+var version = "3.1.0"
 
 const (
 	appTitle = "FiveM Launcher"
@@ -66,6 +66,7 @@ func main() {
 		w.Header().Set("Cache-Control", "no-store")
 		fileSrv.ServeHTTP(w, r)
 	})
+	mux.HandleFunc("/img", serveImage) // โลโก้/แบนเนอร์เซิร์ฟผ่านตัวโปรแกรม + แคช
 	// รูปพื้นหลังที่ผู้ใช้เลือก (เบลอไว้แล้วตั้งแต่ตอนเลือก)
 	mux.HandleFunc("/wallpaper.jpg", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Cache-Control", "no-store")
