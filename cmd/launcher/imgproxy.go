@@ -27,6 +27,7 @@ var (
 	imgSem      = make(chan struct{}, 6)
 	imgInflight sync.Map // key -> *sync.Mutex (กันโหลดรูปเดียวกันซ้ำพร้อมกัน)
 	imgPruneMu  sync.Mutex
+	imgMiss     sync.Map // key -> time: รูปที่โหลดไม่ได้ (เช่นเซิร์ฟไม่มีโลโก้) ไม่ต้องลองซ้ำ 30 นาที
 )
 
 func imgCacheDir() string { return filepath.Join(os.Getenv("LOCALAPPDATA"), appTitle, "img-cache") }
@@ -63,6 +64,10 @@ func serveImage(w http.ResponseWriter, r *http.Request) {
 		writeImg(w, b, ct)
 		return
 	}
+	if t, ok := imgMiss.Load(key); ok && time.Since(t.(time.Time)) < 30*time.Minute {
+		http.Error(w, "unavailable", 404)
+		return
+	}
 	m, _ := imgInflight.LoadOrStore(key, &sync.Mutex{})
 	mu := m.(*sync.Mutex)
 	mu.Lock()
@@ -76,6 +81,7 @@ func serveImage(w http.ResponseWriter, r *http.Request) {
 	b, ct, err := downloadImage(u.String())
 	<-imgSem
 	if err != nil {
+		imgMiss.Store(key, time.Now())
 		http.Error(w, "unavailable", 404)
 		return
 	}

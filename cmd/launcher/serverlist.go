@@ -190,9 +190,10 @@ func decodeListServer(msg []byte) *listServer {
 	s.Locale = vars["locale"]
 	s.Tags = vars["tags"]
 	s.Tags = clip(s.Tags, 100)
-	if hasIcon {
-		s.Icon = fmt.Sprintf("https://frontend.cfx-services.net/api/servers/icon/%s/%d.png", s.ID, iconVer)
-	}
+	// iconVersion = 0 จะไม่ถูกส่งมาใน protobuf (ค่าเริ่มต้น) แต่เซิร์ฟยังมีโลโก้ได้ → สร้างที่อยู่เสมอ
+	// เซิร์ฟที่ไม่มีโลโก้จะได้ 404 แล้วหน้าเว็บแสดงตัวอักษรแทน
+	_ = hasIcon
+	s.Icon = fmt.Sprintf("https://frontend.cfx-services.net/api/servers/icon/%s/%d.png", s.ID, iconVer)
 	if b := vars["banner_detail"]; strings.HasPrefix(b, "https://") {
 		s.Banner = b
 	} else if b := vars["banner_connecting"]; strings.HasPrefix(b, "https://") {
