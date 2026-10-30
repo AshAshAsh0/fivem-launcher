@@ -1,0 +1,64 @@
+# ทดลองสร้างตัวติดตั้งแบบ Inno Setup (ออกเป็น pre-release ชื่อ inno-test — ไม่กระทบระบบอัปเดตอัตโนมัติ)
+name: Test Inno Setup
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "เวอร์ชัน (เช่น 2.3.0)"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  launcher:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+      - run: go install github.com/tc-hib/go-winres@v0.3.3
+      - name: Build launcher
+        env:
+          VERSION: ${{ github.event.inputs.version }}
+          UPDATE_REPO: ${{ github.repository }}
+          MADE_BY: ${{ vars.MADE_BY }}
+          DISCORD_URL: ${{ vars.DISCORD_URL }}
+        run: ./build.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: launcher
+          path: out/FiveM Launcher.exe
+
+  installer:
+    needs: launcher
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: launcher
+          path: out
+      - name: Ensure Inno Setup
+        shell: pwsh
+        run: |
+          $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $iscc)) { choco install innosetup -y --no-progress }
+      - name: Build installer
+        shell: pwsh
+        run: |
+          $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+          & $iscc /Qp "/DAppVer=${{ github.event.inputs.version }}" "/DSrcExe=..\out\FiveM Launcher.exe" installer\FiveMLauncher.iss
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Get-ChildItem out
+      - name: Publish pre-release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: inno-test
+          name: "ทดลอง: ตัวติดตั้ง Inno Setup ${{ github.event.inputs.version }}"
+          body: "ไฟล์ทดลองสำหรับสแกนไวรัสเท่านั้น — ยังไม่ใช่เวอร์ชันจริง"
+          prerelease: true
+          make_latest: false
+          files: out/FiveM-Launcher-Setup.exe
