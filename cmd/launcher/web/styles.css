@@ -1257,3 +1257,17 @@ html[data-motion='reduced'] .splash * { animation: none !important; }
 .mine-grp .grp-more { order: 6; width: 28px; height: 28px; }
 .mine-grp-empty { padding: 10px 14px; border-radius: 10px; border: 1px dashed rgba(255, 255, 255, .1); color: var(--muted); font-size: 12.5px; }
 .menu-layer { z-index: 90; }
+
+/* v9: ตัวกรองรายชื่อ + แจ้งเตือนไม่พบ FiveM */
+.b-filters { display: flex; align-items: center; gap: 14px; margin: -4px 0 10px; flex-wrap: wrap; }
+.b-filters .b-meta { margin: 0 auto 0 0 !important; }
+.b-chk { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--ink-2); cursor: pointer; user-select: none; }
+.b-chk input { appearance: none; width: 16px; height: 16px; border-radius: 4px; background: rgba(57, 60, 65, .6); box-shadow: inset 0 0 0 1px rgba(255,255,255,.14); display: grid; place-items: center; margin: 0; cursor: pointer; }
+.b-chk input:checked { background: rgba(10, 174, 251, .25); box-shadow: inset 0 0 0 1.5px var(--accent); }
+.b-chk input:checked::after { content: ''; width: 8px; height: 8px; border-radius: 2px; background: var(--accent); }
+.b-filters .seg.sm button { height: 28px; padding: 0 12px; font-size: 12px; }
+.fivem-miss { display: flex; align-items: center; gap: 12px; padding: 10px 12px 10px 14px; margin: -4px 0 12px; border-radius: 10px; background: rgba(240, 90, 90, .1); box-shadow: inset 0 0 0 1px rgba(240, 90, 90, .45); }
+.fivem-miss > svg { width: 18px; height: 18px; color: #ff8c8c; flex: none; }
+.fivem-miss span { flex: 1; min-width: 0; }
+.fivem-miss b { display: block; font-size: 13.5px; color: #ffb3b3; }
+.fivem-miss small { display: block; font-size: 12px; color: var(--muted); }

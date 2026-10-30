@@ -46,7 +46,7 @@
   const SQUIGGLE = '<svg viewBox="0 0 120 12" preserveAspectRatio="none"><path d="M2 7c8-6 14 4 22 0s14-6 22 0 14 4 22 0 14-6 22 0 14 4 22 0"/></svg>';
 
   // ---------- state ----------
-  const DEFAULT_SETTINGS = { wall: null, lang: null, theme: 'mono', after: 'minimize', refresh: 15, perf: 'balanced', cursor: 'theme', motion: 'full', fivemPath: null };
+  const DEFAULT_SETTINGS = { bHidePrivate: false, bHideFull: false, bSort: 'players', wall: null, lang: null, theme: 'mono', after: 'minimize', refresh: 15, perf: 'balanced', cursor: 'theme', motion: 'full', fivemPath: null };
   const state = {
     servers: [],
     groups: [],
@@ -723,7 +723,13 @@
         </div>
         <button class="icon-btn ${B.loading ? 'spin' : ''}" id="bRefresh" title="โหลดรายชื่อใหม่">${I.refresh}</button>
       </div>
-      <div class="b-meta" id="bMeta"></div>
+      ${state.fivem && state.fivem.found === false ? `<div class="fivem-miss">${I.x}<span><b>ไม่พบ FiveM ในเครื่องนี้</b><small>ต้องติดตั้ง FiveM ก่อนถึงจะเข้าเซิร์ฟได้ ถ้าติดตั้งไว้ที่อื่น เลือกไฟล์ FiveM.exe เองได้</small></span><button class="btn btn-sm btn-dark" data-act="dl-fivem2">${I.ext} ดาวน์โหลด FiveM</button><button class="btn btn-sm" data-act="pick-fivem2">${I.folder2} เลือกไฟล์</button></div>` : ''}
+      <div class="b-filters">
+        <div class="b-meta" id="bMeta"></div>
+        <label class="b-chk"><input type="checkbox" id="fPriv" ${state.settings.bHidePrivate ? 'checked' : ''}><span>ซ่อนเซิร์ฟส่วนตัว</span></label>
+        <label class="b-chk"><input type="checkbox" id="fFull" ${state.settings.bHideFull ? 'checked' : ''}><span>ซ่อนเซิร์ฟเต็ม</span></label>
+        <div class="seg sm" id="bSort"><button data-s="players" class="${state.settings.bSort !== 'name' ? 'on' : ''}">คนเยอะสุด</button><button data-s="name" class="${state.settings.bSort === 'name' ? 'on' : ''}">ชื่อ ก-ฮ</button></div>
+      </div>
       <div class="b-split ${B.sel ? 'open' : ''}" id="bSplit">
         <aside class="sv-side" id="svSide"></aside>
         <div class="b-col"><div class="b-list" id="bList"></div><div class="b-more" id="bMore"></div></div>
@@ -759,6 +765,7 @@
     </div>`;
   }
   function joinDirect(t) {
+    warnNoFiveM();
     toast(`กำลังเข้า ${t}`);
     api.launch(t, state.settings.after).catch(() => toast('ที่อยู่ไม่ถูกต้อง หรือเปิด FiveM ไม่สำเร็จ', 'err'));
   }
@@ -816,6 +823,7 @@
     $('#svIp', side)?.addEventListener('keydown', (e) => { if (e.key === 'Enter') savePrivate(s, e.target.value); });
     $('#svGoMine', side)?.addEventListener('click', () => { if (mineOf) { $('#bq').value = ''; state.browse.q = ''; drawBrowse(); mineSide(mineOf); $('#bList').closest('.b-col').scrollTop = 0; } });
     $('#svPlay', side)?.addEventListener('click', () => {
+      warnNoFiveM();
       toast(`กำลังเข้า ${s.name}`);
       api.launch(target, state.settings.after).catch(() => toast('เปิด FiveM ไม่สำเร็จ', 'err'));
     });
@@ -986,6 +994,7 @@
       row.classList.toggle('sel', B.sel === s.id);
       row.querySelector('[data-b="private"]')?.addEventListener('click', (e) => { e.stopPropagation(); serverPopup(s); });
       const join = () => {
+        warnNoFiveM();
         toast(`กำลังเข้า ${s.name}`);
         api.launch(targetOf(s), state.settings.after).catch(() => toast('เปิด FiveM ไม่สำเร็จ', 'err'));
       };
@@ -1005,7 +1014,8 @@
     drawBrowse();
     let r;
     try {
-      r = await api.browse({ q: B.q, region: B.region, offset: B.items.length, limit: 50, force });
+      const S = state.settings;
+      r = await api.browse({ q: B.q, region: B.region, offset: B.items.length, limit: 50, force, hidePrivate: !!S.bHidePrivate, hideFull: !!S.bHideFull, sort: S.bSort === 'name' ? 'name' : 'players' });
     } catch (e) {
       r = { error: e.message };
     }
@@ -1073,6 +1083,18 @@
       loadBrowse(true);
     }));
     $('#bRefresh').addEventListener('click', () => loadBrowse(true, true));
+    $('#fPriv').addEventListener('change', (e) => { state.settings.bHidePrivate = e.target.checked; persist(); loadBrowse(true); });
+    $('#fFull').addEventListener('change', (e) => { state.settings.bHideFull = e.target.checked; persist(); loadBrowse(true); });
+    $$('#bSort button').forEach((b) => b.addEventListener('click', () => {
+      state.settings.bSort = b.dataset.s; persist();
+      $$('#bSort button').forEach((x) => x.classList.toggle('on', x === b));
+      loadBrowse(true);
+    }));
+    $('[data-act="dl-fivem2"]')?.addEventListener('click', () => api.openExternal(CFG.fivemDownloadUrl));
+    $('[data-act="pick-fivem2"]')?.addEventListener('click', async () => {
+      const r = await api.pickFiveM();
+      if (r) { state.fivem = r; state.settings.fivemPath = r.path; persist(); render(); toast('ตั้งค่าตำแหน่ง FiveM แล้ว'); }
+    });
     if (B.loaded) { drawBrowse(); if (Date.now() / 1000 - B.updated > 300) loadBrowse(true); }
     else loadBrowse(true);
   }
@@ -1289,10 +1311,17 @@
     const m = modal(`
       <div class="modal sm">
         <div class="modal-head"><h2>รีเซ็ตทั้งหมด?</h2><button class="x-btn" data-close>${I.x}</button></div>
-        <div class="modal-body"><p class="confirm-text">ลิสต์เซิร์ฟเวอร์ ${state.servers.length} รายการและการตั้งค่าทั้งหมดจะถูกลบ แนะนำให้ส่งออกข้อมูลเก็บไว้ก่อน</p></div>
-        <div class="modal-foot"><button class="btn" data-close>ยกเลิก</button><button class="btn btn-danger" id="doReset">${I.reset} รีเซ็ต</button></div>
+        <div class="modal-body"><p class="confirm-text">ลิสต์เซิร์ฟเวอร์ ${state.servers.length} รายการและการตั้งค่าทั้งหมดจะถูกลบ แนะนำให้ส่งออกข้อมูลเก็บไว้ก่อน</p>
+          <p class="confirm-text" style="margin-top:12px">พิมพ์คำว่า <b style="color:var(--danger)" data-no-i18n>${isEN() ? 'RESET' : 'รีเซ็ต'}</b> เพื่อยืนยัน</p>
+          <input class="input" id="resetWord" autocomplete="off" spellcheck="false" style="margin-top:8px"></div>
+        <div class="modal-foot"><button class="btn" data-close>ยกเลิก</button><button class="btn btn-danger" id="doReset" disabled>${I.reset} รีเซ็ต</button></div>
       </div>`);
-    $('#doReset', m).addEventListener('click', () => {
+    const word = isEN() ? 'RESET' : 'รีเซ็ต';
+    const inp = $('#resetWord', m), btn = $('#doReset', m);
+    inp.addEventListener('input', () => { btn.disabled = inp.value.trim().toUpperCase() !== word.toUpperCase(); });
+    setTimeout(() => inp.focus(), 60);
+    btn.addEventListener('click', () => {
+      if (inp.value.trim().toUpperCase() !== word.toUpperCase()) return;
       state.servers = [];
       state.groups = [];
       state.settings = { ...DEFAULT_SETTINGS };
@@ -1592,9 +1621,11 @@
   }
 
   // ---------- play ----------
+  function warnNoFiveM() { if (state.fivem && state.fivem.found === false) toast('ไม่พบ FiveM ในเครื่อง — กำลังลองเปิดผ่านลิงก์ fivem:// (ถ้าไม่ขึ้น ให้ติดตั้ง FiveM ก่อน)', 'err'); }
   async function play(id) {
     const s = byId(id);
     if (!s) return;
+    warnNoFiveM();
     s.lastPlayed = Date.now();
     persist();
     toast(`กำลังเข้า ${s.name}`);

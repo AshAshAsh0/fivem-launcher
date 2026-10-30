@@ -26,7 +26,7 @@ import (
 var webFS embed.FS
 
 // version ถูกแทนค่าตอน build ด้วย -ldflags "-X main.version=..."
-var version = "3.5.1"
+var version = "3.6.0"
 
 const (
 	appTitle = "FiveM Launcher"
@@ -319,7 +319,10 @@ func handle(method, raw string) (any, error) {
 		off, _ := o["offset"].(float64)
 		lim, _ := o["limit"].(float64)
 		force, _ := o["force"].(bool)
-		return browseServers(q, region, int(off), int(lim), force), nil
+		hidePriv, _ := o["hidePrivate"].(bool)
+		hideFull, _ := o["hideFull"].(bool)
+		sortBy, _ := o["sort"].(string)
+		return browseServers(q, region, int(off), int(lim), force, browseOpts{hidePriv, hideFull, sortBy}), nil
 	case "checkUpdate":
 		return checkUpdate(arg[string](args, 0))
 	case "installUpdate":

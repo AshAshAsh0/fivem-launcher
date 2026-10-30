@@ -51,7 +51,7 @@
       return { ok: true, online: true, connect: key, display: key, name: d.name, desc: '', players: Math.min(d.max, Math.max(0, d.players + jitter)), max: d.max, ping: d.ping + Math.round(Math.random() * 6), logo: d.logo, banner: d.banner, tags: [] };
     },
     async fetchImage(u) { return u; },
-    async fivemStatus() { return { path: 'C:\\Users\\User\\AppData\\Local\\FiveM\\FiveM.exe', found: true }; },
+    async fivemStatus() { return { path: 'C:\\Users\\User\\AppData\\Local\\FiveM\\FiveM.exe', found: !sessionStorage.getItem('nofivem') }; },
     async pickFiveM() { return null; },
     async launch() { return { ok: true }; },
     async openFiveM() { return true; },
@@ -69,9 +69,10 @@
       const demoIcon = (i) => { const h = (i * 47) % 360; return 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="hsl(${h},80%,60%)"/><stop offset="1" stop-color="hsl(${(h + 60) % 360},70%,35%)"/></linearGradient></defs><rect width="64" height="64" fill="url(#g)"/><circle cx="44" cy="20" r="10" fill="rgba(255,255,255,.35)"/><path d="M10 52 28 24l10 14 6-8 10 22z" fill="rgba(255,255,255,.55)"/></svg>`); };
       await wait(o.offset ? 300 : 900);
       const names = ['เมืองหลวง RP', 'Bangkok Life', 'SCHOOL CITY', 'Neon Drift', 'โรงเรียนมัธยม RP', 'Sakura Town', 'Thai Police RP', 'Racing Club TH'];
-      window.__demoList ||= Array.from({ length: 140 }, (_, i) => ({ id: 'srv' + i, name: names[i % names.length] + (i > 7 ? ' #' + i : ''), desc: i % 3 ? '' : 'Roleplay เมืองไทย เปิด 24 ชม.', players: Math.max(0, 1800 - i * 13), max: 2048, locale: i % 4 ? 'th-TH' : 'en-US', tags: 'roleplay,thai,economy', icon: demoIcon(i), banner: i % 2 ? '' : demoIcon(i + 3), private: i % 5 === 1, discord: i % 2 ? '' : 'https://discord.gg/demo', website: i % 3 ? '' : 'https://example.com' }));
+      window.__demoList ||= Array.from({ length: 140 }, (_, i) => ({ id: 'srv' + i, name: names[i % names.length] + (i > 7 ? ' #' + i : ''), desc: i % 3 ? '' : 'Roleplay เมืองไทย เปิด 24 ชม.', players: i === 2 ? 2048 : Math.max(0, 1800 - i * 13), max: 2048, locale: i % 4 ? 'th-TH' : 'en-US', tags: 'roleplay,thai,economy', icon: demoIcon(i), banner: i % 2 ? '' : demoIcon(i + 3), private: i % 5 === 1, discord: i % 2 ? '' : 'https://discord.gg/demo', website: i % 3 ? '' : 'https://example.com' }));
       const q = (o.q || '').toLowerCase();
-      const all = window.__demoList.filter((s) => (o.region !== 'th' || s.locale === 'th-TH') && (!q || (s.name + s.desc + s.tags).toLowerCase().includes(q)));
+      let all = window.__demoList.filter((s) => (o.region !== 'th' || s.locale === 'th-TH') && (!q || (s.name + s.desc + s.tags).toLowerCase().includes(q)) && !(o.hidePrivate && s.private) && !(o.hideFull && s.players >= s.max));
+      if (o.sort === 'name') all = [...all].sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
       return { items: all.slice(o.offset, o.offset + o.limit), total: all.length, players: all.reduce((a, s) => a + s.players, 0), all: 140, updated: Date.now() / 1000 };
     },
     async checkUpdate() { return { available: true, version: '2.2.0', url: '#' }; }, async installUpdate() { await wait(800); throw new Error('preview'); },

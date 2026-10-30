@@ -370,7 +370,13 @@ func loadServerList(force bool) ([]*listServer, time.Time, error) {
 }
 
 // browseServers ค้นหา/กรอง แล้วคืนเป็นหน้า ๆ
-func browseServers(query, region string, offset, limit int, force bool) map[string]any {
+type browseOpts struct {
+	hidePrivate bool
+	hideFull    bool
+	sort        string // "players" (ค่าเริ่มต้น) | "name"
+}
+
+func browseServers(query, region string, offset, limit int, force bool, opt browseOpts) map[string]any {
 	items, at, err := loadServerList(force)
 	if err != nil {
 		return map[string]any{"error": errText(err)}
@@ -379,10 +385,22 @@ func browseServers(query, region string, offset, limit int, force bool) map[stri
 	if limit <= 0 || limit > 100 {
 		limit = 50
 	}
+	if opt.sort == "name" {
+		sorted := make([]*listServer, len(items))
+		copy(sorted, items)
+		sort.SliceStable(sorted, func(i, j int) bool { return strings.ToLower(sorted[i].Name) < strings.ToLower(sorted[j].Name) })
+		items = sorted
+	}
 	total, players := 0, 0
 	page := make([]*listServer, 0, limit)
 	for _, s := range items {
 		if region == "th" && !s.isThai {
+			continue
+		}
+		if opt.hidePrivate && s.Private {
+			continue
+		}
+		if opt.hideFull && s.Max > 0 && s.Players >= s.Max {
 			continue
 		}
 		ok := true
