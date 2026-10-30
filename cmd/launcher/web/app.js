@@ -45,7 +45,7 @@
   const SQUIGGLE = '<svg viewBox="0 0 120 12" preserveAspectRatio="none"><path d="M2 7c8-6 14 4 22 0s14-6 22 0 14 4 22 0 14-6 22 0 14 4 22 0"/></svg>';
 
   // ---------- state ----------
-  const DEFAULT_SETTINGS = { lang: null, theme: 'mono', after: 'minimize', refresh: 15, perf: 'balanced', cursor: 'theme', motion: 'full', fivemPath: null };
+  const DEFAULT_SETTINGS = { wall: null, lang: null, theme: 'mono', after: 'minimize', refresh: 15, perf: 'balanced', cursor: 'theme', motion: 'full', fivemPath: null };
   const state = {
     servers: [],
     groups: [],
@@ -199,12 +199,34 @@
   }
 
   // ---------- theme / prefs ----------
+  // ย่อ + เบลอ + ลดความสว่างรูปครั้งเดียวตอนเลือก (แสดงผลเป็นรูปนิ่ง ไม่เบลอสดตลอดเวลา จึงไม่กินเครื่อง)
+  async function makeWallpaper(file) {
+    if (!file.type.startsWith('image/') || file.size > 40 << 20) throw new Error('type');
+    const url = URL.createObjectURL(file);
+    try {
+      const img = new Image();
+      img.src = url;
+      await img.decode();
+      const scale = Math.min(1, 1600 / img.naturalWidth);
+      const w = Math.max(320, Math.round(img.naturalWidth * scale)), h = Math.max(200, Math.round(img.naturalHeight * scale));
+      const c = document.createElement('canvas');
+      c.width = w; c.height = h;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#06111b'; ctx.fillRect(0, 0, w, h);
+      ctx.filter = 'blur(12px) brightness(.8) saturate(1.2)';
+      ctx.drawImage(img, -40, -40, w + 80, h + 80);
+      return c.toDataURL('image/jpeg', 0.84).split(',')[1];
+    } finally { URL.revokeObjectURL(url); }
+  }
   function applyPrefs() {
     const r = document.documentElement;
     r.dataset.theme = state.settings.theme;
     r.dataset.motion = state.settings.motion;
     r.dataset.cursor = state.settings.cursor;
     r.dataset.perf = state.settings.perf;
+    const wall = Number(state.settings.wall) && api.wallpaperURL ? api.wallpaperURL(state.settings.wall) : '';
+    if (wall) { r.dataset.wall = ''; r.style.setProperty('--wall', `url("${wall}")`); }
+    else { delete r.dataset.wall; r.style.removeProperty('--wall'); }
     if (!state.settings.lang) state.settings.lang = window.I18N?.detect() || 'th';
     window.I18N?.set(state.settings.lang);
     api.setLang?.(state.settings.lang);
@@ -826,7 +848,7 @@
 
       <section class="sect">
         <h3>ธีมโปรแกรม</h3>
-        <p class="d">เลือกสไตล์ที่ใช่ — เท่ ๆ คูล ๆ หรือคาวาอิ น่ารัก ๆ เปลี่ยนได้ทันที</p>
+        <p class="d">เลือกสไตล์ที่ใช่ — เรียบหรู น่ารัก หรือมืดแบบเมนูในเกม เปลี่ยนได้ทันที</p>
         <div class="theme-opts">
           <button class="theme-opt ${S.theme === 'mono' ? 'on' : ''}" data-theme-pick="mono">
             <span class="check">${I.check}</span>
@@ -838,6 +860,23 @@
             <div class="mini sakura"><span class="t"></span><span class="a"></span><span class="b"></span><span class="c"></span></div>
             <div class="theme-meta"><div><b style="font-family:Mali,var(--font-head)">ซากุระ</b><small>พาสเทลชมพู สว่าง สดใส</small></div><span class="pill pill-sakura">คาวาอิ</span></div>
           </button>
+          <button class="theme-opt ${S.theme === 'hud' ? 'on' : ''}" data-theme-pick="hud">
+            <span class="check">${I.check}</span>
+            <div class="mini hud"><span class="t"></span><span class="a"></span><span class="b"></span><span class="c"></span></div>
+            <div class="theme-meta"><div><b>HUD</b><small>กระจกน้ำเงินเข้ม ฟ้านีออน สไตล์ UI ในเกม</small></div><span class="pill pill-hud">เกมมิ่ง</span></div>
+          </button>
+        </div>
+      </section>
+
+      <section class="sect">
+        <h3>รูปพื้นหลัง</h3>
+        <p class="d">ใช้รูปของคุณเป็นพื้นหลังหลังแผงกระจก เช่น ภาพแคปจากในเกม — โปรแกรมจะเบลอให้อัตโนมัติ (แสดงเฉพาะธีม HUD)</p>
+        <div class="wall-row">
+          <div class="wall-prev" id="wallPrev" ${S.wall && api.wallpaperURL ? `style="background-image:url('${api.wallpaperURL(S.wall)}')"` : ''}>${S.wall ? '' : 'ไม่มีรูป'}</div>
+          <button class="btn" data-act="pick-wall">${I.folder2 || ''} เลือกรูป...</button>
+          ${S.wall ? '<button class="btn" data-act="clear-wall">ลบรูป</button>' : ''}
+          ${S.theme !== 'hud' ? '<button class="btn btn-dark" data-act="use-hud">ใช้ธีม HUD</button>' : ''}
+          <input type="file" id="wallFile" accept="image/png,image/jpeg,image/webp,image/bmp" hidden>
         </div>
       </section>
 
@@ -979,6 +1018,25 @@
 
     if (state.page === 'settings') {
       $$('[data-theme-pick]').forEach((b) => b.addEventListener('click', () => setSetting('theme', b.dataset.themePick)));
+      $('[data-act="pick-wall"]')?.addEventListener('click', () => $('#wallFile').click());
+      $('[data-act="use-hud"]')?.addEventListener('click', () => setSetting('theme', 'hud'));
+      $('[data-act="clear-wall"]')?.addEventListener('click', async () => {
+        await api.clearWallpaper?.();
+        setSetting('wall', null);
+        toast('ลบรูปพื้นหลังแล้ว');
+      });
+      $('#wallFile')?.addEventListener('change', async (e) => {
+        const f = e.target.files && e.target.files[0];
+        e.target.value = '';
+        if (!f) return;
+        try {
+          const b64 = await makeWallpaper(f);
+          if (!(await api.setWallpaper(b64))) throw new Error('save');
+          if (state.settings.theme !== 'hud') state.settings.theme = 'hud';
+          setSetting('wall', Date.now());
+          toast('ตั้งรูปพื้นหลังแล้ว');
+        } catch { toast('ใช้รูปนี้ไม่ได้ ลองรูปอื่นดูนะ', 'err'); }
+      });
       $$('[data-setting]').forEach((g) => g.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => {
         const key = g.dataset.setting;
         const val = key === 'refresh' ? Number(b.dataset.v) : b.dataset.v;
@@ -1448,8 +1506,9 @@
     $('#btnClose').addEventListener('click', () => api.close());
     $('.titlebar').addEventListener('dblclick', (e) => { if (!e.target.closest('button')) api.toggleMax(); });
     $('#btnTheme').addEventListener('click', () => {
-      setSetting('theme', state.settings.theme === 'mono' ? 'sakura' : 'mono', state.page === 'settings');
-      toast(state.settings.theme === 'sakura' ? 'ธีมซากุระ 🌸' : 'ธีมขาว-เทา');
+      const order = ['mono', 'sakura', 'hud'];
+      setSetting('theme', order[(order.indexOf(state.settings.theme) + 1) % order.length], state.page === 'settings');
+      toast({ mono: 'ธีมขาว-เทา', sakura: 'ธีมซากุระ 🌸', hud: 'ธีม HUD' }[state.settings.theme]);
     });
     $('#btnDiscord').addEventListener('click', () => api.openExternal(CFG.discordUrl));
     $('#btnDiscord').hidden = !CFG.discordUrl;

@@ -43,7 +43,8 @@
     // toasts
     'เพิ่มเซิร์ฟเวอร์แล้ว': 'Server added', 'บันทึกการแก้ไขแล้ว': 'Changes saved', 'ลบเซิร์ฟเวอร์แล้ว': 'Server deleted',
     'คัดลอกที่อยู่แล้ว': 'Address copied', 'อัปเดตสถานะแล้ว': 'Status updated', 'ยังไม่มีเซิร์ฟเวอร์ในลิสต์': 'No servers in your list yet',
-    'กำลังเปิด FiveM': 'Opening FiveM', 'เปิด FiveM ไม่สำเร็จ': 'Could not open FiveM', 'ธีมซากุระ 🌸': 'Sakura theme 🌸', 'ธีมขาว-เทา': 'Mono theme',
+    'กำลังเปิด FiveM': 'Opening FiveM', 'เปิด FiveM ไม่สำเร็จ': 'Could not open FiveM', 'ธีมซากุระ 🌸': 'Sakura theme 🌸', 'ธีมขาว-เทา': 'Mono theme', 'ธีม HUD': 'HUD theme', 'รูปพื้นหลัง': 'Background image', 'ใช้รูปของคุณเป็นพื้นหลังหลังแผงกระจก เช่น ภาพแคปจากในเกม — โปรแกรมจะเบลอให้อัตโนมัติ (แสดงเฉพาะธีม HUD)': 'Use your own picture behind the glass panels, like an in-game screenshot — it gets blurred automatically (HUD theme only)', 'ไม่มีรูป': 'No image', 'เลือกรูป...': 'Choose image...', 'ลบรูป': 'Remove', 'ใช้ธีม HUD': 'Use HUD theme', 'ลบรูปพื้นหลังแล้ว': 'Background image removed', 'ตั้งรูปพื้นหลังแล้ว': 'Background image set', 'ใช้รูปนี้ไม่ได้ ลองรูปอื่นดูนะ': "Couldn't use that image — try another one", 'กระจกน้ำเงินเข้ม ฟ้านีออน สไตล์ UI ในเกม': 'Dark navy glass and neon blue, like an in-game UI', 'เกมมิ่ง': 'Gaming',
+    'เลือกสไตล์ที่ใช่ — เรียบหรู น่ารัก หรือมืดแบบเมนูในเกม เปลี่ยนได้ทันที': 'Pick your style — clean, cute, or dark like an in-game menu. Switches instantly.',
     'ตั้งค่าตำแหน่ง FiveM แล้ว': 'FiveM location set', 'ส่งออกข้อมูลแล้ว': 'Data exported', 'ไฟล์ไม่ถูกต้อง': 'Invalid file',
     'รีเซ็ตเรียบร้อย': 'Reset complete', 'ล้างแคชไม่สำเร็จ': 'Could not clear cache',
     // backend errors

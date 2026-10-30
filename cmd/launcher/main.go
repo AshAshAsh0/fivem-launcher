@@ -3,6 +3,7 @@
 package main
 
 import (
+	"encoding/base64"
 	"embed"
 	"encoding/json"
 	"errors"
@@ -25,7 +26,7 @@ import (
 var webFS embed.FS
 
 // version ถูกแทนค่าตอน build ด้วย -ldflags "-X main.version=..."
-var version = "2.6.0"
+var version = "2.7.0"
 
 const (
 	appTitle = "FiveM Launcher"
@@ -65,6 +66,11 @@ func main() {
 		w.Header().Set("Cache-Control", "no-store")
 		fileSrv.ServeHTTP(w, r)
 	})
+	// รูปพื้นหลังที่ผู้ใช้เลือก (เบลอไว้แล้วตั้งแต่ตอนเลือก)
+	mux.HandleFunc("/wallpaper.jpg", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Cache-Control", "no-store")
+		http.ServeFile(w, r, filepath.Join(dataDir, "wallpaper.jpg"))
+	})
 	go http.Serve(ln, mux)
 
 	webview2.FramelessPopup = true
@@ -93,8 +99,13 @@ func main() {
 
 	// สีพื้นหลังตอนเปิดโปรแกรม ให้ตรงกับธีม (กันจอขาวแวบ)
 	bg := "FFEBEBEC"
-	if b, err := os.ReadFile(filepath.Join(dataDir, "launcher-data.json")); err == nil && strings.Contains(string(b), `"theme": "sakura"`) {
-		bg = "FFFBECF1"
+	if b, err := os.ReadFile(filepath.Join(dataDir, "launcher-data.json")); err == nil {
+		switch {
+		case strings.Contains(string(b), `"theme": "sakura"`):
+			bg = "FFFBECF1"
+		case strings.Contains(string(b), `"theme": "hud"`):
+			bg = "FF0D1013"
+		}
 	}
 	os.Setenv("WEBVIEW2_DEFAULT_BACKGROUND_COLOR", bg)
 
@@ -199,6 +210,16 @@ func handle(method, raw string) (any, error) {
 		if len(args) > 0 {
 			scheduleSave(args[0])
 		}
+		return true, nil
+	case "setWallpaper":
+		b, err := base64.StdEncoding.DecodeString(arg[string](args, 0))
+		if err != nil || len(b) < 4 || len(b) > 6<<20 || b[0] != 0xFF || b[1] != 0xD8 { // ต้องเป็น JPEG
+			return false, nil
+		}
+		_ = os.MkdirAll(dataDir, 0o755)
+		return os.WriteFile(filepath.Join(dataDir, "wallpaper.jpg"), b, 0o644) == nil, nil
+	case "clearWallpaper":
+		_ = os.Remove(filepath.Join(dataDir, "wallpaper.jpg"))
 		return true, nil
 
 	case "query":

@@ -47,6 +47,9 @@
     watchStop: (id) => call('watchStop', id),
     watchList: () => call('watchList'),
     installUpdate: (url, ver) => call('installUpdate', url, ver),
+    setWallpaper: (b64) => call('setWallpaper', b64),
+    clearWallpaper: () => call('clearWallpaper'),
+    wallpaperURL: (v) => `/wallpaper.jpg?v=${v}`,
   };
 
   // ลากหน้าต่างจากแถบบน/แถบข้าง

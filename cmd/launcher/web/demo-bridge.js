@@ -75,5 +75,8 @@
     },
     async checkUpdate() { return { available: true, version: '2.2.0', url: '#' }; }, async installUpdate() { await wait(800); throw new Error('preview'); },
     async exportData() { return false; }, async importData() { return null; },
+    async setWallpaper(b64) { try { localStorage.setItem('fl-demo-wall', 'data:image/jpeg;base64,' + b64); return true; } catch { return false; } },
+    async clearWallpaper() { try { localStorage.removeItem('fl-demo-wall'); } catch {} return true; },
+    wallpaperURL() { try { return localStorage.getItem('fl-demo-wall') || ''; } catch { return ''; } },
   };
 })();
