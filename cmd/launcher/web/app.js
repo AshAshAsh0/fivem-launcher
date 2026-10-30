@@ -257,7 +257,7 @@
     return `<section class="hero" style="${toneStyle(t)}">
       <div style="min-width:0">
         <span class="badge soft">เซิร์ฟของคุณ ✦</span>
-        <h2 class="hero-title" data-no-i18n>${esc(s.name)}</h2>
+        <h2 class="hero-title${[...String(s.name)].length > 34 ? ' xlong' : [...String(s.name)].length > 20 ? ' long' : ''}" data-no-i18n title="${esc(s.name)}">${esc(s.name)}</h2>
         <div class="hero-chips">
           <span class="js-st">${S.online ? '<span class="pill pill-ok">ออนไลน์</span>' : '<span class="pill pill-off">ออฟไลน์</span>'}</span>
           <span class="js-ping">${S.ping != null ? `<span class="pill pill-mono">${I.signal} ${S.ping}ms</span>` : ''}</span>

@@ -271,6 +271,9 @@ html.maximized .shell { border-radius: 0; }
   overflow: hidden;
 }
 .hero-title { font-family: var(--font-head); font-weight: 800; font-size: 30px; margin: 16px 0 6px; line-height: 1.25; text-transform: uppercase; word-break: break-word; }
+.hero-title { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+.hero-title.long { font-size: 24px; }
+.hero-title.xlong { font-size: 20px; }
 .hero-desc { color: var(--muted); margin: 0 0 22px; }
 .hero-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 16px; }
 .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 22px; }
