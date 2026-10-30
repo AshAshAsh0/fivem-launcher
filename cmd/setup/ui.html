@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>FiveM Launcher Setup</title>
+<style>
+  :root {
+    --font: 'Segoe UI', 'Leelawadee UI', Tahoma, sans-serif;
+    --body: #f3f3f3; --white: #ffffff; --line: #d5d5d5; --line2: #bdbdbd;
+    --text: #1b1b1b; --sub: #5c5c5c; --muted: #8a8a8a;
+    --accent: #0067c0; --accent-hover: #1975c5; --accent-press: #3183ca;
+    --brand: #1d1d21;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; overflow: hidden; }
+  body {
+    font: 13px/1.5 var(--font); color: var(--text); background: var(--body);
+    display: grid; grid-template-rows: 1fr auto; user-select: none; cursor: default;
+  }
+  svg { flex: none; }
+  main { min-height: 0; overflow: hidden; }
+
+  /* ---------- pages ---------- */
+  .page { display: none; height: 100%; min-height: 0; }
+  .page.on { display: grid; }
+  .page.std { grid-template-rows: auto 1fr; }
+  .page.side { grid-template-columns: 164px 1fr; background: var(--white); }
+
+  .head { background: var(--white); border-bottom: 1px solid var(--line); display: flex; align-items: center; padding: 12px 16px 12px 22px; min-height: 64px; }
+  .head .tx { flex: 1; min-width: 0; }
+  .head b { display: block; font-weight: 600; font-size: 13.5px; }
+  .head span { display: block; color: var(--sub); padding-left: 14px; font-size: 12.5px; }
+  .head .ic { width: 44px; height: 44px; border-radius: 10px; background: var(--brand); display: grid; place-items: center; }
+  .content { padding: 18px 26px 10px; min-height: 0; overflow: hidden; display: flex; flex-direction: column; }
+  .content p { margin: 0 0 12px; }
+
+  .art { background: linear-gradient(160deg, #2b2b31 0%, #141417 100%); position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 40px; }
+  .art::before { content: ''; position: absolute; inset: 0; background-image: linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px); background-size: 18px 18px; }
+  .art::after { content: ''; position: absolute; width: 220px; height: 220px; border-radius: 50%; border: 26px solid rgba(255,255,255,.05); bottom: -90px; left: -70px; }
+  .art .logo { position: relative; width: 76px; height: 76px; border-radius: 20px; background: #fff; display: grid; place-items: center; box-shadow: 0 10px 24px rgba(0,0,0,.4); }
+  .art .nm { position: relative; color: #fff; font-weight: 700; font-size: 15px; margin-top: 16px; text-align: center; line-height: 1.3; }
+  .art .vr { position: relative; color: rgba(255,255,255,.5); font-size: 11.5px; margin-top: 4px; }
+  .side .content { padding: 26px 26px 10px; }
+  h1 { font-size: 19px; font-weight: 600; margin: 0 0 16px; line-height: 1.35; }
+
+  /* ---------- controls ---------- */
+  .license { flex: 1; min-height: 0; overflow-y: auto; background: var(--white); border: 1px solid var(--line2); padding: 10px 12px; font-size: 12px; color: #333; user-select: text; white-space: pre-wrap; line-height: 1.6; }
+  .radios { margin-top: 10px; display: grid; gap: 4px; }
+  label.rc { display: flex; align-items: center; gap: 8px; cursor: default; }
+  input[type=radio], input[type=checkbox] { width: 15px; height: 15px; margin: 0; accent-color: var(--accent); }
+
+  fieldset { border: 1px solid var(--line2); border-radius: 4px; padding: 10px 12px 12px; margin: 6px 0 0; }
+  legend { padding: 0 4px; color: var(--text); }
+  .row { display: flex; gap: 8px; align-items: center; }
+  .input { flex: 1; min-width: 0; height: 28px; padding: 0 8px; border: 1px solid var(--line2); border-bottom-color: #8a8a8a; border-radius: 4px; font: 12.5px var(--font); background: var(--white); outline: none; user-select: text; }
+  .input:focus { border-bottom: 2px solid var(--accent); }
+  .space { margin-top: 14px; color: var(--sub); line-height: 1.7; }
+  .checks { display: grid; gap: 10px; margin-top: 6px; padding: 12px 14px; background: var(--white); border: 1px solid var(--line); border-radius: 4px; }
+  .summary { flex: 1; background: var(--white); border: 1px solid var(--line2); padding: 10px 12px; font-size: 12.5px; line-height: 1.75; overflow-y: auto; user-select: text; }
+  .summary b { font-weight: 600; }
+
+  progress { width: 100%; height: 16px; appearance: none; border: 1px solid var(--line2); border-radius: 3px; background: #e6e6e6; overflow: hidden; }
+  progress::-webkit-progress-bar { background: #e6e6e6; }
+  progress::-webkit-progress-value { background: #06b025; transition: width .3s; }
+  .status { margin: 4px 0 10px; color: var(--text); }
+  .log { flex: 1; min-height: 0; overflow-y: auto; background: var(--white); border: 1px solid var(--line2); padding: 6px 10px; font-size: 12px; color: #444; line-height: 1.7; user-select: text; }
+  .err { color: #c42b1c; }
+
+  /* ---------- footer ---------- */
+  .foot { border-top: 1px solid var(--line); background: var(--body); padding: 10px 14px 12px 14px; }
+  .brandline { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 11.5px; margin: -4px 0 8px; }
+  .brandline::after { content: ''; flex: 1; border-top: 1px solid var(--line); }
+  .btns { display: flex; justify-content: flex-end; gap: 8px; }
+  .btn {
+    min-width: 88px; height: 30px; padding: 0 14px; font: 13px var(--font); color: var(--text);
+    background: #fdfdfd; border: 1px solid #d0d0d0; border-bottom-color: #b8b8b8; border-radius: 4px; cursor: default;
+  }
+  .btn:hover { background: #f6f6f6; }
+  .btn:active { background: #f0f0f0; color: #5d5d5d; }
+  .btn.primary { background: var(--accent); color: #fff; border-color: #0c5ea8; border-bottom-color: #003e73; }
+  .btn.primary:hover { background: var(--accent-hover); }
+  .btn.primary:active { background: var(--accent-press); }
+  .btn:disabled { background: #f5f5f5; color: #a0a0a0; border-color: #e0e0e0; }
+  .btn.gap { margin-left: 8px; }
+  .btn[hidden] { display: none; }
+</style>
+</head>
+<body>
+<main>
+  <!-- 1 welcome -->
+  <section class="page side" id="pWelcome">
+    <div class="art"><div class="logo" id="logoA"></div><div class="nm">FiveM<br>Launcher</div><div class="vr" data-ver></div></div>
+    <div class="content">
+      <h1>ยินดีต้อนรับสู่ตัวช่วยติดตั้ง FiveM Launcher</h1>
+      <p>ตัวช่วยนี้จะติดตั้ง FiveM Launcher เวอร์ชัน <span data-ver></span> ลงในคอมพิวเตอร์ของคุณ</p>
+      <p>แนะนำให้ปิด FiveM Launcher ที่เปิดอยู่ก่อนเริ่มติดตั้ง เพื่อให้สามารถอัปเดตไฟล์ได้โดยไม่ต้องรีสตาร์ทเครื่อง</p>
+      <p id="updNote" hidden>ตรวจพบ FiveM Launcher ที่ติดตั้งไว้แล้วในเครื่องนี้ ตัวช่วยจะอัปเดตเป็นเวอร์ชันใหม่ โดยรายการเซิร์ฟเวอร์และการตั้งค่าเดิมจะยังคงอยู่</p>
+      <p>คลิก “ถัดไป” เพื่อดำเนินการต่อ</p>
+    </div>
+  </section>
+
+  <!-- 2 license -->
+  <section class="page std" id="pLicense">
+    <div class="head"><div class="tx"><b>ข้อตกลงการใช้งาน</b><span>โปรดอ่านข้อตกลงการใช้งานก่อนติดตั้ง FiveM Launcher</span></div><div class="ic" data-icon></div></div>
+    <div class="content">
+      <div class="license" id="licText"></div>
+      <div class="radios">
+        <label class="rc"><input type="radio" name="lic" id="licYes"> ข้าพเจ้ายอมรับข้อตกลงการใช้งาน</label>
+        <label class="rc"><input type="radio" name="lic" id="licNo" checked> ข้าพเจ้าไม่ยอมรับข้อตกลงการใช้งาน</label>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 location -->
+  <section class="page std" id="pDir">
+    <div class="head"><div class="tx"><b>เลือกตำแหน่งที่จะติดตั้ง</b><span>เลือกโฟลเดอร์ที่จะใช้ติดตั้ง FiveM Launcher</span></div><div class="ic" data-icon></div></div>
+    <div class="content">
+      <p>ตัวช่วยจะติดตั้ง FiveM Launcher ลงในโฟลเดอร์ด้านล่าง หากต้องการติดตั้งในโฟลเดอร์อื่น ให้คลิก “เรียกดู...” แล้วเลือกโฟลเดอร์ที่ต้องการ</p>
+      <fieldset><legend>โฟลเดอร์ปลายทาง</legend>
+        <div class="row"><input class="input" id="dir" spellcheck="false"><button class="btn" id="bBrowse">เรียกดู...</button></div>
+      </fieldset>
+      <div class="space">พื้นที่ที่ต้องใช้: <span id="spReq"></span><br>พื้นที่ว่าง: <span id="spFree"></span></div>
+    </div>
+  </section>
+
+  <!-- 4 options -->
+  <section class="page std" id="pOpts">
+    <div class="head"><div class="tx"><b>เลือกงานเพิ่มเติม</b><span>เลือกงานเพิ่มเติมที่ต้องการให้ตัวช่วยดำเนินการระหว่างติดตั้ง</span></div><div class="ic" data-icon></div></div>
+    <div class="content">
+      <p>เลือกรายการที่ต้องการ แล้วคลิก “ถัดไป”</p>
+      <div class="checks">
+        <label class="rc"><input type="checkbox" id="oDesktop" checked> สร้างทางลัดบนเดสก์ท็อป</label>
+        <label class="rc"><input type="checkbox" id="oStart" checked> สร้างทางลัดในเมนู Start</label>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 ready -->
+  <section class="page std" id="pReady">
+    <div class="head"><div class="tx"><b>พร้อมติดตั้ง</b><span>ตัวช่วยพร้อมที่จะเริ่มติดตั้ง FiveM Launcher ลงในคอมพิวเตอร์ของคุณ</span></div><div class="ic" data-icon></div></div>
+    <div class="content">
+      <p>คลิก “ติดตั้ง” เพื่อเริ่มการติดตั้ง หรือคลิก “ย้อนกลับ” หากต้องการตรวจสอบหรือเปลี่ยนแปลงการตั้งค่า</p>
+      <div class="summary" id="summary"></div>
+    </div>
+  </section>
+
+  <!-- 6 progress -->
+  <section class="page std" id="pProg">
+    <div class="head"><div class="tx"><b id="progHead">กำลังติดตั้ง</b><span id="progSub">โปรดรอสักครู่ขณะที่ตัวช่วยกำลังติดตั้ง FiveM Launcher</span></div><div class="ic" data-icon></div></div>
+    <div class="content">
+      <div class="status" id="status">กำลังเตรียมการ...</div>
+      <progress id="bar" max="100" value="0"></progress>
+      <div style="height:12px"></div>
+      <div class="log" id="log"></div>
+    </div>
+  </section>
+
+  <!-- 7 finish -->
+  <section class="page side" id="pFinish">
+    <div class="art"><div class="logo" data-logo></div><div class="nm">FiveM<br>Launcher</div><div class="vr" data-ver></div></div>
+    <div class="content">
+      <h1 id="finTitle">การติดตั้ง FiveM Launcher เสร็จสมบูรณ์</h1>
+      <p id="finText">ตัวช่วยได้ติดตั้ง FiveM Launcher ลงในคอมพิวเตอร์ของคุณเรียบร้อยแล้ว สามารถเปิดใช้งานได้จากทางลัดที่สร้างไว้</p>
+      <label class="rc" id="runWrap" style="margin-top:6px"><input type="checkbox" id="oRun" checked> เปิด FiveM Launcher</label>
+      <p style="margin-top:14px">คลิก “เสร็จสิ้น” เพื่อปิดตัวช่วยติดตั้ง</p>
+    </div>
+  </section>
+
+  <!-- error -->
+  <section class="page side" id="pError">
+    <div class="art"><div class="logo" data-logo></div><div class="nm">FiveM<br>Launcher</div><div class="vr" data-ver></div></div>
+    <div class="content">
+      <h1>การติดตั้งไม่สำเร็จ</h1>
+      <p class="err" id="errText"></p>
+      <p>โปรดปิด FiveM Launcher ที่เปิดอยู่ แล้วคลิก “ลองอีกครั้ง” หรือคลิก “ย้อนกลับ” เพื่อเลือกโฟลเดอร์อื่น</p>
+    </div>
+  </section>
+
+  <!-- uninstall confirm -->
+  <section class="page std" id="pUninst">
+    <div class="head"><div class="tx"><b>ถอนการติดตั้ง FiveM Launcher</b><span>นำ FiveM Launcher ออกจากคอมพิวเตอร์ของคุณ</span></div><div class="ic" data-icon></div></div>
+    <div class="content">
+      <p>ตัวช่วยจะนำ FiveM Launcher รวมถึงทางลัดบนเดสก์ท็อปและในเมนู Start ออกจากคอมพิวเตอร์ของคุณ การดำเนินการนี้ไม่มีผลต่อโปรแกรม FiveM และไฟล์เกม</p>
+      <fieldset><legend>ถอนการติดตั้งจาก</legend><div class="input" id="uDir" style="display:flex;align-items:center;background:#fafafa"></div></fieldset>
+      <div class="checks" style="margin-top:14px">
+        <label class="rc"><input type="checkbox" id="oWipe"> ลบรายการเซิร์ฟเวอร์และการตั้งค่าที่บันทึกไว้ด้วย</label>
+      </div>
+      <p style="margin-top:12px">คลิก “ถอนการติดตั้ง” เพื่อดำเนินการต่อ</p>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="brandline" id="brandline">FiveM Launcher</div>
+  <div class="btns">
+    <button class="btn" id="bBack">&lt; ย้อนกลับ</button>
+    <button class="btn primary" id="bNext">ถัดไป &gt;</button>
+    <button class="btn gap" id="bCancel">ยกเลิก</button>
+  </div>
+</footer>
+
+<script>
+(() => {
+  const $ = (s) => document.querySelector(s);
+  let seq = 0; const pend = new Map();
+  window.__goResolve = (id, ok, v) => { const p = pend.get(id); if (!p) return; pend.delete(id); ok ? p.res(v) : p.rej(new Error(v)); };
+  const call = (m, ...a) => new Promise((res, rej) => { const id = ++seq; pend.set(id, { res, rej }); window.goCall(id, m, JSON.stringify(a)).catch(rej); });
+
+  const MARK = (c, s) => `<svg viewBox="0 0 40 40" width="${s}" height="${s}" fill="none" stroke="${c}" stroke-linecap="round" stroke-linejoin="round"><path d="M13 30 21.2 9.5c.5-1.3 2.3-1.3 2.8 0L32 30" stroke-width="4.4"/><path d="M8 30h7.5" stroke-width="4.4"/><path d="M22.6 21.5v8.5" stroke-width="3.2"/></svg>`;
+  document.querySelectorAll('[data-icon]').forEach((e) => (e.innerHTML = MARK('#fff', 26)));
+  document.querySelectorAll('.art .logo').forEach((e) => (e.innerHTML = MARK('#1d1d21', 44)));
+
+  const LICENSE = `ข้อตกลงการใช้งานซอฟต์แวร์ FiveM Launcher
+
+โปรดอ่านข้อตกลงฉบับนี้โดยละเอียดก่อนติดตั้งหรือใช้งานซอฟต์แวร์ การติดตั้งหรือใช้งานซอฟต์แวร์ถือว่าท่านยอมรับข้อตกลงทั้งหมด
+
+1. การอนุญาตให้ใช้งาน
+ท่านได้รับอนุญาตให้ติดตั้งและใช้งานซอฟต์แวร์นี้บนคอมพิวเตอร์ส่วนบุคคลของท่านโดยไม่มีค่าใช้จ่าย
+
+2. ความสัมพันธ์กับบุคคลภายนอก
+ซอฟต์แวร์นี้เป็นเครื่องมือช่วยเชื่อมต่อเซิร์ฟเวอร์ที่พัฒนาขึ้นอย่างอิสระ ไม่มีส่วนเกี่ยวข้อง ไม่ได้รับการรับรอง และไม่ได้เป็นผลิตภัณฑ์ของ Cfx.re, FiveM, Rockstar Games หรือ Take-Two Interactive ชื่อและเครื่องหมายการค้าดังกล่าวเป็นทรัพย์สินของเจ้าของแต่ละราย
+
+3. ข้อมูลของผู้ใช้
+ซอฟต์แวร์จะบันทึกรายการเซิร์ฟเวอร์และการตั้งค่าไว้ในคอมพิวเตอร์ของท่านเท่านั้น และจะติดต่อเซิร์ฟเวอร์ที่ท่านเพิ่มไว้เพื่ออ่านสถานะ (ชื่อ จำนวนผู้เล่น และค่าปิง) ซอฟต์แวร์ไม่เก็บหรือส่งข้อมูลส่วนบุคคลของท่านไปยังบุคคลอื่น
+
+4. ฟังก์ชันล้างแคช
+ฟังก์ชันล้างแคชจะลบเฉพาะโฟลเดอร์ crashes, data/cache, data/server-cache และ data/server-cache-priv ของ FiveM ตามที่ท่านสั่งเท่านั้น
+
+5. การปฏิเสธการรับประกัน
+ซอฟต์แวร์นี้ให้บริการ “ตามสภาพ” โดยไม่มีการรับประกันใด ๆ ทั้งโดยชัดแจ้งหรือโดยนัย ผู้พัฒนาจะไม่รับผิดชอบต่อความเสียหายใด ๆ ที่เกิดจากการใช้งานหรือไม่สามารถใช้งานซอฟต์แวร์ได้
+
+6. การถอนการติดตั้ง
+ท่านสามารถถอนการติดตั้งซอฟต์แวร์ได้ทุกเมื่อผ่าน การตั้งค่า > แอป ของ Windows`;
+  $('#licText').textContent = LICENSE;
+
+
+  // ---------- English (ใช้เมื่อ Windows ไม่ได้ตั้งเป็นภาษาไทย) ----------
+  const EN = {
+    '< ย้อนกลับ': '< Back', 'ถัดไป >': 'Next >', 'ยกเลิก': 'Cancel', 'ติดตั้ง': 'Install', 'เสร็จสิ้น': 'Finish', 'ลองอีกครั้ง': 'Retry',
+    'ถอนการติดตั้ง': 'Uninstall', 'เรียกดู...': 'Browse...',
+    'ยินดีต้อนรับสู่ตัวช่วยติดตั้ง FiveM Launcher': 'Welcome to the FiveM Launcher Setup Wizard',
+    'ตัวช่วยนี้จะติดตั้ง FiveM Launcher เวอร์ชัน': 'This wizard will install FiveM Launcher version',
+    'ลงในคอมพิวเตอร์ของคุณ': 'on your computer.',
+    'แนะนำให้ปิด FiveM Launcher ที่เปิดอยู่ก่อนเริ่มติดตั้ง เพื่อให้สามารถอัปเดตไฟล์ได้โดยไม่ต้องรีสตาร์ทเครื่อง': 'It is recommended that you close FiveM Launcher before continuing. This allows Setup to update the files without restarting your computer.',
+    'ตรวจพบ FiveM Launcher ที่ติดตั้งไว้แล้วในเครื่องนี้ ตัวช่วยจะอัปเดตเป็นเวอร์ชันใหม่ โดยรายการเซิร์ฟเวอร์และการตั้งค่าเดิมจะยังคงอยู่': 'An existing installation of FiveM Launcher was found. Setup will update it; your saved servers and settings will be kept.',
+    'คลิก “ถัดไป” เพื่อดำเนินการต่อ': 'Click Next to continue.',
+    'ข้อตกลงการใช้งาน': 'License Agreement', 'โปรดอ่านข้อตกลงการใช้งานก่อนติดตั้ง FiveM Launcher': 'Please review the license terms before installing FiveM Launcher.',
+    'ข้าพเจ้ายอมรับข้อตกลงการใช้งาน': 'I accept the agreement', 'ข้าพเจ้าไม่ยอมรับข้อตกลงการใช้งาน': 'I do not accept the agreement',
+    'เลือกตำแหน่งที่จะติดตั้ง': 'Choose Install Location', 'เลือกโฟลเดอร์ที่จะใช้ติดตั้ง FiveM Launcher': 'Choose the folder in which to install FiveM Launcher.',
+    'ตัวช่วยจะติดตั้ง FiveM Launcher ลงในโฟลเดอร์ด้านล่าง หากต้องการติดตั้งในโฟลเดอร์อื่น ให้คลิก “เรียกดู...” แล้วเลือกโฟลเดอร์ที่ต้องการ': 'Setup will install FiveM Launcher in the following folder. To install in a different folder, click Browse and select another folder.',
+    'โฟลเดอร์ปลายทาง': 'Destination Folder', 'พื้นที่ที่ต้องใช้:': 'Space required:', 'พื้นที่ว่าง:': 'Space available:',
+    'เลือกงานเพิ่มเติม': 'Select Additional Tasks', 'เลือกงานเพิ่มเติมที่ต้องการให้ตัวช่วยดำเนินการระหว่างติดตั้ง': 'Which additional tasks should be performed?',
+    'เลือกรายการที่ต้องการ แล้วคลิก “ถัดไป”': 'Select the additional tasks you would like Setup to perform, then click Next.',
+    'สร้างทางลัดบนเดสก์ท็อป': 'Create a desktop shortcut', 'สร้างทางลัดในเมนู Start': 'Create a Start menu shortcut',
+    'พร้อมติดตั้ง': 'Ready to Install', 'ตัวช่วยพร้อมที่จะเริ่มติดตั้ง FiveM Launcher ลงในคอมพิวเตอร์ของคุณ': 'Setup is now ready to begin installing FiveM Launcher on your computer.',
+    'คลิก “ติดตั้ง” เพื่อเริ่มการติดตั้ง หรือคลิก “ย้อนกลับ” หากต้องการตรวจสอบหรือเปลี่ยนแปลงการตั้งค่า': 'Click Install to continue with the installation, or click Back if you want to review or change any settings.',
+    'ตำแหน่งที่ติดตั้ง:': 'Destination location:', 'งานเพิ่มเติม:': 'Additional tasks:', '(ไม่มี)': '(none)', 'เวอร์ชัน:': 'Version:',
+    '(อัปเดตจากเวอร์ชันที่ติดตั้งไว้)': '(updating the existing installation)',
+    'กำลังติดตั้ง': 'Installing', 'โปรดรอสักครู่ขณะที่ตัวช่วยกำลังติดตั้ง FiveM Launcher': 'Please wait while Setup installs FiveM Launcher on your computer.',
+    'กำลังเตรียมการ...': 'Preparing...', 'เสร็จสมบูรณ์': 'Completed',
+    'การติดตั้ง FiveM Launcher เสร็จสมบูรณ์': 'Completing the FiveM Launcher Setup Wizard',
+    'ตัวช่วยได้ติดตั้ง FiveM Launcher ลงในคอมพิวเตอร์ของคุณเรียบร้อยแล้ว สามารถเปิดใช้งานได้จากทางลัดที่สร้างไว้': 'Setup has finished installing FiveM Launcher on your computer. The application may be launched from the installed shortcuts.',
+    'เปิด FiveM Launcher': 'Launch FiveM Launcher', 'คลิก “เสร็จสิ้น” เพื่อปิดตัวช่วยติดตั้ง': 'Click Finish to exit Setup.',
+    'การติดตั้งไม่สำเร็จ': 'Setup was not completed',
+    'โปรดปิด FiveM Launcher ที่เปิดอยู่ แล้วคลิก “ลองอีกครั้ง” หรือคลิก “ย้อนกลับ” เพื่อเลือกโฟลเดอร์อื่น': 'Close FiveM Launcher if it is running and click Retry, or click Back to choose another folder.',
+    'ถอนการติดตั้ง FiveM Launcher': 'Uninstall FiveM Launcher', 'นำ FiveM Launcher ออกจากคอมพิวเตอร์ของคุณ': 'Remove FiveM Launcher from your computer.',
+    'ตัวช่วยจะนำ FiveM Launcher รวมถึงทางลัดบนเดสก์ท็อปและในเมนู Start ออกจากคอมพิวเตอร์ของคุณ การดำเนินการนี้ไม่มีผลต่อโปรแกรม FiveM และไฟล์เกม': 'FiveM Launcher, its desktop shortcut and Start menu entry will be removed from your computer. FiveM itself and your game files are not affected.',
+    'ถอนการติดตั้งจาก': 'Uninstall from', 'ลบรายการเซิร์ฟเวอร์และการตั้งค่าที่บันทึกไว้ด้วย': 'Also delete saved servers and settings',
+    'คลิก “ถอนการติดตั้ง” เพื่อดำเนินการต่อ': 'Click Uninstall to continue.',
+    'กำลังถอนการติดตั้ง': 'Uninstalling', 'โปรดรอสักครู่ขณะที่ตัวช่วยกำลังนำ FiveM Launcher ออกจากคอมพิวเตอร์ของคุณ': 'Please wait while FiveM Launcher is removed from your computer.',
+    'ถอนการติดตั้ง FiveM Launcher เรียบร้อยแล้ว': 'FiveM Launcher was removed',
+    'FiveM Launcher และข้อมูลที่บันทึกไว้ถูกนำออกจากคอมพิวเตอร์ของคุณแล้ว': 'FiveM Launcher and your saved data have been removed from your computer.',
+    'FiveM Launcher ถูกนำออกจากคอมพิวเตอร์ของคุณแล้ว รายการเซิร์ฟเวอร์ที่บันทึกไว้ยังคงอยู่หากติดตั้งใหม่ภายหลัง': 'FiveM Launcher has been removed. Your saved servers are kept in case you reinstall it later.',
+  };
+  const LICENSE_EN = `FiveM Launcher — Software License Agreement
+
+Please read this agreement carefully before installing or using the software. By installing or using the software you agree to all of these terms.
+
+1. License
+You may install and use this software on your personal computer free of charge.
+
+2. Third parties
+This software is an independently developed tool for connecting to servers. It is not affiliated with, endorsed by, or a product of Cfx.re, FiveM, Rockstar Games or Take-Two Interactive. All trademarks belong to their respective owners.
+
+3. Your data
+The software stores your server list and settings on your computer only, and contacts the servers you add to read their status (name, player count and ping). It does not collect or send your personal data to anyone.
+
+4. Cache cleaning
+The cache cleaning feature only deletes FiveM's crashes, data/cache, data/server-cache and data/server-cache-priv folders, and only when you ask it to.
+
+5. Disclaimer of warranty
+The software is provided "as is", without warranty of any kind, express or implied. The developer is not liable for any damage arising from the use of, or inability to use, the software.
+
+6. Uninstalling
+You can uninstall the software at any time from Windows Settings > Apps.`;
+  let LANG = 'th';
+  const hasThai = (t) => /[฀-๿]/.test(t);
+  function trNode(n) {
+    const v = n.nodeValue, m = v.match(/^(\s*)([\s\S]*?)(\s*)$/);
+    let out = EN[m[2]];
+    if (out == null) { const r = m[2].match(/^เวอร์ชัน (.+)$/); if (r) out = 'Version ' + r[1]; }
+    if (out != null) n.nodeValue = m[1] + out + m[3];
+  }
+  function walkEN(root) {
+    if (LANG !== 'en' || !root) return;
+    if (root.nodeType === 3) { if (hasThai(root.nodeValue)) trNode(root); return; }
+    if (root.nodeType !== 1 || root.id === 'licText') return;
+    const tw = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    let n; while ((n = tw.nextNode())) if (hasThai(n.nodeValue) && !n.parentElement.closest('#licText')) trNode(n);
+  }
+  function setLang(l) {
+    LANG = l === 'en' ? 'en' : 'th';
+    document.documentElement.lang = LANG;
+    if (LANG !== 'en') return;
+    $('#licText').textContent = LICENSE_EN;
+    walkEN(document.body);
+    new MutationObserver((ms) => ms.forEach((m) => (m.type === 'characterData' ? walkEN(m.target) : m.addedNodes.forEach(walkEN))))
+      .observe(document.body, { childList: true, subtree: true, characterData: true });
+  }
+
+  const fmt = (b) => (b >= 1024 ** 3 ? (b / 1024 ** 3).toFixed(1) + ' GB' : (b / 1024 ** 2).toFixed(1) + ' MB');
+  let info = { mode: 'install' };
+  let page = '';
+  const FLOW = ['pWelcome', 'pLicense', 'pDir', 'pOpts', 'pReady'];
+  let busy = false;
+
+  function show(id) {
+    page = id;
+    document.querySelectorAll('.page').forEach((p) => p.classList.toggle('on', p.id === id));
+    const B = $('#bBack'), N = $('#bNext'), C = $('#bCancel');
+    B.hidden = false; C.hidden = false; B.disabled = false; N.disabled = false; C.disabled = false;
+    N.textContent = 'ถัดไป >';
+    if (id === 'pWelcome') { B.disabled = true; }
+    if (id === 'pLicense') { N.disabled = !$('#licYes').checked; }
+    if (id === 'pReady') { N.textContent = 'ติดตั้ง'; buildSummary(); }
+    if (id === 'pDir') updateSpace();
+    if (id === 'pProg') { B.disabled = true; N.disabled = true; C.disabled = true; }
+    if (id === 'pFinish') { B.hidden = true; C.hidden = true; N.textContent = 'เสร็จสิ้น'; }
+    if (id === 'pError') { N.textContent = 'ลองอีกครั้ง'; }
+    if (id === 'pUninst') { B.hidden = true; N.textContent = 'ถอนการติดตั้ง'; }
+    setTimeout(() => N.focus(), 0);
+  }
+
+  async function updateSpace() {
+    $('#spReq').textContent = fmt(info.required || 8 * 1024 * 1024);
+    try { $('#spFree').textContent = fmt(await call('free', $('#dir').value.trim())); } catch {}
+  }
+
+  function buildSummary() {
+    const tasks = [];
+    if ($('#oDesktop').checked) tasks.push('สร้างทางลัดบนเดสก์ท็อป');
+    if ($('#oStart').checked) tasks.push('สร้างทางลัดในเมนู Start');
+    $('#summary').innerHTML = `<b>ตำแหน่งที่ติดตั้ง:</b><br>&nbsp;&nbsp;&nbsp;&nbsp;${esc($('#dir').value.trim())}<br><br>` +
+      `<b>งานเพิ่มเติม:</b><br>${tasks.length ? tasks.map((t) => '&nbsp;&nbsp;&nbsp;&nbsp;' + t).join('<br>') : '&nbsp;&nbsp;&nbsp;&nbsp;(ไม่มี)'}<br><br>` +
+      `<b>เวอร์ชัน:</b> ${esc(info.version)}${info.installed ? ' ' + (LANG === 'en' ? EN['(อัปเดตจากเวอร์ชันที่ติดตั้งไว้)'] : '(อัปเดตจากเวอร์ชันที่ติดตั้งไว้)') : ''}`;
+  }
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  const log = (t) => { const d = document.createElement('div'); d.textContent = t; $('#log').appendChild(d); $('#log').scrollTop = 1e6; };
+  window.__progress = (p, t) => { $('#bar').value = p; $('#status').textContent = t; log(t); };
+
+  async function install() {
+    $('#log').innerHTML = ''; $('#bar').value = 0;
+    show('pProg'); busy = true;
+    try {
+      await call('install', { dir: $('#dir').value.trim(), desktop: $('#oDesktop').checked, startMenu: $('#oStart').checked });
+      busy = false;
+      $('#status').textContent = 'เสร็จสมบูรณ์';
+      setTimeout(() => show('pFinish'), 450);
+    } catch (e) {
+      busy = false;
+      $('#errText').textContent = e.message;
+      show('pError');
+    }
+  }
+
+  async function uninstall() {
+    $('#progHead').textContent = 'กำลังถอนการติดตั้ง';
+    $('#progSub').textContent = 'โปรดรอสักครู่ขณะที่ตัวช่วยกำลังนำ FiveM Launcher ออกจากคอมพิวเตอร์ของคุณ';
+    $('#log').innerHTML = '';
+    show('pProg'); busy = true;
+    await call('uninstall', $('#oWipe').checked);
+    busy = false;
+    $('#finTitle').textContent = 'ถอนการติดตั้ง FiveM Launcher เรียบร้อยแล้ว';
+    $('#finText').textContent = $('#oWipe').checked
+      ? 'FiveM Launcher และข้อมูลที่บันทึกไว้ถูกนำออกจากคอมพิวเตอร์ของคุณแล้ว'
+      : 'FiveM Launcher ถูกนำออกจากคอมพิวเตอร์ของคุณแล้ว รายการเซิร์ฟเวอร์ที่บันทึกไว้ยังคงอยู่หากติดตั้งใหม่ภายหลัง';
+    $('#runWrap').hidden = true;
+    setTimeout(() => show('pFinish'), 450);
+  }
+
+  $('#bNext').onclick = () => {
+    if (info.mode === 'uninstall') {
+      if (page === 'pUninst') return uninstall();
+      if (page === 'pFinish') return call('finishUninstall');
+      return;
+    }
+    if (page === 'pFinish') return $('#oRun').checked ? call('launch') : call('close');
+    if (page === 'pError') return install();
+    if (page === 'pDir' && !/^[a-zA-Z]:\\/.test($('#dir').value.trim())) { $('#dir').focus(); return; }
+    if (page === 'pReady') return install();
+    show(FLOW[FLOW.indexOf(page) + 1]);
+  };
+  $('#bBack').onclick = () => {
+    if (page === 'pError') return show('pDir');
+    const i = FLOW.indexOf(page);
+    if (i > 0) show(FLOW[i - 1]);
+  };
+  $('#bCancel').onclick = () => { if (!busy) call('confirmCancel'); };
+  $('#bBrowse').onclick = async () => { const p = await call('pickFolder'); if (p) { $('#dir').value = p; updateSpace(); } };
+  $('#dir').addEventListener('change', updateSpace);
+  $('#licYes').onchange = $('#licNo').onchange = () => { $('#bNext').disabled = !$('#licYes').checked; };
+  document.addEventListener('contextmenu', (e) => { if (!e.target.closest('input, .license')) e.preventDefault(); });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && e.target.tagName !== 'BUTTON' && !$('#bNext').disabled && !$('#bNext').hidden) $('#bNext').click();
+    if (e.key === 'Escape' && !busy) $('#bCancel').click();
+  });
+
+  call('info').then((i) => {
+    info = i;
+    setLang(i.lang);
+    document.querySelectorAll('[data-ver]').forEach((e) => (e.textContent = (e.classList.contains('vr') ? 'เวอร์ชัน ' : '') + i.version));
+    $('#brandline').textContent = `FiveM Launcher ${i.version}`;
+    $('#dir').value = i.dir;
+    $('#uDir').textContent = i.dir;
+    $('#updNote').hidden = !i.installed;
+    show(i.mode === 'uninstall' ? 'pUninst' : 'pWelcome');
+  });
+})();
+</script>
+</body>
+</html>

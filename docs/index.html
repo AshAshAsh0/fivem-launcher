@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FiveM Launcher — เข้าเซิร์ฟ FiveM ในคลิกเดียว</title>
+<meta name="description" content="Launcher ฟรีสำหรับ Windows เก็บเซิร์ฟ FiveM ที่ชอบ ดูคนออนไลน์และปิงแบบเรียลไทม์ แล้วเข้าเกมได้ในคลิกเดียว">
+<meta property="og:title" content="FiveM Launcher">
+<meta property="og:description" content="เก็บเซิร์ฟ FiveM ที่ชอบ ดูคนออนไลน์และปิง แล้วเข้าเกมได้ในคลิกเดียว — ฟรี ขนาดไม่ถึง 7 MB">
+<meta property="og:image" content="img/home.webp">
+<style>
+  @font-face { font-family: 'Prompt'; font-weight: 700; font-display: swap; src: url('fonts/Prompt-Bold.woff') format('woff'); }
+  @font-face { font-family: 'Prompt'; font-weight: 800; font-display: swap; src: url('fonts/Prompt-ExtraBold.woff') format('woff'); }
+  @font-face { font-family: 'Anuphan'; font-weight: 100 700; font-display: swap; src: url('fonts/Anuphanwght.woff') format('woff'); }
+  :root {
+    --bg: #ebebec; --grid: rgba(20,20,30,.05); --surface: #fff; --s2: #f3f3f4; --ink: #1d1d21; --ink2: #4d4d55; --muted: #85858e; --line: #dcdce0;
+    --ok: #2fcf7a; --head: 'Prompt', 'Leelawadee UI', system-ui, sans-serif; --body: 'Anuphan', 'Leelawadee UI', system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; font: 16px/1.65 var(--body); color: var(--ink); background-color: var(--bg);
+    background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 34px 34px;
+  }
+  a { color: inherit; }
+  svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
+
+  nav { display: flex; align-items: center; justify-content: space-between; padding: 22px 0; }
+  .brand { display: flex; align-items: center; gap: 12px; font: 800 20px var(--head); text-decoration: none; }
+  .mark { width: 42px; height: 42px; border-radius: 13px; background: var(--ink); color: #fff; display: grid; place-items: center; transform: rotate(-4deg); box-shadow: 0 3px 0 rgba(0,0,0,.2); }
+  .mark svg { width: 24px; height: 24px; }
+  .tag { font: 700 11px var(--head); background: var(--ink); color: #fff; padding: 3px 10px; border-radius: 99px; transform: rotate(-4deg); }
+  .navlinks { display: flex; gap: 22px; font-size: 14px; color: var(--ink2); }
+  .navlinks a { text-decoration: none; }
+  .navlinks a:hover { color: var(--ink); }
+
+  .hero { display: grid; grid-template-columns: 1.05fr 1fr; gap: 40px; align-items: center; padding: 34px 0 60px; }
+  h1 { font: 800 clamp(34px, 5vw, 54px)/1.2 var(--head); margin: 14px 0 16px; letter-spacing: -.01em; }
+  .sq { position: relative; display: inline-block; }
+  .sq svg { position: absolute; left: 3%; bottom: -10px; width: 94%; height: 14px; stroke-width: 2.6; }
+  .lead { font-size: 18px; color: var(--ink2); margin: 0 0 28px; max-width: 520px; }
+  .badge { display: inline-flex; align-items: center; gap: 8px; font: 700 13px var(--head); background: var(--surface); padding: 6px 14px; border-radius: 99px; box-shadow: inset 0 0 0 1px var(--line); }
+  .badge i { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); }
+  .dl { display: inline-flex; align-items: center; gap: 12px; background: var(--ink); color: #fff; text-decoration: none; padding: 16px 28px; border-radius: 20px; font: 700 18px var(--head); box-shadow: 0 5px 0 #000; transition: transform .1s, box-shadow .1s; }
+  .dl:hover { transform: translateY(-1px); }
+  .dl:active { transform: translateY(3px); box-shadow: 0 2px 0 #000; }
+  .dl svg { width: 22px; height: 22px; stroke-width: 2.4; }
+  .dl small { display: block; font: 500 12px var(--body); opacity: .65; margin-top: -2px; }
+  .meta { margin-top: 14px; font-size: 13px; color: var(--muted); }
+  .shot { position: relative; }
+  .shot img { width: 100%; display: block; border-radius: 18px; border: 2.5px solid var(--ink); box-shadow: 10px 12px 0 rgba(0,0,0,.12); transform: rotate(2deg); background: #fff; }
+  .shot .mini { position: absolute; width: 46%; left: -8%; bottom: -14%; transform: rotate(-5deg); border-width: 2px; box-shadow: 0 16px 34px -12px rgba(0,0,0,.45); }
+
+  section { padding: 56px 0; }
+  h2 { font: 800 32px/1.25 var(--head); margin: 0 0 8px; }
+  .sub { color: var(--muted); margin: 0 0 30px; }
+  .feats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .feat { background: var(--surface); border-radius: 22px; padding: 22px; box-shadow: inset 0 0 0 1px var(--line), 0 4px 0 var(--line); }
+  .feat .ic { width: 42px; height: 42px; border-radius: 13px; background: var(--s2); display: grid; place-items: center; margin-bottom: 12px; }
+  .feat b { font: 700 17px var(--head); display: block; margin-bottom: 4px; }
+  .feat p { margin: 0; color: var(--ink2); font-size: 14.5px; }
+
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; counter-reset: s; }
+  .step { background: var(--surface); border-radius: 22px; padding: 22px; box-shadow: inset 0 0 0 1px var(--line); position: relative; }
+  .step::before { counter-increment: s; content: counter(s); position: absolute; top: -14px; left: 20px; width: 32px; height: 32px; border-radius: 10px; background: var(--ink); color: #fff; display: grid; place-items: center; font: 800 15px var(--head); transform: rotate(-5deg); }
+  .step b { font: 700 16px var(--head); display: block; margin: 8px 0 4px; }
+  .step p { margin: 0; font-size: 14.5px; color: var(--ink2); }
+  .note { margin-top: 18px; background: #fff4d6; color: #6b4f00; border-radius: 16px; padding: 14px 18px; font-size: 14.5px; display: flex; gap: 12px; }
+  .note svg { margin-top: 3px; }
+
+  .faq { display: grid; gap: 10px; }
+  details { background: var(--surface); border-radius: 18px; box-shadow: inset 0 0 0 1px var(--line); padding: 4px 20px; }
+  summary { cursor: pointer; font: 700 16px var(--head); padding: 14px 0; list-style: none; display: flex; justify-content: space-between; gap: 12px; }
+  summary::after { content: '+'; font-size: 22px; line-height: 1; color: var(--muted); }
+  details[open] summary::after { content: '−'; }
+  details p { margin: 0 0 16px; color: var(--ink2); font-size: 15px; }
+
+  .cta { text-align: center; background: var(--ink); color: #fff; border-radius: 28px; padding: 48px 24px; }
+  .cta h2 { color: #fff; }
+  .cta .dl { background: #fff; color: var(--ink); box-shadow: 0 5px 0 rgba(255,255,255,.25); }
+  footer { padding: 34px 0 50px; font-size: 13px; color: var(--muted); text-align: center; }
+  footer p { margin: 4px 0; }
+
+  @media (max-width: 860px) {
+    .hero { grid-template-columns: 1fr; gap: 50px; }
+    .feats, .steps { grid-template-columns: 1fr; }
+    .navlinks { display: none; }
+    .shot .mini { display: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <nav>
+      <a class="brand" href="#"><span class="mark"><svg viewBox="0 0 40 40"><path d="M13 30 21.2 9.5c.5-1.3 2.3-1.3 2.8 0L32 30" stroke-width="4.4"/><path d="M8 30h7.5" stroke-width="4.4"/><path d="M22.6 21.5v8.5" stroke-width="3.2"/></svg></span>FiveM <span class="tag">launcher ♡</span></a>
+      <div class="navlinks"><a href="#features">ฟีเจอร์</a><a href="#install">วิธีติดตั้ง</a><a href="#faq">คำถามที่พบบ่อย</a><a id="ghLink" href="#">GitHub</a></div>
+    </nav>
+
+    <header class="hero">
+      <div>
+        <span class="badge"><i></i> ฟรี · Windows 10 / 11</span>
+        <h1>เข้าเซิร์ฟ FiveM ใน<span class="sq">คลิกเดียว<svg viewBox="0 0 120 12" preserveAspectRatio="none"><path d="M2 7c8-6 14 4 22 0s14-6 22 0 14 4 22 0 14-6 22 0 14 4 22 0"/></svg></span></h1>
+        <p class="lead">เก็บเซิร์ฟที่ชอบไว้ที่เดียว ดูจำนวนคนออนไลน์และปิงแบบเรียลไทม์ ล้างแคชแก้เกมเด้งได้ในตัว — โปรแกรมเล็ก เบา ไม่กินเครื่อง</p>
+        <a class="dl" id="dlBtn" href="#"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg><span>ดาวน์โหลดฟรี<small id="dlMeta">สำหรับ Windows</small></span></a>
+        <div class="meta" id="meta">ขนาดไม่ถึง 7 MB · ไม่ต้องใช้สิทธิ์ Admin · รองรับไทย / English</div>
+      </div>
+      <div class="shot">
+        <img src="img/home.webp" alt="หน้าหลักของ FiveM Launcher" loading="eager">
+        <img class="mini" src="img/setup.webp" alt="หน้าติดตั้ง">
+      </div>
+    </header>
+  </div>
+
+  <section id="features">
+    <div class="wrap">
+      <h2>ทำอะไรได้บ้าง</h2>
+      <p class="sub">ทุกอย่างที่ต้องใช้ก่อนเข้าเกม รวมไว้ในหน้าเดียว</p>
+      <div class="feats">
+        <div class="feat"><div class="ic"><svg viewBox="0 0 24 24"><path d="M7 5.5v13a1 1 0 0 0 1.5.9l10.4-6.5a1 1 0 0 0 0-1.8L8.5 4.6A1 1 0 0 0 7 5.5Z"/></svg></div><b>กดเล่นแล้วเข้าเลย</b><p>เปิด FiveM และเชื่อมต่อเซิร์ฟให้อัตโนมัติ ไม่ต้องพิมพ์ connect ใน F8</p></div>
+        <div class="feat"><div class="ic"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M21.5 20a6.5 6.5 0 0 0-4-6"/></svg></div><b>เห็นคนออนไลน์และปิง</b><p>รู้ทันทีว่าเซิร์ฟไหนเปิด คนเยอะแค่ไหน เต็มหรือยัง อัปเดตให้เองทุก 15 วินาที</p></div>
+        <div class="feat"><div class="ic"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div><b>เพิ่มเซิร์ฟได้ทุกแบบ</b><p>โดเมน, IP:Port, ลิงก์ cfx.re/join หรือคำสั่ง connect — ดึงชื่อ โลโก้ และแบนเนอร์ให้อัตโนมัติ</p></div>
+        <div class="feat"><div class="ic"><svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V4.8c0-.4.4-.8.8-.8h4.4c.4 0 .8.4.8.8V7M6.5 7l.9 12.2c.1.8.7 1.3 1.5 1.3h6.2c.8 0 1.4-.5 1.5-1.3L17.5 7"/></svg></div><b>ล้างแคช FiveM</b><p>แก้อาการเกมเด้ง โหลดค้าง หรือพื้นที่เต็ม บอกขนาดก่อนลบทุกครั้ง</p></div>
+        <div class="feat"><div class="ic"><svg viewBox="0 0 24 24"><path d="M13 3 5 14h6l-1 7 8-11h-6l1-7Z"/></svg></div><b>เบา ไม่แย่งเกม</b><p>ตอนเล่นเกมโปรแกรมจะผ่อนแรงเอง ย่อหน้าต่างแล้วหยุดทำงานเบื้องหลังทั้งหมด</p></div>
+        <div class="feat"><div class="ic"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18c1.2 0 1.8-.9 1.8-1.8 0-.5-.2-.9-.5-1.2-.3-.3-.5-.8-.5-1.2 0-1 .8-1.8 1.8-1.8h2.1A4.3 4.3 0 0 0 21 10.7C21 6.4 17 3 12 3Z"/></svg></div><b>สองธีม สองภาษา</b><p>ขาว-เทามินิมอล หรือซากุระสีชมพู เลือกภาษาไทยหรืออังกฤษได้ อัปเดตเวอร์ชันใหม่ให้อัตโนมัติ</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="install">
+    <div class="wrap">
+      <h2>วิธีติดตั้ง</h2>
+      <p class="sub">ใช้เวลาไม่ถึงนาที</p>
+      <div class="steps">
+        <div class="step"><b>ดาวน์โหลด</b><p>กดปุ่มดาวน์โหลดด้านบน จะได้ไฟล์ <code>FiveM-Launcher-Setup.exe</code></p></div>
+        <div class="step"><b>เปิดไฟล์ติดตั้ง</b><p>ดับเบิลคลิกไฟล์ แล้วกด “ถัดไป” ตามขั้นตอนจนติดตั้งเสร็จ</p></div>
+        <div class="step"><b>เพิ่มเซิร์ฟแล้วกดเล่น</b><p>กด “เพิ่มเซิร์ฟเวอร์” ใส่ที่อยู่เซิร์ฟ กด “ตรวจสอบ” แล้วบันทึก</p></div>
+      </div>
+      <div class="note"><svg viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 2 18a2 2 0 0 0 1.7 3h16.6A2 2 0 0 0 22 18L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg><span>ถ้า Windows ขึ้นหน้าจอสีน้ำเงิน <b>“Windows protected your PC”</b> ให้กด <b>More info</b> แล้วกด <b>Run anyway</b> — ที่ขึ้นแบบนี้เพราะโปรแกรมยังไม่มีลายเซ็นดิจิทัล (โปรแกรมเล็ก ๆ ส่วนใหญ่ก็เป็นแบบนี้)</span></div>
+    </div>
+  </section>
+
+  <section id="faq">
+    <div class="wrap">
+      <h2>คำถามที่พบบ่อย</h2>
+      <p class="sub">&nbsp;</p>
+      <div class="faq">
+        <details><summary>ปลอดภัยไหม? โปรแกรมทำอะไรกับเครื่องบ้าง</summary><p>โปรแกรมติดตั้งในโฟลเดอร์ของผู้ใช้ ไม่ต้องใช้สิทธิ์ Admin และไม่แตะไฟล์ระบบ สิ่งที่ทำมีแค่อ่านสถานะเซิร์ฟที่คุณเพิ่มไว้ เปิด FiveM และลบโฟลเดอร์แคชของ FiveM เมื่อคุณสั่งเท่านั้น ข้อมูลเซิร์ฟเก็บอยู่ในเครื่องคุณ ไม่ส่งไปที่ไหน และโค้ดทั้งหมดเปิดให้ดูได้บน GitHub</p></details>
+        <details><summary>ต้องมีอะไรในเครื่องบ้าง?</summary><p>Windows 10 หรือ 11 (64-bit) และต้องติดตั้ง FiveM ไว้แล้ว โปรแกรมใช้ Microsoft Edge WebView2 ซึ่งมีมากับ Windows 11 และ Windows 10 ที่อัปเดตแล้ว ถ้าเครื่องไหนไม่มี ตัวติดตั้งจะพาไปดาวน์โหลดให้</p></details>
+        <details><summary>กดเล่นแล้วไม่เข้าเกม ทำยังไง?</summary><p>เช็กว่าติดตั้ง FiveM แล้วและเปิดเองได้ปกติ ถ้า Windows ถามว่าจะเปิดลิงก์ด้วยโปรแกรมไหน ให้เลือก FiveM ถ้ายังไม่ได้ ลองไปที่ ตั้งค่า → ตำแหน่ง FiveM แล้วเลือกไฟล์ FiveM.exe เอง</p></details>
+        <details><summary>ล้างแคชแล้วข้อมูลหายไหม?</summary><p>ไม่หาย จะลบเฉพาะไฟล์ชั่วคราวที่ FiveM โหลดจากเซิร์ฟ (crashes, cache, server-cache) ไม่กระทบตัวเกม การตั้งค่า หรือบัญชี ครั้งต่อไปที่เข้าเซิร์ฟจะโหลดนานขึ้นนิดหน่อย</p></details>
+        <details><summary>ถอนการติดตั้งยังไง?</summary><p>ไปที่ การตั้งค่า (Settings) → แอป (Apps) → ค้นหา FiveM Launcher → ถอนการติดตั้ง (Uninstall)</p></details>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <div class="cta">
+      <h2>พร้อมลุยแล้วใช่ไหม?</h2>
+      <p class="sub" style="color:rgba(255,255,255,.6)">ดาวน์โหลดฟรี ไม่มีโฆษณา</p>
+      <a class="dl" id="dlBtn2" href="#"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg><span>ดาวน์โหลด FiveM Launcher</span></a>
+    </div>
+  </div>
+
+  <footer class="wrap">
+    <p id="credit">FiveM Launcher</p>
+    <p>โปรแกรมนี้พัฒนาขึ้นอย่างอิสระ ไม่มีส่วนเกี่ยวข้องกับ Cfx.re, FiveM หรือ Rockstar Games</p>
+  </footer>
+
+<script>
+(() => {
+  // หา owner/repo จากที่อยู่ GitHub Pages (owner.github.io/repo) — ไม่ต้องแก้ไฟล์นี้
+  const FALLBACK_REPO = ''; // ถ้าใช้โดเมนอื่น ใส่ 'owner/repo' ตรงนี้
+  let repo = FALLBACK_REPO;
+  const h = location.hostname.match(/^([^.]+)\.github\.io$/i);
+  if (h) {
+    const first = location.pathname.split('/').filter(Boolean)[0];
+    repo = h[1] + '/' + (first || h[1] + '.github.io');
+  }
+  if (!repo) return;
+  const asset = `https://github.com/${repo}/releases/latest/download/FiveM-Launcher-Setup.exe`;
+  document.querySelectorAll('#dlBtn, #dlBtn2').forEach((a) => (a.href = asset));
+  document.getElementById('ghLink').href = `https://github.com/${repo}`;
+
+  fetch(`https://api.github.com/repos/${repo}/releases/latest`)
+    .then((r) => (r.ok ? r.json() : null))
+    .then((rel) => {
+      if (!rel) return;
+      const a = (rel.assets || []).find((x) => /setup.*\.exe$/i.test(x.name));
+      const v = String(rel.tag_name || '').replace(/^v/, '');
+      const mb = a ? (a.size / 1048576).toFixed(1) + ' MB' : '';
+      const d = new Date(rel.published_at).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' });
+      document.getElementById('dlMeta').textContent = `เวอร์ชัน ${v}${mb ? ' · ' + mb : ''}`;
+      document.getElementById('meta').textContent = `อัปเดตล่าสุด ${d} · ไม่ต้องใช้สิทธิ์ Admin · รองรับไทย / English`;
+      if (a) document.querySelectorAll('#dlBtn, #dlBtn2').forEach((x) => (x.href = a.browser_download_url));
+    })
+    .catch(() => {});
+})();
+</script>
+</body>
+</html>

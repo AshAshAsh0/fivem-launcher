@@ -1,0 +1,8 @@
+/* ฟอนต์ฝังในโปรแกรม (SIL Open Font License — ดู OFL-*.txt) */
+@font-face { font-family: 'Prompt'; font-weight: 600; font-display: block; src: url('Prompt-SemiBold.woff') format('woff'); }
+@font-face { font-family: 'Prompt'; font-weight: 700; font-display: block; src: url('Prompt-Bold.woff') format('woff'); }
+@font-face { font-family: 'Prompt'; font-weight: 800 900; font-display: block; src: url('Prompt-ExtraBold.woff') format('woff'); }
+@font-face { font-family: 'Anuphan'; font-weight: 100 700; font-display: block; src: url('Anuphanwght.woff') format('woff'); }
+@font-face { font-family: 'Mali'; font-weight: 400 600; font-display: block; src: url('Mali-Medium.woff') format('woff'); }
+@font-face { font-family: 'Mali'; font-weight: 700 900; font-display: block; src: url('Mali-Bold.woff') format('woff'); }
+@font-face { font-family: 'JetBrains Mono'; font-weight: 100 800; font-display: block; src: url('JetBrainsMonowght.woff') format('woff'); }

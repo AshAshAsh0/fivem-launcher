@@ -1,0 +1,53 @@
+# สร้างไฟล์ Setup และออก Release อัตโนมัติ
+# วิธีใช้: ไปที่แท็บ Actions > "Build & Release" > Run workflow แล้วใส่เวอร์ชัน (เช่น 2.2.0)
+#          หรือ push tag ชื่อ v2.2.0
+name: Build & Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "เวอร์ชันที่จะออก (เช่น 2.2.0)"
+        required: true
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+
+      - name: Install go-winres
+        run: go install github.com/tc-hib/go-winres@v0.3.3
+
+      - name: Resolve version
+        id: ver
+        run: |
+          V="${{ github.event.inputs.version }}"
+          if [ -z "$V" ]; then V="${GITHUB_REF_NAME}"; fi
+          V="${V#v}"
+          echo "version=$V" >> "$GITHUB_OUTPUT"
+
+      - name: Build
+        env:
+          VERSION: ${{ steps.ver.outputs.version }}
+          UPDATE_REPO: ${{ github.repository }}
+          MADE_BY: ${{ vars.MADE_BY }}
+          DISCORD_URL: ${{ vars.DISCORD_URL }}
+        run: ./build.sh
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.ver.outputs.version }}
+          name: FiveM Launcher ${{ steps.ver.outputs.version }}
+          generate_release_notes: true
+          files: out/FiveM-Launcher-Setup.exe
