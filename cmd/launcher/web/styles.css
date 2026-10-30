@@ -1217,3 +1217,27 @@ html[data-motion='reduced'] .splash * { animation: none !important; }
 .titlebar { justify-content: flex-start; }
 .titlebar .tabs { margin: 0 0 0 18px; }
 .titlebar .win-ctrls { margin-left: auto; }
+
+/* v7: เซิร์ฟของฉันบนหน้าหลัก */
+.b-sec { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 6px 2px 2px; font: 600 12px var(--font-head); text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+.b-sec:first-child { margin-top: 0; }
+.mine-head .btn { height: 30px; font-size: 12px; }
+.mine-empty { display: flex; align-items: center; gap: 14px; width: 100%; text-align: left; padding: 14px 16px; border-radius: 14px; border: 1px dashed rgba(10, 174, 251, .45); background: rgba(10, 174, 251, .06); color: var(--ink); }
+.mine-empty > svg { width: 22px; height: 22px; color: var(--accent); flex: none; }
+.mine-empty b { display: block; font-size: 14px; }
+.mine-empty small { display: block; color: var(--muted); font-size: 12.5px; margin-top: 2px; }
+.mine-empty:hover { background: rgba(10, 174, 251, .12); }
+.b-mine { display: inline-block; font: 600 11px var(--font-body); color: var(--accent); background: rgba(10, 174, 251, .12); border-radius: 6px; padding: 1px 8px; margin-right: 8px; vertical-align: 2px; }
+.b-row.mine .b-ic { position: relative; overflow: visible; color: #fff; }
+.b-row.mine .b-ic img { border-radius: inherit; }
+.b-row.mine .sr-dot { z-index: 2; border-color: #17191c; }
+.b-row.mine.offline .sr-dot { background: #8a9099; }
+.b-row.mine.offline .b-name, .b-row.mine.offline .b-pl b { opacity: .6; }
+.b-st .pill { height: 18px; font-size: 10.5px; padding: 0 6px; margin-left: 4px; vertical-align: 1px; }
+.b-row.mine .more-btn { width: 36px; height: 36px; }
+.sv-ipbox { display: flex; gap: 8px; }
+.sv-ipbox .input { flex: 1; min-width: 0; height: 42px; font-family: var(--font-mono); font-size: 13px; }
+.sv-ipbox .btn { height: 42px; }
+.sv-note.ok { background: rgba(47, 210, 127, .12) !important; color: #4be39a !important; }
+.sv-side .sv-lock.b-mine { position: absolute; left: 14px; top: 14px; z-index: 2; background: rgba(10, 20, 30, .7); }
+.sv-links .pill-bell { height: 30px; }

@@ -646,7 +646,11 @@
     if (isCard) root.classList.toggle('offline', !S.online);
   }
   function patchAll() {
-    if (state.page === 'settings' || state.page === 'browse') return;
+    if (state.page === 'browse') {
+      $$('.b-row[data-mid]').forEach((r) => { const s = byId(r.dataset.mid); if (s) { patchStatus(r, s, true); const stEl = r.querySelector('.js-st'); if (stEl) stEl.innerHTML = st(s).online ? '' : '<span class="pill pill-off">ออฟไลน์</span>'; } });
+      return;
+    }
+    if (state.page === 'settings') return;
     const rows = $$('.srow');
     const fav = state.page === 'favorites';
     const list = filtered(fav);
@@ -664,7 +668,15 @@
   }
 
   function updateHomeParts() {
-    if (state.page === 'settings' || state.page === 'browse') return;
+    if (state.page === 'browse') {
+      const col = $('#bList')?.closest('.b-col'), y = col ? col.scrollTop : 0;
+      drawBrowse();
+      if (col) col.scrollTop = y;
+      const sel = state.browse.sel;
+      if (sel && sel.startsWith('m:')) { const m = byId(sel.slice(2)); m ? mineSide(m) : closeServer(); }
+      return;
+    }
+    if (state.page === 'settings') return;
     const fav = state.page === 'favorites';
     const list = filtered(fav);
     const gw = $('#gridWrap');
@@ -725,11 +737,7 @@
       <div class="b-ic"><span>${esc(initial(s.name))}</span>${s.icon ? `<img src="${esc(imgSrc(s.icon))}" alt="" loading="lazy">` : ''}</div>
       <div class="b-main"><div class="b-name" title="${esc(s.name)}">${s.private ? '<span class="b-lock">🔒 ส่วนตัว</span>' : ''}<span data-no-i18n>${esc(s.name)}</span></div><div class="b-sub" title="${esc(sub)}" data-no-i18n>${esc(sub)}</div></div>
       <div class="b-pl"><div><b>${fmtNum(s.players)}</b> / ${fmtNum(s.max)}</div><div class="bar"><i style="width:${p}%;--barc:${barColor(p)}"></i></div></div>
-      <div class="b-act">
-        ${s.private
-          ? `<button class="btn btn-sm" data-b="private" title="เซิร์ฟนี้ตั้งเป็นส่วนตัว">ทำไมเข้าไม่ได้?</button>`
-          : `<button class="btn btn-sm btn-dark b-play" data-b="play" title="เข้าเซิร์ฟนี้เลย">${I.play} เล่น</button>`}
-      </div>
+
     </div>`;
   }
 
@@ -747,7 +755,7 @@
       <div class="b-ic">${I.bolt}</div>
       <div class="b-main"><div class="b-name">เข้าเซิร์ฟจากที่อยู่นี้โดยตรง</div><div class="b-sub" data-no-i18n>${esc(t)}</div></div>
       <div class="b-pl"></div>
-      <div class="b-act"><button class="btn btn-sm btn-dark b-play" data-b="direct">${I.play} เข้าเลย</button></div>
+      <div class="b-act"><button class="btn btn-sm" data-b="direct-save">${I.plus} บันทึก</button><button class="btn btn-sm btn-dark b-play" data-b="direct">${I.play} เข้าเลย</button></div>
     </div>`;
   }
   function joinDirect(t) {
@@ -765,14 +773,12 @@
     const side = $('#svSide'); if (side) side.innerHTML = '';
   }
   function serverPopup(s) {
-    const B = state.browse, side = $('#svSide'), split = $('#bSplit');
-    if (!side || !split) return;
-    B.sel = s.id; B.selItem = s;
-    $$('.b-row').forEach((r) => r.classList.toggle('sel', r.dataset.id === s.id));
+    state.browse.selItem = s;
     const p = s.max ? Math.min(100, Math.round((s.players / s.max) * 100)) : 0;
     const tags = s.tags.split(',').map((t) => t.trim()).filter(Boolean).slice(0, 8);
     const target = targetOf(s);
-    side.innerHTML = `
+    const mineOf = state.servers.find((x) => x.cfxId === s.id);
+    const side = openSide(`
       <div class="sv-banner">
         ${s.banner ? `<img src="${esc(imgSrc(s.banner))}" alt="">` : s.icon ? `<img class="blur" src="${esc(imgSrc(s.icon))}" alt="">` : ''}
         <button class="x-btn" id="svClose" title="ปิด">${I.x}</button>
@@ -794,19 +800,21 @@
         <div class="bar"><i style="width:${p}%;--barc:${barColor(p)}"></i></div>
         ${s.desc ? `<p class="sv-desc" data-no-i18n>${esc(s.desc)}</p>` : ''}
         ${s.private
-          ? `<p class="sv-note">เซิร์ฟนี้ตั้งเป็นส่วนตัว จึงเข้าจากรายชื่อไม่ได้ ต้องใช้ IP หรือลิงก์ที่เซิร์ฟแจกใน Discord — วางในช่องค้นหาแล้วกด “เข้าเลย”</p>`
+          ? (mineOf
+            ? `<p class="sv-note ok">บันทึกเซิร์ฟนี้ไว้ใน “เซิร์ฟของฉัน” แล้ว — กดเล่นจากรายการด้านบนได้เลย</p><button class="btn" id="svGoMine">★ ไปที่เซิร์ฟของฉัน</button>`
+            : `<p class="sv-note">เซิร์ฟนี้ตั้งเป็นส่วนตัว เข้าจากรายชื่อไม่ได้ — ขอ IP หรือลิงก์จาก Discord ของเซิร์ฟ แล้ววางด้านล่าง ระบบจะบันทึกไว้ใน “เซิร์ฟของฉัน” ให้กดเข้าได้ทุกครั้ง</p>
+              <div class="sv-ipbox"><input class="input" id="svIp" placeholder="เช่น 103.91.190.199:30120" spellcheck="false"><button class="btn btn-dark" id="svSave">${I.check} บันทึก</button></div>`)
           : `<div class="sv-addr"><code data-no-i18n>${esc(target)}</code><button class="btn btn-sm" id="svCopy">${I.copy} คัดลอก</button></div>`}
         ${s.discord || s.website ? `<div class="sv-links">
           ${s.discord ? `<button class="btn btn-sm sv-discord" data-link="${esc(s.discord)}">Discord</button>` : ''}
           ${s.website ? `<button class="btn btn-sm" data-link="${esc(s.website)}">${I.globe} เว็บไซต์</button>` : ''}
         </div>` : ''}
       </div>
-      ${s.private ? '' : `<div class="sv-foot"><button class="btn btn-dark btn-lg sv-play" id="svPlay">${I.play} เล่นเลย</button></div>`}`;
-    const wasOpen = split.classList.contains('open');
-    split.classList.add('open');
-    side.classList.toggle('swap', wasOpen);
-    side.scrollTop = 0;
-    $('#svClose', side).onclick = closeServer;
+      ${s.private ? '' : `<div class="sv-foot"><button class="btn btn-dark btn-lg sv-play" id="svPlay">${I.play} เล่นเลย</button></div>`}`, s.id);
+    if (!side) return;
+    $('#svSave', side)?.addEventListener('click', () => savePrivate(s, $('#svIp', side).value));
+    $('#svIp', side)?.addEventListener('keydown', (e) => { if (e.key === 'Enter') savePrivate(s, e.target.value); });
+    $('#svGoMine', side)?.addEventListener('click', () => { if (mineOf) { $('#bq').value = ''; state.browse.q = ''; drawBrowse(); mineSide(mineOf); $('#bList').closest('.b-col').scrollTop = 0; } });
     $('#svPlay', side)?.addEventListener('click', () => {
       toast(`กำลังเข้า ${s.name}`);
       api.launch(target, state.settings.after).catch(() => toast('เปิด FiveM ไม่สำเร็จ', 'err'));
@@ -821,6 +829,112 @@
       if (state.browse.sel !== s.id) return; // ผู้ใช้เปลี่ยนไปเซิร์ฟอื่นแล้ว
       const el = $('#svPing'); if (el) el.innerHTML = r && r.online && r.ping != null ? `${r.ping}<small>ms</small>` : '—';
     }).catch(() => { const el = $('#svPing'); if (el && state.browse.sel === s.id) el.textContent = '—'; });
+  }
+
+  // ---------- เซิร์ฟของฉัน (เพิ่ม IP เองได้ รวมเซิร์ฟส่วนตัว) ----------
+  function mineHTML(q) {
+    const t = String(q || '').trim().toLowerCase();
+    const list = state.servers.filter((s) => !t || [s.name, s.address, s.display].join(' ').toLowerCase().includes(t));
+    if (t && !list.length) return '';
+    const head = `<div class="b-sec mine-head"><span>เซิร์ฟของฉัน</span><button class="btn btn-sm" data-b="add-mine">${I.plus} เพิ่มเซิร์ฟ / IP</button></div>`;
+    if (!list.length) return head + `<button class="mine-empty" data-b="add-mine">${I.plus}<span><b>เพิ่มเซิร์ฟของคุณ</b><small>ใส่ IP หรือลิงก์ของเซิร์ฟ (รวมเซิร์ฟส่วนตัว) แล้วจะอยู่ตรงนี้ กดเข้าได้ทุกครั้ง</small></span></button>`;
+    return head + list.map(mineRow).join('');
+  }
+  function mineRow(s) {
+    const S = st(s), p = loadPct(s), logo = logoOf(s), sel = state.browse.sel === 'm:' + s.id;
+    return `<div class="b-row mine ${S.online ? '' : 'offline'} ${sel ? 'sel' : ''}" data-mid="${s.id}" title="ดับเบิลคลิกเพื่อเข้าเซิร์ฟ">
+      <div class="b-ic" style="background:${toneOf(s)}"><span>${esc(initial(s.name))}</span>${logo ? `<img src="${esc(logo)}" alt="">` : ''}<i class="sr-dot"></i></div>
+      <div class="b-main"><div class="b-name"><span class="b-mine">★ ของฉัน</span><span data-no-i18n>${esc(s.name)}</span></div><div class="b-sub" data-no-i18n>${esc(s.display || s.address)}${s.lastPlayed ? ` · ${esc(ago(s.lastPlayed))}` : ''}</div></div>
+      <div class="b-pl"><div><b class="js-pl">${fmtNum(S.players)}</b> / <span class="js-max">${fmtNum(S.max)}</span> <span class="js-st b-st">${S.online ? '' : '<span class="pill pill-off">ออฟไลน์</span>'}</span></div><div class="bar"><i class="js-bar" style="width:${p}%;--barc:${barColor(p)}"></i></div></div>
+      <div class="b-act"><button class="more-btn" data-act="more" data-id="${s.id}" title="เพิ่มเติม">${I.more}</button></div>
+    </div>`;
+  }
+  function bindMine(root) {
+    $$('[data-b="add-mine"]', root).forEach((b) => (b.onclick = () => openServerModal()));
+    $$('.b-row[data-mid]', root).forEach((row) => {
+      const s = byId(row.dataset.mid);
+      if (!s) return;
+      row.onclick = (e) => { if (!e.target.closest('button') && state.browse.sel !== 'm:' + s.id) mineSide(s); };
+      row.ondblclick = (e) => { if (!e.target.closest('button')) play(s.id); };
+      const more = row.querySelector('[data-act="more"]');
+      if (more) more.onclick = (e) => { e.stopPropagation(); openMenu(more, s); };
+    });
+  }
+  // เปิดหน้าต่างเพิ่มเซิร์ฟ พร้อมใส่ที่อยู่ให้แล้วกดตรวจสอบเลย
+  function addServerWith(addr) {
+    openServerModal();
+    setTimeout(() => { const i = $('#fAddr'); if (i) { i.value = addr; $('#fCheck')?.click(); } }, 80);
+  }
+  function openSide(html, key) {
+    const B = state.browse, side = $('#svSide'), split = $('#bSplit');
+    if (!side || !split) return null;
+    B.sel = key;
+    $$('.b-row').forEach((r) => r.classList.toggle('sel', (r.dataset.mid ? 'm:' + r.dataset.mid : r.dataset.id) === key));
+    const wasOpen = split.classList.contains('open');
+    side.innerHTML = html;
+    split.classList.add('open');
+    side.classList.toggle('swap', wasOpen);
+    side.scrollTop = 0;
+    $('#svClose', side).onclick = closeServer;
+    return side;
+  }
+  function mineSide(s) {
+    const S = st(s), p = loadPct(s), logo = logoOf(s), banner = bannerOf(s), t = toneOf(s);
+    state.browse.selItem = null;
+    const side = openSide(`
+      <div class="sv-banner" style="background:linear-gradient(135deg, ${shade(t, 0.4)}, ${t})">
+        ${banner ? `<img src="${esc(banner)}" alt="">` : logo ? `<img class="blur" src="${esc(logo)}" alt="">` : ''}
+        <button class="x-btn" id="svClose" title="ปิด">${I.x}</button>
+        <span class="b-mine sv-lock">★ เซิร์ฟของฉัน</span>
+      </div>
+      <div class="sv-head"><div class="sv-ic" style="background:${t}"><span>${esc(initial(s.name))}</span>${logo ? `<img src="${esc(logo)}" alt="">` : ''}</div></div>
+      <div class="sv-title"><h2 data-no-i18n title="${esc(s.name)}">${esc(s.name)}</h2>
+        <div class="sv-tags">${S.online ? '<span class="pill pill-ok">ออนไลน์</span>' : '<span class="pill pill-off">ออฟไลน์</span>'}${s.category ? `<span class="pill pill-mono" data-no-i18n>${esc(s.category)}</span>` : ''}${lastHTML(s)}</div></div>
+      <div class="sv-body">
+        <div class="sv-stats">
+          <div><span class="lbl">จำนวนผู้เล่น</span><b>${fmtNum(S.players)}<small>/${fmtNum(S.max)}</small></b></div>
+          <div><span class="lbl">ปิง</span><b>${S.ping != null ? `${S.ping}<small>ms</small>` : '—'}</b></div>
+          <div><span class="lbl">ความจุ</span><b style="color:${pctColor(p)}">${p}%</b></div>
+        </div>
+        <div class="bar"><i style="width:${p}%;--barc:${barColor(p)}"></i></div>
+        ${s.desc ? `<p class="sv-desc" data-no-i18n>${esc(s.desc)}</p>` : ''}
+        <div class="sv-addr"><code data-no-i18n>${esc(s.connect || s.address)}</code><button class="btn btn-sm" id="svCopy">${I.copy} คัดลอก</button></div>
+        <div class="sv-links">
+          ${bellHTML(s)}
+          ${s.discord ? `<button class="btn btn-sm sv-discord" data-link="${esc(normUrl(s.discord))}">Discord</button>` : ''}
+          <button class="btn btn-sm" id="svEdit">${I.edit} แก้ไข</button>
+          <button class="btn btn-sm" id="svDel" style="color:var(--danger)">${I.trash} ลบ</button>
+        </div>
+      </div>
+      <div class="sv-foot"><button class="btn btn-dark btn-lg sv-play" id="svPlay">${I.play} ${S.online ? 'เล่นเลย' : 'ลองเข้า'}</button></div>`, 'm:' + s.id);
+    if (!side) return;
+    $('#svPlay', side).onclick = () => play(s.id);
+    $('#svEdit', side).onclick = () => openServerModal(s);
+    $('#svDel', side).onclick = () => confirmDelete(s);
+    $$('[data-link]', side).forEach((b) => (b.onclick = () => api.openExternal(b.dataset.link)));
+    $$('[data-act="watch"]', side).forEach((b) => (b.onclick = () => toggleWatch(s)));
+    $('#svCopy', side).onclick = () => { try { navigator.clipboard.writeText(s.connect || s.address); toast('คัดลอกที่อยู่แล้ว'); } catch { toast('คัดลอกไม่สำเร็จ', 'err'); } };
+  }
+  // เซิร์ฟส่วนตัวจากรายชื่อ: ใส่ IP ที่ได้จาก Discord ของเซิร์ฟ แล้วบันทึกเข้า "เซิร์ฟของฉัน" (ใช้ชื่อ/โลโก้ของเซิร์ฟนั้น)
+  async function savePrivate(s, addr) {
+    addr = String(addr || '').trim().replace(/^connect\s+/i, '');
+    if (!directTarget(addr)) return toast('ที่อยู่ไม่ถูกต้อง ลองวาง IP:พอร์ต หรือลิงก์ cfx.re/join', 'err');
+    const rec = {
+      id: uid(), address: addr, connect: addr, display: addr.replace(/^https?:\/\//, ''), cfxId: s.id,
+      name: s.name, category: '', desc: s.desc || '', bannerUrl: '', logoUrl: '', discord: s.discord || '',
+      tone: 'auto', autoTone: null, logo: null, banner: s.banner || null, fav: false, group: null,
+      addedAt: Date.now(), lastPlayed: null, status: null,
+    };
+    if (s.icon) {
+      try { rec.logo = (await api.fetchImage(s.icon)) || null; } catch {}
+      if (rec.logo) rec.autoTone = await dominantColor(rec.logo);
+    }
+    state.servers.unshift(rec);
+    persist();
+    toast(`บันทึก ${s.name} ไว้ในเซิร์ฟของฉันแล้ว`);
+    try { await refreshOne(rec, true); persist(); } catch {}
+    drawBrowse();
+    mineSide(rec);
   }
 
   function browseSkeleton() {
@@ -842,6 +956,7 @@
     const bindDirect = () => {
       list.querySelector('[data-direct]')?.addEventListener('dblclick', () => joinDirect(direct));
       list.querySelector('[data-b="direct"]')?.addEventListener('click', () => joinDirect(direct));
+      list.querySelector('[data-b="direct-save"]')?.addEventListener('click', () => addServerWith(direct));
     };
     if (B.loading && !B.items.length) {
       $('#bMeta').textContent = 'กำลังโหลดรายชื่อเซิร์ฟ... ครั้งแรกอาจใช้เวลาสักครู่';
@@ -852,11 +967,12 @@
     }
     const t = B.updated ? new Date(B.updated * 1000).toLocaleTimeString(isEN() ? 'en-GB' : 'th-TH', { hour: '2-digit', minute: '2-digit' }) : '';
     $('#bMeta').textContent = `พบ ${fmtNum(B.total)} เซิร์ฟ · ผู้เล่นรวม ${fmtNum(B.players)} · อัปเดตเมื่อ ${t}`;
-    list.innerHTML = (direct ? directRow(direct) : '') + (B.items.length ? B.items.map(browseRow).join('') : direct ? '' : `<div class="empty"><div><div class="em-mark">${I.search}</div><b>ไม่พบเซิร์ฟที่ตรงกับคำค้น</b>ลองพิมพ์คำอื่น เปลี่ยนเป็น “ทั้งหมด” หรือวาง IP / ลิงก์ cfx.re ของเซิร์ฟ</div></div>`);
+    list.innerHTML = (direct ? directRow(direct) : '') + mineHTML(B.q) + (B.items.length ? '<div class="b-sec">เซิร์ฟสาธารณะ</div>' : '') + (B.items.length ? B.items.map(browseRow).join('') : direct ? '' : `<div class="empty"><div><div class="em-mark">${I.search}</div><b>ไม่พบเซิร์ฟที่ตรงกับคำค้น</b>ลองพิมพ์คำอื่น เปลี่ยนเป็น “ทั้งหมด” หรือวาง IP / ลิงก์ cfx.re ของเซิร์ฟ</div></div>`);
     bindDirect();
+    bindMine(list);
     $('#bMore').innerHTML = B.items.length < B.total ? `<button class="btn" id="bMoreBtn" ${B.loading ? 'disabled' : ''}>แสดงเพิ่ม</button>` : '';
     $('#bMoreBtn')?.addEventListener('click', () => loadBrowse(false));
-    list.querySelectorAll('.b-row').forEach((row) => {
+    list.querySelectorAll('.b-row[data-id]').forEach((row) => {
       const s = B.items.find((x) => x.id === row.dataset.id);
       if (!s) return;
       row.classList.toggle('sel', B.sel === s.id);
@@ -869,6 +985,7 @@
       if (playBtn) playBtn.onclick = (e) => { e.stopPropagation(); join(); };
       row.onclick = (e) => { if (!e.target.closest('button') && B.sel !== s.id) serverPopup(s); };
       row.ondblclick = (e) => { if (!e.target.closest('button') && !s.private) join(); };
+      row.title = s.private ? '' : 'ดับเบิลคลิกเพื่อเข้าเซิร์ฟ';
     });
   }
 
@@ -930,7 +1047,11 @@
 
   function bindBrowse() {
     const B = state.browse;
-    if (B.sel && B.selItem) setTimeout(() => B.sel && serverPopup(B.selItem), 0);
+    if (B.sel) setTimeout(() => {
+      if (!B.sel) return;
+      if (B.sel.startsWith('m:')) { const m = byId(B.sel.slice(2)); m ? mineSide(m) : closeServer(); }
+      else if (B.selItem) serverPopup(B.selItem);
+    }, 0);
     let t;
     $('#bq').addEventListener('keydown', (e) => { if (e.key === 'Enter' && directTarget(B.q)) joinDirect(directTarget(B.q)); });
     $('#bq').addEventListener('input', (e) => {
@@ -1661,6 +1782,8 @@
     try { startPage = sessionStorage.getItem('fl-page') || 'browse'; sessionStorage.removeItem('fl-page'); } catch {}
     S.step(3, 75);
     go(startPage === 'settings' ? 'settings' : 'browse');
+    restartAuto();
+    refreshAll();
     // รอรายชื่อเซิร์ฟสักครู่ (ถ้าเน็ตช้า หน้ารายชื่อจะโชว์โครงโหลดต่อเอง) แล้วปิดหน้า loading
     await new Promise((r) => { const t0 = Date.now(); const w = () => (state.browse.loaded || state.browse.error || Date.now() - t0 > 2500 ? r() : setTimeout(w, 80)); w(); });
     S.done();
