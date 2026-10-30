@@ -3,7 +3,6 @@
 package main
 
 import (
-	"encoding/base64"
 	"embed"
 	"encoding/json"
 	"errors"
@@ -26,7 +25,7 @@ import (
 var webFS embed.FS
 
 // version ถูกแทนค่าตอน build ด้วย -ldflags "-X main.version=..."
-var version = "3.10.0"
+var version = "3.11.0"
 
 const (
 	appTitle = "FiveM Launcher"
@@ -67,11 +66,6 @@ func main() {
 		fileSrv.ServeHTTP(w, r)
 	})
 	mux.HandleFunc("/img", serveImage) // โลโก้/แบนเนอร์เซิร์ฟผ่านตัวโปรแกรม + แคช
-	// รูปพื้นหลังที่ผู้ใช้เลือก (เบลอไว้แล้วตั้งแต่ตอนเลือก)
-	mux.HandleFunc("/wallpaper.jpg", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Cache-Control", "no-store")
-		http.ServeFile(w, r, filepath.Join(dataDir, "wallpaper.jpg"))
-	})
 	go http.Serve(ln, mux)
 
 	webview2.FramelessPopup = true
@@ -99,7 +93,8 @@ func main() {
 	}
 
 	// สีพื้นหลังตอนเปิดโปรแกรม ให้ตรงกับธีม (กันจอขาวแวบ)
-	bg, startTheme, startLang := "FF0B0C0E", "hud", "" // ธีม HUD เป็นธีมหลักถาวร
+	bg, startLang := "FF0B0C0E", ""
+	_ = os.Remove(filepath.Join(dataDir, "wallpaper.jpg")) // รูปพื้นหลังจากเวอร์ชันเก่า (เลิกใช้แล้ว)
 	if b, err := os.ReadFile(filepath.Join(dataDir, "launcher-data.json")); err == nil {
 		if strings.Contains(string(b), `"lang": "en"`) {
 			startLang = "en"
@@ -149,7 +144,7 @@ func main() {
 		}()
 	})
 	// ส่งธีม/ภาษาไปให้หน้า loading ใช้ได้ตั้งแต่เฟรมแรก
-	wv.Navigate(fmt.Sprintf("http://127.0.0.1:%d/index.html?theme=%s&lang=%s&v=%s", ln.Addr().(*net.TCPAddr).Port, startTheme, startLang, version))
+	wv.Navigate(fmt.Sprintf("http://127.0.0.1:%d/index.html?lang=%s&v=%s", ln.Addr().(*net.TCPAddr).Port, startLang, version))
 	wv.Run()
 	flushSave()
 }
@@ -212,20 +207,10 @@ func handle(method, raw string) (any, error) {
 			scheduleSave(args[0])
 		}
 		return true, nil
-	case "setWallpaper":
-		b, err := base64.StdEncoding.DecodeString(arg[string](args, 0))
-		if err != nil || len(b) < 4 || len(b) > 6<<20 || b[0] != 0xFF || b[1] != 0xD8 { // ต้องเป็น JPEG
-			return false, nil
-		}
-		_ = os.MkdirAll(dataDir, 0o755)
-		return os.WriteFile(filepath.Join(dataDir, "wallpaper.jpg"), b, 0o644) == nil, nil
 	case "listBackups":
 		return listBackups(), nil
 	case "readBackup":
 		return readBackup(arg[string](args, 0)), nil
-	case "clearWallpaper":
-		_ = os.Remove(filepath.Join(dataDir, "wallpaper.jpg"))
-		return true, nil
 
 	case "query":
 		opts := arg[map[string]any](args, 1)

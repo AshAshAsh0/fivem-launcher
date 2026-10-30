@@ -17,16 +17,11 @@
     plus: '<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',
     play: '<svg viewBox="0 0 24 24"><path d="M7 5.5v13a1 1 0 0 0 1.5.9l10.4-6.5a1 1 0 0 0 0-1.8L8.5 4.6A1 1 0 0 0 7 5.5Z" fill="currentColor" stroke="none"/></svg>',
     bolt: '<svg viewBox="0 0 24 24"><path d="M13 3 5 14h6l-1 7 8-11h-6l1-7Z"/></svg>',
-    users: '<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M21.5 20a6.5 6.5 0 0 0-4-6"/></svg>',
-    user: '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.6"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>',
     search: '<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></svg>',
     refresh: '<svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg>',
-    heart: '<svg viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.3a4.3 4.3 0 0 1 7.5 2.5C19.5 15.4 12 20 12 20Z"/></svg>',
     more: '<svg viewBox="0 0 24 24"><circle cx="6" cy="12" r="1.3" fill="currentColor"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/><circle cx="18" cy="12" r="1.3" fill="currentColor"/></svg>',
     x: '<svg viewBox="0 0 24 24"><path d="m7 7 10 10M17 7 7 17"/></svg>',
     check: '<svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>',
-    signal: '<svg viewBox="0 0 24 24"><path d="M5 19v-3M10 19v-6M15 19v-9M20 19V6"/></svg>',
-    clock: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
     globe: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9s-1.3 6.3-3.8 9c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3Z"/></svg>',
     trash: '<svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V4.8c0-.4.4-.8.8-.8h4.4c.4 0 .8.4.8.8V7M6.5 7l.9 12.2c.1.8.7 1.3 1.5 1.3h6.2c.8 0 1.4-.5 1.5-1.3L17.5 7"/></svg>',
     edit: '<svg viewBox="0 0 24 24"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4Z"/></svg>',
@@ -40,22 +35,19 @@
     folder2: '<svg viewBox="0 0 24 24"><path d="M3.5 7.5A2 2 0 0 1 5.5 5.5h4l2 2h7a2 2 0 0 1 2 2v7.5a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2Z"/><path d="M12 11v5M9.5 13.5h5"/></svg>',
     filter: '<svg viewBox="0 0 24 24"><path d="M4 6.5h16M7 12h10M10 17.5h4"/></svg>',
     star: '<svg viewBox="0 0 24 24"><path d="m12 3.8 2.5 5.1 5.6.8-4 3.9 1 5.6-5.1-2.7-5 2.7 1-5.6-4.1-3.9 5.6-.8Z"/></svg>',
-    chev: '<svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>',
-    grip: '<svg viewBox="0 0 24 24"><circle cx="9" cy="6" r="1.2" fill="currentColor"/><circle cx="15" cy="6" r="1.2" fill="currentColor"/><circle cx="9" cy="12" r="1.2" fill="currentColor"/><circle cx="15" cy="12" r="1.2" fill="currentColor"/><circle cx="9" cy="18" r="1.2" fill="currentColor"/><circle cx="15" cy="18" r="1.2" fill="currentColor"/></svg>',
     sparkle: '<svg viewBox="0 0 24 24"><path d="M12 3c.6 4.6 2.4 6.4 7 7-4.6.6-6.4 2.4-7 7-.6-4.6-2.4-6.4-7-7 4.6-.6 6.4-2.4 7-7Z" fill="currentColor" stroke="none"/></svg>',
     mark: '<svg viewBox="0 0 40 40"><path d="M13 30 21.2 9.5c.5-1.3 2.3-1.3 2.8 0L32 30" fill="none" stroke="currentColor" stroke-width="4.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 30h7.5" stroke="currentColor" stroke-width="4.4" stroke-linecap="round"/><path d="M22.6 21.5v8.5" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/></svg>',
   };
-  const SQUIGGLE = '<svg viewBox="0 0 120 12" preserveAspectRatio="none"><path d="M2 7c8-6 14 4 22 0s14-6 22 0 14 4 22 0 14-6 22 0 14 4 22 0"/></svg>';
 
   // ---------- state ----------
-  const DEFAULT_SETTINGS = { bHidePrivate: false, bHideFull: false, bSort: 'players', wall: null, lang: null, theme: 'mono', after: 'minimize', refresh: 15, perf: 'balanced', cursor: 'theme', motion: 'full', fivemPath: null };
+  const DEFAULT_SETTINGS = { bHidePrivate: false, bHideFull: false, bSort: 'players', lang: null, after: 'minimize', refresh: 15, perf: 'balanced', motion: 'full', fivemPath: null };
+  // เก็บเฉพาะค่าที่ยังใช้อยู่ (ค่าที่เลิกใช้แล้ว เช่น ธีม/รูปพื้นหลัง/เคอร์เซอร์ จะถูกตัดทิ้ง)
+  const pickSettings = (o) => Object.fromEntries(Object.keys(DEFAULT_SETTINGS).map((k) => [k, o && o[k] !== undefined ? o[k] : DEFAULT_SETTINGS[k]]));
   const state = {
     servers: [],
     groups: [],
     settings: { ...DEFAULT_SETTINGS },
     page: 'browse',
-    filter: 'all',
-    q: '',
     refreshing: false,
     fivem: { path: '', found: false },
     visible: true,
@@ -123,7 +115,7 @@
         discord: str(x.discord), bannerUrl: str(x.bannerUrl, 2000), logoUrl: str(x.logoUrl, 2000),
         logo: img(x.logo), banner: img(x.banner),
         tone: isHex(x.tone) ? x.tone : 'auto', autoTone: isHex(x.autoTone) ? x.autoTone : null,
-        fav: !!x.fav, group: typeof x.group === 'string' ? x.group : null, lastPlayed: Number(x.lastPlayed) || null, addedAt: Number(x.addedAt) || Date.now(),
+        fav: undefined, group: typeof x.group === 'string' ? x.group : null, lastPlayed: Number(x.lastPlayed) || null, addedAt: Number(x.addedAt) || Date.now(),
         status: x.status && typeof x.status === 'object' ? { online: !!x.status.online, players: Number(x.status.players) || 0, max: Number(x.status.max) || 0, ping: x.status.ping == null ? null : Number(x.status.ping) || 0 } : null,
       };
     });
@@ -218,35 +210,11 @@
   }
 
   // ---------- theme / prefs ----------
-  // ย่อ + เบลอ + ลดความสว่างรูปครั้งเดียวตอนเลือก (แสดงผลเป็นรูปนิ่ง ไม่เบลอสดตลอดเวลา จึงไม่กินเครื่อง)
-  async function makeWallpaper(file) {
-    if (!file.type.startsWith('image/') || file.size > 40 << 20) throw new Error('type');
-    const url = URL.createObjectURL(file);
-    try {
-      const img = new Image();
-      img.src = url;
-      await img.decode();
-      const scale = Math.min(1, 1600 / img.naturalWidth);
-      const w = Math.max(320, Math.round(img.naturalWidth * scale)), h = Math.max(200, Math.round(img.naturalHeight * scale));
-      const c = document.createElement('canvas');
-      c.width = w; c.height = h;
-      const ctx = c.getContext('2d');
-      ctx.fillStyle = '#0b0c0e'; ctx.fillRect(0, 0, w, h);
-      ctx.filter = 'blur(12px) brightness(.8) saturate(1.2)';
-      ctx.drawImage(img, -40, -40, w + 80, h + 80);
-      return c.toDataURL('image/jpeg', 0.84).split(',')[1];
-    } finally { URL.revokeObjectURL(url); }
-  }
   function applyPrefs() {
     const r = document.documentElement;
-    state.settings.theme = 'hud'; // ธีมหลักถาวรของ Launcher
-    r.dataset.theme = 'hud';
+    r.dataset.theme = 'hud'; // ธีมเดียวของ Launcher
     r.dataset.motion = state.settings.motion;
-    r.dataset.cursor = state.settings.cursor;
     r.dataset.perf = state.settings.perf;
-    const wall = ''; // ปิดรูปพื้นหลังแบบกำหนดเอง
-    if (wall) { r.dataset.wall = ''; r.style.setProperty('--wall', `url("${wall}")`); }
-    else { delete r.dataset.wall; r.style.removeProperty('--wall'); }
     if (!state.settings.lang) state.settings.lang = window.I18N?.detect() || 'th';
     window.I18N?.set(state.settings.lang);
     api.setLang?.(state.settings.lang);
@@ -264,7 +232,6 @@
     const mo = Math.floor(d / 30);
     return en ? `${mo}mo ago` : `${mo} เดือนก่อน`;
   }
-  const lastHTML = (s) => s.lastPlayed ? `<span class="pill pill-mono js-last" title="เล่นล่าสุด" data-no-i18n>${I.clock} ${ago(s.lastPlayed)}</span>` : '';
 
   // ---------- navigation ----------
   function go(page) {
@@ -280,78 +247,13 @@
 
   function render(animate = false) {
     const v = $('#view');
-    if (state.page === 'settings') v.innerHTML = settingsHTML();
-    else if (state.page === 'browse') v.innerHTML = browseHTML();
-    else v.innerHTML = homeHTML(state.page === 'favorites');
+    v.innerHTML = state.page === 'settings' ? settingsHTML() : browseHTML();
     v.classList.toggle('enter', animate);
     if (animate) setTimeout(() => v.classList.remove('enter'), 700);
     bindView();
   }
 
-  // ---------- HOME ----------
-  function featured() {
-    if (!state.servers.length) return null;
-    const played = state.servers.filter((s) => s.lastPlayed).sort((a, b) => b.lastPlayed - a.lastPlayed);
-    return played[0] || state.servers[0];
-  }
-
-  // เซิร์ฟที่เลือกในลิสต์ (ไม่ได้เลือก = เซิร์ฟที่เล่นล่าสุด)
-  function selected(list) {
-    const pool = list || state.servers;
-    return (state.sel && pool.find((s) => s.id === state.sel)) || (pool.includes(featured()) ? featured() : pool[0]) || null;
-  }
-  function statsLine() {
-    const online = state.servers.filter((s) => st(s).online).length;
-    const players = state.servers.reduce((a, s) => a + (st(s).online ? st(s).players : 0), 0);
-    return `<span class="lp-stat"><i class="dot on"></i><b id="statOnline">${online}<small>/${state.servers.length}</small></b> ออนไลน์</span><span class="lp-stat">${I.users}<b id="statPlayers">${fmtNum(players)}</b> ผู้เล่น</span>`;
-  }
-  function detailHTML(list) {
-    const s = selected(list);
-    if (!s) {
-      return `<aside class="detail empty-detail">
-        <div class="dt-welcome">
-          <div class="em-mark">${I.mark}</div>
-          <h2 class="dt-name" style="text-transform:none">ยังไม่มีเซิร์ฟเวอร์</h2>
-          <p class="dt-desc">เพิ่มเซิร์ฟเวอร์แรกของคุณ แล้วเข้าเกมได้ในคลิกเดียว</p>
-          <button class="btn btn-dark btn-lg dt-wide" data-act="add">${I.plus} เพิ่มเซิร์ฟเวอร์</button>
-          <button class="btn dt-wide" data-act="go-browse">${I.search} ค้นหาเซิร์ฟ</button>
-          <button class="dt-link" data-act="open-fivem">เปิด FiveM เฉย ๆ</button>
-        </div>
-      </aside>`;
-    }
-    const t = toneOf(s), S = st(s), p = loadPct(s), logo = logoOf(s), banner = bannerOf(s);
-    const full = S.online && S.max && S.players >= S.max;
-    const tag = s.lastPlayed && s === featured() ? 'เล่นล่าสุด ✦' : s.category || 'เซิร์ฟของคุณ ✦';
-    return `<aside class="detail" style="${toneStyle(t)}" data-id="${s.id}">
-      <div class="dt-banner" style="background:linear-gradient(135deg, ${shade(t, 0.4)}, ${t})">
-        ${banner ? `<img src="${esc(banner)}" alt="">` : logo ? `<img src="${esc(logo)}" alt="" class="blur-logo">` : ''}
-        <span class="js-st">${S.online ? '<span class="pill pill-ok">ออนไลน์</span>' : '<span class="pill pill-off">ออฟไลน์</span>'}</span>
-        <button class="fav-btn ${s.fav ? 'on' : ''}" data-act="fav" data-id="${s.id}" title="เซิร์ฟโปรด">${I.heart}</button>
-      </div>
-      <div class="dt-head">
-        <div class="dt-logo" style="background:${t}">${logo ? `<img src="${esc(logo)}" alt="">` : `<span>${esc(initial(s.name))}</span>`}</div>
-        <div class="dt-title">
-          <span class="badge soft" ${s.category && tag === s.category ? 'data-no-i18n' : ''}>${esc(tag)}</span>
-          <h2 class="dt-name${[...String(s.name)].length > 26 ? ' xlong' : [...String(s.name)].length > 16 ? ' long' : ''}" title="${esc(s.name)}" data-no-i18n>${esc(s.name)}</h2>
-          <div class="dt-addr" data-no-i18n>${esc(s.display || s.address)}</div>
-        </div>
-      </div>
-      <div class="dt-stats">
-        <div class="dt-stat"><span class="lbl">ผู้เล่น</span><b><span class="js-pl">${fmtNum(S.players)}</span><small>/<span class="js-max">${fmtNum(S.max)}</span></small></b></div>
-        <div class="dt-stat"><span class="lbl">ปิง</span><b class="js-ping-n">${S.ping != null ? `${S.ping}<small>ms</small>` : '—'}</b></div>
-        <div class="dt-stat"><span class="lbl">ความจุ</span><b class="js-pct" style="color:${pctColor(p)}">${full ? 'เต็ม · ' : ''}${p}%</b></div>
-      </div>
-      <div class="bar"><i class="js-bar" style="width:${p}%;--barc:${barColor(p)}"></i></div>
-      ${s.desc ? `<p class="dt-desc" data-no-i18n>${esc(s.desc)}</p>` : ''}
-      <div class="dt-chips">${lastHTML(s)}${bellHTML(s)}</div>
-      <div class="dt-actions">
-        <button class="btn btn-tone btn-lg dt-play" data-act="play" data-id="${s.id}">${I.play} ${S.online ? 'เล่นเลย' : 'ลองเข้า'}</button>
-        <button class="more-btn" data-act="more" data-id="${s.id}" title="เพิ่มเติม">${I.more}</button>
-      </div>
-      <button class="dt-link" data-act="open-fivem">เปิด FiveM เฉย ๆ</button>
-    </aside>`;
-  }
-
+  // ---------- แจ้งเตือนเซิร์ฟ ----------
   // แจ้งเตือนเมื่อมีที่ว่าง (เซิร์ฟเต็ม) หรือเมื่อเซิร์ฟเปิด (เซิร์ฟออฟไลน์)
   function bellKind(s) {
     const S = st(s);
@@ -386,73 +288,7 @@
     refreshAll();
   };
 
-  function cardHTML(s, i) {
-    const t = toneOf(s), S = st(s), p = loadPct(s), logo = logoOf(s);
-    const drag = (state.page === 'home' || state.page === 'favorites') && state.filter !== 'recent' && state.page === 'home';
-    const sel = selected(filtered(state.page === 'favorites'));
-    return `<article class="srow ${S.online ? '' : 'offline'} ${sel && sel.id === s.id ? 'sel' : ''}" ${drag ? 'draggable="true"' : ''} style="${toneStyle(t)};--i:${i}" data-id="${s.id}" data-bell="${bellKind(s)}|${state.watching[s.id] || ''}">
-      <div class="sr-ic" style="background:${t}">${logo ? `<img src="${esc(logo)}" alt="">` : `<span>${esc(initial(s.name))}</span>`}<i class="sr-dot js-dot"></i></div>
-      <div class="sr-main">
-        <div class="sr-name" data-no-i18n>${esc(s.name)}${s.fav ? `<span class="sr-fav">${I.heart}</span>` : ''}</div>
-        <div class="sr-sub"><span data-no-i18n>${esc(s.display || s.address)}</span>${state.watching[s.id] ? '<span class="sr-bell">🔔</span>' : ''}</div>
-      </div>
-      <div class="sr-pl">
-        <div class="sr-num"><b class="js-pl">${fmtNum(S.players)}</b><span>/<span class="js-max">${fmtNum(S.max)}</span></span></div>
-        <div class="bar"><i class="js-bar" style="width:${p}%;--barc:${barColor(p)}"></i></div>
-      </div>
-      <span class="sr-ping js-ping">${S.ping != null ? `${S.ping}ms` : '—'}</span>
-      <button class="sr-play" data-act="play" data-id="${s.id}" title="${S.online ? 'เล่น' : 'ลองเข้า'}">${I.play}</button>
-      <button class="more-btn" data-act="more" data-id="${s.id}" title="เพิ่มเติม">${I.more}</button>
-    </article>`;
-  }
-
-  function filtered(favOnly) {
-    const q = state.q.trim().toLowerCase();
-    const recent = !favOnly && state.filter === 'recent';
-    const out = state.servers.filter((s) => {
-      if (recent && !s.lastPlayed) return false;
-      if (favOnly && !s.fav) return false;
-      if (!favOnly && state.filter === 'online' && !st(s).online) return false;
-      if (!favOnly && state.filter === 'fav' && !s.fav) return false;
-      if (q && ![s.name, s.display, s.address, s.category, s.desc].join(' ').toLowerCase().includes(q)) return false;
-      return true;
-    });
-    return recent ? out.sort((a, b) => b.lastPlayed - a.lastPlayed) : out;
-  }
-
-  function gridHTML(favOnly) {
-    const list = filtered(favOnly);
-    if (!state.servers.length) {
-      return `<div class="empty"><div><div class="em-mark">${I.mark}</div><b>ลิสต์ยังว่างอยู่</b>กด “เพิ่มเซิร์ฟเวอร์” เพื่อเริ่มต้น หรือหาเซิร์ฟจากรายชื่อของ FiveM<div style="margin-top:16px"><button class="btn" data-act="go-browse">${I.search} ค้นหาเซิร์ฟ</button></div></div></div>`;
-    }
-    if (!list.length && !favOnly && state.filter === 'recent' && !state.q.trim()) {
-      return `<div class="empty"><div><div class="em-mark">${I.clock}</div><b>ยังไม่ได้เล่นเซิร์ฟไหนเลย</b>กดเล่นเซิร์ฟสักตัว แล้วจะขึ้นที่นี่ เรียงจากเล่นล่าสุด</div></div>`;
-    }
-    if (!list.length) {
-      return `<div class="empty"><div><div class="em-mark">${favOnly ? I.heart : I.search}</div><b>${favOnly && !state.q ? 'ยังไม่มีเซิร์ฟโปรด' : 'ไม่พบเซิร์ฟเวอร์'}</b>${favOnly && !state.q ? 'กดหัวใจบนการ์ดเพื่อเพิ่มเข้าลิสต์นี้' : 'ลองเปลี่ยนคำค้นหรือตัวกรองดู'}</div></div>`;
-    }
-    if (favOnly || !state.groups.length || state.filter === 'recent') return `<div class="grid rows" data-gid="">${list.map(cardHTML).join('')}</div>`;
-    // แบ่งตามกลุ่ม
-    const ids = new Set(state.groups.map((g) => g.id));
-    const searching = !!state.q.trim() || state.filter !== 'all';
-    let i = 0;
-    const section = (gid, name, items, g) => {
-      if (searching && !items.length) return '';
-      const cards = items.map((s) => cardHTML(s, i++)).join('');
-      return `<section class="grp ${g?.collapsed ? 'collapsed' : ''}" data-gid="${gid}">
-        <div class="grp-head" data-gid="${gid}">
-          ${g ? `<button class="grp-tog" data-grp="toggle" data-gid="${gid}" title="ย่อ/ขยายกลุ่ม">${I.chev}</button>` : ''}
-          <span class="grp-name" ${g ? 'data-no-i18n' : ''}>${esc(name)}</span><span class="grp-count">${items.length}</span>
-          ${g ? `<button class="grp-more" data-grp="menu" data-gid="${gid}" title="จัดการกลุ่ม">${I.more}</button>` : ''}
-        </div>
-        <div class="grid rows" data-gid="${gid}">${cards || '<div class="grp-empty">ลากเซิร์ฟมาวางที่นี่</div>'}</div>
-      </section>`;
-    };
-    return state.groups.map((g) => section(g.id, g.name, list.filter((s) => s.group === g.id), g)).join('')
-      + section('', 'ไม่ได้จัดกลุ่ม', list.filter((s) => !s.group || !ids.has(s.group)), null);
-  }
-
-  // ---------- กลุ่ม & ลากเรียง ----------
+  // ---------- กลุ่ม ----------
   const groupById = (id) => state.groups.find((g) => g.id === id);
 
   function groupModal(g, thenMove) {
@@ -500,237 +336,38 @@
     });
   }
 
-  // ย้ายเซิร์ฟ id ไปไว้ก่อน/หลัง targetId (หรือท้ายกลุ่ม gid ถ้าไม่มี target)
-  function moveServer(id, targetId, after, gid) {
-    const s = byId(id);
-    endDrag();
-    if (!s || id === targetId) return;
-    const arr = state.servers.filter((x) => x !== s);
-    if (targetId) {
-      const t = byId(targetId);
-      s.group = t.group && groupById(t.group) ? t.group : null;
-      const ti = arr.indexOf(t);
-      arr.splice(after ? ti + 1 : ti, 0, s);
-    } else {
-      s.group = gid || null;
-      let last = -1;
-      arr.forEach((x, i) => { if ((x.group && groupById(x.group) ? x.group : '') === (gid || '')) last = i; });
-      arr.splice(last + 1, 0, s);
-    }
-    state.servers = arr;
-    persist();
-    updateHomeParts();
-  }
-
-  let dragId = null;
-  // จบสถานะลาก (ต้องเรียกเองด้วย เพราะการ์ดที่ถูกลากอาจถูกวาดใหม่ก่อน dragend จะมาถึง)
-  function endDrag() {
-    dragId = null; dragY = -1;
-    document.body.classList.remove('dnd');
-    $$('.dragging').forEach((e) => e.classList.remove('dragging'));
-    clearDropMarks();
-  }
-  document.addEventListener('dragend', endDrag, true);
-  document.addEventListener('drop', () => setTimeout(endDrag, 0), true);
-  // เลื่อนหน้าอัตโนมัติเมื่อลากการ์ดไปใกล้ขอบบน/ล่าง (ระหว่างลากบน Windows ใช้ล้อเมาส์ไม่ได้)
-  let dragY = -1, autoScrolling = false;
-  function autoScrollStep() {
-    const sc = $('#gridWrap') || $('#scroll');
-    if (!dragId || !sc || dragY < 0) { autoScrolling = false; return; }
-    const r = sc.getBoundingClientRect(), edge = 90;
-    let v = 0;
-    if (dragY < r.top + edge) v = -Math.ceil(((r.top + edge - dragY) / edge) * 22);
-    else if (dragY > r.bottom - edge) v = Math.ceil(((dragY - (r.bottom - edge)) / edge) * 22);
-    if (!v) { autoScrolling = false; return; }
-    sc.scrollTop += Math.max(-30, Math.min(30, v));
-    requestAnimationFrame(autoScrollStep);
-  }
-  document.addEventListener('dragover', (e) => {
-    if (!dragId) return;
-    dragY = e.clientY;
-    if (!autoScrolling) { autoScrolling = true; requestAnimationFrame(autoScrollStep); }
-  }, true);
-  function clearDropMarks() {
-    $$('.drop-before, .drop-after, .drop-into').forEach((e) => e.classList.remove('drop-before', 'drop-after', 'drop-into'));
-  }
-  function bindDnD() {
-    $$('.srow[draggable]').forEach((c) => {
-      c.addEventListener('dragstart', (e) => {
-        if (e.target.closest('button')) { e.preventDefault(); return; }
-        dragId = c.dataset.id;
-        e.dataTransfer.effectAllowed = 'move';
-        e.dataTransfer.setData('application/x-fl-server', dragId);
-        c.style.transform = '';
-        document.body.classList.add('dnd');
-        setTimeout(() => c.classList.add('dragging'), 0);
-      });
-      c.addEventListener('dragend', () => {
-        dragId = null;
-        c.classList.remove('dragging');
-        document.body.classList.remove('dnd');
-        clearDropMarks();
-      });
-      c.addEventListener('dragover', (e) => {
-        if (!dragId || dragId === c.dataset.id) return;
-        e.preventDefault(); e.stopPropagation();
-        const r = c.getBoundingClientRect();
-        const after = e.clientY > r.top + r.height / 2; // ลิสต์แนวตั้ง: ครึ่งล่าง = วางต่อท้าย
-        clearDropMarks();
-        c.classList.add(after ? 'drop-after' : 'drop-before');
-      });
-      c.addEventListener('drop', (e) => {
-        if (!dragId) return;
-        e.preventDefault(); e.stopPropagation();
-        const after = c.classList.contains('drop-after');
-        const id = dragId;
-        clearDropMarks();
-        moveServer(id, c.dataset.id, after);
-      });
-    });
-    $$('.grid[data-gid], .grp-head').forEach((z) => {
-      z.addEventListener('dragover', (e) => {
-        if (!dragId) return;
-        e.preventDefault();
-        clearDropMarks();
-        (z.classList.contains('grid') ? z : z.nextElementSibling)?.classList.add('drop-into');
-      });
-      z.addEventListener('drop', (e) => {
-        if (!dragId) return;
-        e.preventDefault();
-        const id = dragId;
-        clearDropMarks();
-        moveServer(id, null, true, z.dataset.gid || '');
-      });
-    });
-    $$('[data-grp="toggle"]').forEach((b) => (b.onclick = () => {
-      const g = groupById(b.dataset.gid);
-      if (!g) return;
-      g.collapsed = !g.collapsed;
-      b.closest('.grp').classList.toggle('collapsed', g.collapsed);
-      persist();
-    }));
-    $$('[data-grp="menu"]').forEach((b) => (b.onclick = (e) => { e.stopPropagation(); const g = groupById(b.dataset.gid); if (g) groupMenu(b, g); }));
-  }
-
-  function homeHTML(favOnly) {
-    const list = filtered(favOnly);
-    return `<div class="home">
-      <section class="list-pane">
-        <div class="lp-head">
-          <div class="lp-title">
-            <h1 class="h2">${favOnly ? (isEN() ? 'Favorite <span class="sq">servers</span>' : 'เซิร์ฟ<span class="sq">โปรด</span>') : (isEN() ? 'My <span class="sq">servers</span>' : 'เซิร์ฟ<span class="sq">ของฉัน</span>')}</h1>
-            <div class="lp-stats" id="lpStats">${statsLine()}</div>
-          </div>
-          <div class="lp-actions">
-            ${favOnly ? '' : `<button class="icon-btn" data-act="new-group" title="สร้างกลุ่ม">${I.folder2}</button>`}
-            <button class="icon-btn ${state.refreshing ? 'spin' : ''}" data-act="refresh" id="btnRefresh" title="รีเฟรชสถานะ">${I.refresh}</button>
-            <button class="btn btn-dark" data-act="add">${I.plus} เพิ่ม</button>
-          </div>
-        </div>
-        <div class="lp-tools">
-          <label class="search">${I.search}<input id="q" placeholder="หาเซิร์ฟเวอร์..." value="${esc(state.q)}" spellcheck="false"><span class="kbd">Ctrl F</span></label>
-        </div>
-        ${favOnly ? '' : `<div class="seg sm" id="filters">
-          <button data-f="all" class="${state.filter === 'all' ? 'on' : ''}">ทั้งหมด</button>
-          <button data-f="online" class="${state.filter === 'online' ? 'on' : ''}">ออนไลน์</button>
-          <button data-f="fav" class="${state.filter === 'fav' ? 'on' : ''}">โปรด</button>
-          <button data-f="recent" class="${state.filter === 'recent' ? 'on' : ''}">ล่าสุด</button>
-        </div>`}
-        <div class="lp-list" id="gridWrap">${gridHTML(favOnly)}</div>
-      </section>
-      <div id="detailWrap">${detailHTML(list.length ? list : (favOnly ? [] : state.servers))}</div>
-    </div>`;
-  }
-
-  // อัปเดตเฉพาะตัวเลข/สถานะ โดยไม่สร้างการ์ดใหม่ (ไม่โหลดรูป/GIF ซ้ำ ไม่กระตุก)
-  function patchStatus(root, s, isCard) {
-    const S = st(s), p = loadPct(s), full = S.online && S.max && S.players >= S.max;
-    const set = (sel, fn) => { const el = root.querySelector(sel); if (el) fn(el); };
-    set('.js-st', (el) => { el.innerHTML = S.online ? '<span class="pill pill-ok">ออนไลน์</span>' : '<span class="pill pill-off">ออฟไลน์</span>'; });
-    set('.js-pl', (el) => { el.textContent = fmtNum(S.players); });
-    set('.js-max', (el) => { el.textContent = fmtNum(S.max); });
-    if (s.lastPlayed) set('.js-last', (el) => { el.innerHTML = `${I.clock} ${ago(s.lastPlayed)}`; });
-    set('.js-pct', (el) => { el.textContent = `${isCard && full ? 'เต็ม · ' : ''}${p}%`; el.style.color = pctColor(p); });
-    set('.js-bar', (el) => { el.style.width = `${p}%`; el.style.setProperty('--barc', barColor(p)); });
-    set('.js-ping', (el) => { el.textContent = S.ping != null ? `${S.ping}ms` : '—'; });
-    set('.js-ping-n', (el) => { el.innerHTML = S.ping != null ? `${S.ping}<small>ms</small>` : '—'; });
-    if (isCard) root.classList.toggle('offline', !S.online);
-  }
+  // อัปเดตเฉพาะตัวเลข/สถานะของเซิร์ฟของฉัน โดยไม่สร้างแถวใหม่ (ไม่โหลดรูปซ้ำ ไม่กระตุก)
   function patchAll() {
-    if (state.page === 'browse') {
-      $$('.b-row[data-mid]').forEach((r) => {
-        const s = byId(r.dataset.mid); if (!s) return;
-        const S = st(s);
-        patchStatus(r, s, true);
-        const c = r.querySelector('.js-stc'); if (c) c.innerHTML = stChip(S.online, S.players, S.max, false);
-        if (!S.online) { const pl = r.querySelector('.js-pl'); if (pl) pl.textContent = '—'; const b = r.querySelector('.js-bar'); if (b) b.style.width = '0%'; }
-      });
-      return;
-    }
-    if (state.page === 'settings') return;
-    const rows = $$('.srow');
-    const fav = state.page === 'favorites';
-    const list = filtered(fav);
-    const want = list.map((s) => s.id).join(',');
-    const have = rows.map((c) => c.dataset.id).join(',');
-    const d = selected(list.length ? list : fav ? [] : state.servers);
-    const dId = $('.detail')?.dataset.id || null;
-    if (want !== have || (d?.id || null) !== dId) return updateHomeParts();
-    if (rows.some((c) => { const s = byId(c.dataset.id); return s && c.dataset.bell !== `${bellKind(s)}|${state.watching[s.id] || ''}`; })) return updateHomeParts();
-    rows.forEach((c) => patchStatus(c, byId(c.dataset.id), true));
-    const det = $('.detail[data-id]');
-    if (det && d) patchStatus(det, d, false);
-    if ($('#lpStats')) $('#lpStats').innerHTML = statsLine();
-    $('#btnRefresh')?.classList.toggle('spin', state.refreshing);
+    if (state.page !== 'browse') return;
+    $$('.b-row[data-mid]').forEach((r) => {
+      const s = byId(r.dataset.mid); if (!s) return;
+      const S = st(s), p = loadPct(s);
+      const set = (sel, fn) => { const el = r.querySelector(sel); if (el) fn(el); };
+      r.classList.toggle('offline', !S.online);
+      set('.js-pl', (el) => { el.textContent = S.online ? fmtNum(S.players) : '—'; });
+      set('.js-max', (el) => { el.textContent = fmtNum(S.max); });
+      set('.js-bar', (el) => { el.style.width = `${S.online ? p : 0}%`; el.style.setProperty('--barc', barColor(p)); });
+      set('.js-stc', (el) => { el.innerHTML = stChip(S.online, S.players, S.max, false); });
+    });
   }
-
+  // วาดรายชื่อใหม่ (คงตำแหน่งเลื่อน) และแผงเซิร์ฟของฉันที่เปิดอยู่
   function updateHomeParts() {
-    if (state.page === 'browse') {
-      const col = $('#bList')?.closest('.b-col'), y = col ? col.scrollTop : 0;
-      drawBrowse();
-      if (col) col.scrollTop = y;
-      const sel = state.browse.sel;
-      if (sel && sel.startsWith('m:')) { const m = byId(sel.slice(2)); m ? mineSide(m) : closeServer(); }
-      return;
-    }
-    if (state.page === 'settings') return;
-    const fav = state.page === 'favorites';
-    const list = filtered(fav);
-    const gw = $('#gridWrap');
-    if (gw) { const y = gw.scrollTop; gw.innerHTML = gridHTML(fav); gw.scrollTop = y; }
-    const dw = $('#detailWrap');
-    if (dw) dw.innerHTML = detailHTML(list.length ? list : fav ? [] : state.servers);
-    if ($('#lpStats')) $('#lpStats').innerHTML = statsLine();
-    $('#btnRefresh')?.classList.toggle('spin', state.refreshing);
-    bindCards();
-  }
-  // เลือกเซิร์ฟในลิสต์ → อัปเดตแผงรายละเอียดด้านขวา (ไม่สร้างลิสต์ใหม่)
-  function selectServer(id) {
-    if (state.sel === id && $('.detail')?.dataset.id === id) return;
-    state.sel = id;
-    $$('.srow').forEach((r) => r.classList.toggle('sel', r.dataset.id === id));
-    const fav = state.page === 'favorites';
-    const list = filtered(fav);
-    const dw = $('#detailWrap');
-    if (dw) { dw.innerHTML = detailHTML(list.length ? list : fav ? [] : state.servers); bindCards(true); }
+    if (state.page !== 'browse') return;
+    const col = $('#bList')?.closest('.b-col'), y = col ? col.scrollTop : 0;
+    drawBrowse();
+    if (col) col.scrollTop = y;
+    const sel = state.browse.sel;
+    if (sel && sel.startsWith('m:')) { const m = byId(sel.slice(2)); m ? mineSide(m) : closeServer(); }
   }
 
   // ---------- BROWSE (รายชื่อเซิร์ฟสาธารณะ) ----------
   const joinOf = (id) => `cfx.re/join/${id}`;
   // ใช้ที่อยู่ตรงของเซิร์ฟถ้ามี (ไม่ต้องผ่านระบบลิงก์ cfx.re) ไม่งั้นใช้ cfx.re/join
   const targetOf = (s) => s.endpoint || joinOf(s.id);
-  const norm = (x) => String(x || '').toLowerCase().replace(/^https?:\/\//, '').replace(/:30120$/, '').replace(/\/+$/, '');
-  const inList = (s) => {
-    const keys = [norm(joinOf(s.id)), s.endpoint ? norm(s.endpoint) : null].filter(Boolean);
-    return state.servers.some((x) => keys.includes(norm(x.connect)) || keys.includes(norm(x.address)) || x.cfxId === s.id);
-  };
+
 
   function browseHTML() {
     const B = state.browse;
-    const title = isEN()
-      ? `<h1 class="h1">Choose a <span class="sq">server${SQUIGGLE}</span></h1>`
-      : `<h1 class="h1">เลือก<span class="sq">เซิร์ฟ${SQUIGGLE}</span></h1>`;
-    void title;
     return `
       <div class="toolbar">
         <label class="search ${B.q ? 'has' : ''}" id="bSearch">${I.search}<input id="bq" placeholder="ค้นหาชื่อเซิร์ฟ หรือวาง IP / ลิงก์ cfx.re" value="${esc(B.q)}" spellcheck="false"><button class="q-clear" id="bqClear" title="ล้างคำค้นหา">${I.x}</button></label>
@@ -971,7 +608,7 @@
     const rec = {
       id: uid(), address: addr, connect: addr, display: addr.replace(/^https?:\/\//, ''), cfxId: s.id,
       name: s.name, category: '', desc: s.desc || '', bannerUrl: '', logoUrl: '', discord: s.discord || '',
-      tone: 'auto', autoTone: null, logo: null, banner: s.banner || null, fav: false, group: null,
+      tone: 'auto', autoTone: null, logo: null, banner: s.banner || null, group: null,
       addedAt: Date.now(), lastPlayed: null, status: null,
     };
     if (s.icon) {
@@ -1059,41 +696,7 @@
     drawBrowse();
   }
 
-  function privateInfo(s) {
-    modal(`
-      <div class="modal sm">
-        <div class="modal-head"><h2>🔒 เซิร์ฟส่วนตัว</h2><button class="x-btn" data-close>${I.x}</button></div>
-        <div class="modal-body">
-          <p class="confirm-text"><b style="color:var(--ink)">${esc(s.name)}</b> ตั้งค่าเป็นเซิร์ฟส่วนตัว จึงเข้าจากรายชื่อของ FiveM ไม่ได้ (ปุ่ม Connect ในตัว FiveM เองก็กดไม่ได้เช่นกัน)</p>
-          <p class="confirm-text" style="margin-top:12px">ต้องเข้าผ่านช่องทางของเซิร์ฟเอง เช่น Launcher เฉพาะของเซิร์ฟ หรือลิงก์/IP ที่แจกใน Discord ของเซิร์ฟ — ถ้ามีที่อยู่แล้ว วาง IP หรือลิงก์นั้นในช่องค้นหาด้านบน แล้วกด “เข้าเลย” ได้ทันที</p>
-        </div>
-        <div class="modal-foot"><button class="btn btn-dark" data-close>เข้าใจแล้ว</button></div>
-      </div>`);
-  }
 
-  const adding = new Set();
-  async function addFromBrowse(s) {
-    if (inList(s) || adding.has(s.id)) return;
-    adding.add(s.id);
-    const t = targetOf(s);
-    const rec = {
-      id: uid(), address: t, connect: t, display: t.replace(/^https?:\/\//, ''), cfxId: s.id,
-      name: s.name, category: '', desc: '', bannerUrl: '', logoUrl: '', discord: '',
-      tone: 'auto', autoTone: null, logo: null, banner: s.banner || null, fav: false,
-      addedAt: Date.now(), lastPlayed: null,
-      status: { online: true, players: s.players, max: s.max, ping: null, checkedAt: Date.now() },
-    };
-    if (s.icon) {
-      try { rec.logo = (await api.fetchImage(s.icon)) || null; } catch {}
-      if (rec.logo) rec.autoTone = await dominantColor(rec.logo);
-    }
-    state.servers.push(rec);
-    adding.delete(s.id);
-    persist();
-    toast(`เพิ่ม ${s.name} แล้ว`);
-    drawBrowse();
-    try { await refreshOne(rec, true); persist(); } catch {}
-  }
 
   function bindBrowse() {
     const B = state.browse;
@@ -1169,9 +772,7 @@
         <div class="metrics"><div class="metric">CPU <b id="mCpu">—</b></div><div class="metric">RAM <b id="mRam">—</b></div></div>
       </section>
 
-      <section class="sect"><h3>เคอร์เซอร์เมาส์</h3><p class="d">เปลี่ยนรูปเมาส์ตามธีมที่เลือก</p>${seg('cursor', [['theme', 'ตามธีม'], ['normal', 'แบบปกติ']], S.cursor)}</section>
-
-      <section class="sect"><h3>เอฟเฟกต์การเคลื่อนไหว</h3><p class="d">เต็ม = เลื่อนหน้าจอแบบนุ่ม การ์ดเอียงตามเมาส์ และแอนิเมชันครบ / ลด = ปิดการเคลื่อนไหวทั้งหมด เหมาะกับคนที่เวียนหัวง่าย</p>${seg('motion', [['full', 'เต็ม (ลื่นสุด)'], ['reduced', 'ลด']], S.motion)}</section>
+      <section class="sect"><h3>เอฟเฟกต์การเคลื่อนไหว</h3><p class="d">เต็ม = แอนิเมชันและแสงวิ่งบนปุ่มเล่นครบ / ลด = ปิดการเคลื่อนไหวทั้งหมด เหมาะกับคนที่เวียนหัวง่าย</p>${seg('motion', [['full', 'เต็ม (ลื่นสุด)'], ['reduced', 'ลด']], S.motion)}</section>
 
       <section class="sect">
         <h3>ล้างแคช FiveM</h3>
@@ -1267,42 +868,8 @@
 
   // ---------- binding ----------
   function bindView() {
-    $$('[data-act="go-browse"]').forEach((b) => (b.onclick = () => go('browse')));
     if (state.page === 'browse') { bindBrowse(); return; }
-    $$('[data-act="add"]').forEach((b) => (b.onclick = () => openServerModal()));
-    $$('[data-act="open-fivem"]').forEach((b) => (b.onclick = openFiveMOnly));
-    $('[data-act="refresh"]')?.addEventListener('click', () => refreshAll(true));
-    $('[data-act="new-group"]')?.addEventListener('click', () => groupModal(null));
-    const q = $('#q');
-    if (q) q.addEventListener('input', () => { state.q = q.value; updateHomeParts(); });
-    $$('#filters button').forEach((b) => b.addEventListener('click', () => {
-      state.filter = b.dataset.f;
-      $$('#filters button').forEach((x) => x.classList.toggle('on', x === b));
-      updateHomeParts();
-    }));
-    bindCards();
-
     if (state.page === 'settings') {
-      $$('[data-theme-pick]').forEach((b) => b.addEventListener('click', () => setSetting('theme', b.dataset.themePick)));
-      $('[data-act="pick-wall"]')?.addEventListener('click', () => $('#wallFile').click());
-      $('[data-act="use-hud"]')?.addEventListener('click', () => setSetting('theme', 'hud'));
-      $('[data-act="clear-wall"]')?.addEventListener('click', async () => {
-        await api.clearWallpaper?.();
-        setSetting('wall', null);
-        toast('ลบรูปพื้นหลังแล้ว');
-      });
-      $('#wallFile')?.addEventListener('change', async (e) => {
-        const f = e.target.files && e.target.files[0];
-        e.target.value = '';
-        if (!f) return;
-        try {
-          const b64 = await makeWallpaper(f);
-          if (!(await api.setWallpaper(b64))) throw new Error('save');
-          if (state.settings.theme !== 'hud') state.settings.theme = 'hud';
-          setSetting('wall', Date.now());
-          toast('ตั้งรูปพื้นหลังแล้ว');
-        } catch { toast('ใช้รูปนี้ไม่ได้ ลองรูปอื่นดูนะ', 'err'); }
-      });
       $$('[data-setting]').forEach((g) => g.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => {
         const key = g.dataset.setting;
         const val = key === 'refresh' ? Number(b.dataset.v) : b.dataset.v;
@@ -1323,7 +890,7 @@
         if (d.error || !Array.isArray(d.servers)) return toast('ไฟล์ไม่ถูกต้อง', 'err');
         state.servers = cleanServers(d.servers);
         state.groups = cleanGroups(d.groups, state.servers);
-        state.settings = { ...DEFAULT_SETTINGS, ...(d.settings || {}) };
+        state.settings = pickSettings(d.settings);
         applyPrefs(); persist(); render(); restartAuto(); refreshAll();
         toast(`นำเข้า ${d.servers.length} เซิร์ฟเวอร์แล้ว`);
       });
@@ -1370,7 +937,7 @@
     if (key === 'refresh' || key === 'perf') restartAuto();
     if (key === 'perf') api.setPerfMode(val);
     if (key === 'lang') {
-      try { const u = new URL(location.href); u.searchParams.set('lang', val); u.searchParams.set('theme', state.settings.theme); history.replaceState(null, '', u); } catch {}
+      try { const u = new URL(location.href); u.searchParams.set('lang', val); history.replaceState(null, '', u); } catch {}
       try { sessionStorage.setItem('fl-page', state.page); } catch {}
       setTimeout(() => location.reload(), 450); // รอให้บันทึกการตั้งค่าก่อน
       return;
@@ -1379,29 +946,6 @@
   }
 
   function openFiveMOnly() { api.openFiveM(); toast('กำลังเปิด FiveM', 'info'); }
-  function bindCards(detailOnly = false) {
-    const scope = detailOnly ? $('#detailWrap') : document;
-    if (!scope) return;
-    $$('[data-act="play"]', scope).forEach((b) => (b.onclick = (e) => { e.stopPropagation(); play(b.dataset.id); }));
-    $$('[data-act="fav"]', scope).forEach((b) => (b.onclick = (e) => {
-      e.stopPropagation();
-      const s = byId(b.dataset.id);
-      s.fav = !s.fav;
-      persist();
-      updateHomeParts();
-    }));
-    $$('[data-act="more"]', scope).forEach((b) => (b.onclick = (e) => { e.stopPropagation(); openMenu(b, byId(b.dataset.id)); }));
-    $$('[data-act="watch"]', scope).forEach((b) => (b.onclick = (e) => { e.stopPropagation(); toggleWatch(byId(b.dataset.id)); }));
-    $$('#detailWrap [data-act="add"]').forEach((b) => (b.onclick = () => openServerModal()));
-    $$('#detailWrap [data-act="go-browse"]').forEach((b) => (b.onclick = () => go('browse')));
-    $$('#detailWrap [data-act="open-fivem"]').forEach((b) => (b.onclick = openFiveMOnly));
-    if (detailOnly) return;
-    $$('.srow').forEach((r) => {
-      r.onclick = () => selectServer(r.dataset.id);
-      r.ondblclick = (e) => { if (!e.target.closest('button')) play(r.dataset.id); };
-    });
-    bindDnD();
-  }
 
   const byId = (id) => state.servers.find((s) => s.id === id);
 
@@ -1578,7 +1122,7 @@
       const checked = d.fetched && d.checkedAddr === address;
       const changed = !existing || address !== existing.address;
       const rec = {
-        ...(existing || { id: uid(), category: '', desc: '', bannerUrl: '', logoUrl: '', discord: '', tone: 'auto', fav: false, group: null, addedAt: Date.now(), lastPlayed: null }),
+        ...(existing || { id: uid(), category: '', desc: '', bannerUrl: '', logoUrl: '', discord: '', tone: 'auto', group: null, addedAt: Date.now(), lastPlayed: null }),
         address,
         connect: checked ? d.connect || address : changed ? address : existing.connect,
         display: checked ? d.display || address : changed ? address : existing.display,
@@ -1701,7 +1245,7 @@
     const bug = kind === 'bug';
     const title = bug ? '[ปัญหา] ' : '[ฟีเจอร์] ';
     const body = bug
-      ? `**เกิดอะไรขึ้น**\n\n\n**ทำอะไรก่อนเกิดปัญหา**\n1. \n\n**ภาพหน้าจอ (ถ้ามี)**\n\n\n---\nเวอร์ชัน: ${state.version}\nระบบ: ${state.os}\nภาษา: ${state.settings.lang} · ธีม: ${state.settings.theme}`
+      ? `**เกิดอะไรขึ้น**\n\n\n**ทำอะไรก่อนเกิดปัญหา**\n1. \n\n**ภาพหน้าจอ (ถ้ามี)**\n\n\n---\nเวอร์ชัน: ${state.version}\nระบบ: ${state.os}\nภาษา: ${state.settings.lang}`
       : `**อยากได้อะไร**\n\n\n**ใช้ทำอะไร / ช่วยอะไร**\n\n\n---\nเวอร์ชัน: ${state.version}`;
     api.openExternal(`https://github.com/${CFG.updateRepo}/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}`);
   }
@@ -1789,7 +1333,7 @@
     if (saved) {
       state.servers = cleanServers(saved.servers);
       state.groups = cleanGroups(saved.groups, state.servers);
-      state.settings = { ...DEFAULT_SETTINGS, ...(saved.settings || {}) };
+      state.settings = pickSettings(saved.settings);
       savedCount = Array.isArray(saved.servers) ? saved.servers.length : 0;
     }
     applyPrefs();

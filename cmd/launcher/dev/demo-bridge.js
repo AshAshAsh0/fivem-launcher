@@ -1,5 +1,5 @@
-// โหมดพรีวิวบนเบราว์เซอร์ (ไม่ได้รันผ่าน Electron) — ใช้ข้อมูลตัวอย่าง
-// ตอนรันจริงใน Electron จะมี window.api จาก preload.js อยู่แล้ว ไฟล์นี้จะไม่ทำอะไร
+// โหมดพรีวิวบนเบราว์เซอร์ — ใช้ข้อมูลตัวอย่างแทนตัวโปรแกรม
+// ใช้ทดสอบหน้าตาบนเบราว์เซอร์เท่านั้น (ไม่ได้รวมในตัวโปรแกรม) — ดู dev/serve.py
 (() => {
   if (window.api) return;
 
@@ -77,11 +77,8 @@
     },
     async checkUpdate() { return { available: true, version: '2.2.0', url: '#' }; }, async installUpdate() { await wait(800); throw new Error('preview'); },
     async exportData() { return false; }, async importData() { return null; },
-    async setWallpaper(b64) { try { localStorage.setItem('fl-demo-wall', 'data:image/jpeg;base64,' + b64); return true; } catch { return false; } },
     img: (u) => u,
     async listBackups() { return [{ name: 'launcher-data-20261030-162217.json', time: Date.now() - 600000, servers: 3, names: ['NEON CITY RP', 'WHITE CITY', 'SHARK COMMUNITY'] }]; },
     async readBackup() { return { version: 1, servers: [{ id: 'rest1', name: 'RESTORED CITY', address: 'cfx.re/join/rest01' }, { id: 'rest2', name: 'RESTORED TOWN', address: '5.6.7.8:30120' }], groups: [] }; },
-    async clearWallpaper() { try { localStorage.removeItem('fl-demo-wall'); } catch {} return true; },
-    wallpaperURL() { try { return localStorage.getItem('fl-demo-wall') || ''; } catch { return ''; } },
   };
 })();
