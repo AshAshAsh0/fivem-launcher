@@ -15,6 +15,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"unsafe"
 
 	webview2 "github.com/jchv/go-webview2"
 	"golang.org/x/sys/windows"
@@ -24,7 +25,7 @@ import (
 var webFS embed.FS
 
 // version ถูกแทนค่าตอน build ด้วย -ldflags "-X main.version=..."
-var version = "2.4.0"
+var version = "2.4.1"
 
 const (
 	appTitle = "FiveM Launcher"
@@ -40,6 +41,7 @@ var (
 	saveTmr  *time.Timer
 	pending  []byte
 	custom   string
+	customMu sync.Mutex
 	cacheDir = []string{"crashes", "data/cache", "data/server-cache", "data/server-cache-priv"}
 )
 
@@ -67,7 +69,14 @@ func main() {
 
 	webview2.FramelessPopup = true
 	lastMin := false
-	webview2.OnMessage = handleTrayMessage
+	webview2.OnMessage = func(msg, wp, lp uintptr) bool {
+		if msg == 0x02E0 { // WM_DPICHANGED: ย้ายไปจอที่ DPI ต่างกัน ปรับขนาดหน้าต่างตามที่ Windows แนะนำ
+			r := (*[4]int32)(unsafe.Pointer(lp))
+			pSetWindowPos.Call(hwnd, 0, uintptr(r[0]), uintptr(r[1]), uintptr(r[2]-r[0]), uintptr(r[3]-r[1]), 0x0004|0x0010) // NOZORDER|NOACTIVATE
+			return true
+		}
+		return handleTrayMessage(msg, wp, lp)
+	}
 	webview2.OnClose = func() bool {
 		trayRemove() // ไม่ให้ไอคอนค้างข้างนาฬิกาหลังปิดโปรแกรม
 		return true
@@ -81,6 +90,13 @@ func main() {
 		b, _ := json.Marshal(map[string]bool{"visible": !min})
 		wv.Eval("window.__goVisibility && window.__goVisibility(" + string(b) + ")")
 	}
+
+	// สีพื้นหลังตอนเปิดโปรแกรม ให้ตรงกับธีม (กันจอขาวแวบ)
+	bg := "FFEBEBEC"
+	if b, err := os.ReadFile(filepath.Join(dataDir, "launcher-data.json")); err == nil && strings.Contains(string(b), `"theme": "sakura"`) {
+		bg = "FFFBECF1"
+	}
+	os.Setenv("WEBVIEW2_DEFAULT_BACKGROUND_COLOR", bg)
 
 	wv = webview2.NewWithOptions(webview2.WebViewOptions{
 		Debug:     os.Getenv("FL_DEBUG") == "1",
@@ -141,9 +157,18 @@ func arg[T any](args []json.RawMessage, i int) T {
 	return v
 }
 
+func setCustomPath(p string) {
+	customMu.Lock()
+	custom = p
+	customMu.Unlock()
+}
+
 func fivemPath() string {
-	if custom != "" {
-		return custom
+	customMu.Lock()
+	c := custom
+	customMu.Unlock()
+	if c != "" {
+		return c
 	}
 	return filepath.Join(os.Getenv("LOCALAPPDATA"), "FiveM", "FiveM.exe")
 }
@@ -185,19 +210,27 @@ func handle(method, raw string) (any, error) {
 
 	case "fivemStatus":
 		if s := arg[string](args, 0); s != "" && exists(s) {
-			custom = s
+			setCustomPath(s)
 		}
-		return map[string]any{"path": fivemPath(), "found": exists(fivemPath()), "custom": custom != ""}, nil
+		p := fivemPath()
+		return map[string]any{"path": p, "found": exists(p), "custom": p != filepath.Join(os.Getenv("LOCALAPPDATA"), "FiveM", "FiveM.exe")}, nil
 	case "pickFiveM":
 		p := onUI(func() string { return fileDialog(hwnd, false, "เลือกไฟล์ FiveM.exe", "FiveM (FiveM.exe)", "*.exe", "", "") })
 		if p == "" {
 			return nil, nil
 		}
-		custom = p
+		setCustomPath(p)
 		return map[string]any{"path": p, "found": true, "custom": true}, nil
 	case "launch":
-		target := arg[string](args, 0)
+		target := strings.TrimSpace(arg[string](args, 0))
 		after := arg[string](args, 1)
+		// ทำที่อยู่ให้อยู่ในรูปที่ FiveM รับได้ (เช่น ตัด "connect " หรือช่องว่างที่ติดมา)
+		if a := parseAddress(target); a != nil {
+			target = a.Connect
+		}
+		if target == "" || strings.ContainsAny(target, " \t\r\n\"'<>|^") {
+			return nil, errors.New("รูปแบบที่อยู่ไม่ถูกต้อง")
+		}
 		if !openViaExplorer("fivem://connect/" + target) {
 			return nil, errors.New("เปิด FiveM ไม่สำเร็จ (ติดตั้ง FiveM แล้วหรือยัง?)")
 		}

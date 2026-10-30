@@ -72,7 +72,30 @@
     return 0.2126 * r + 0.7152 * g + 0.0722 * b;
   };
   const shade = (hex, amt) => { const [r, g, b] = hexToRgb(hex); return rgbToHex(r * (1 - amt), g * (1 - amt), b * (1 - amt)); };
-  const toneOf = (s) => (s.tone && s.tone !== 'auto' ? s.tone : s.autoTone || '#2c2c3a');
+  const isHex = (c) => typeof c === 'string' && /^#[0-9a-f]{6}$/i.test(c);
+  const toneOf = (s) => (isHex(s.tone) ? s.tone : isHex(s.autoTone) ? s.autoTone : '#2c2c3a');
+  // ตรวจข้อมูลที่โหลดจากไฟล์ (กันไฟล์สำรองที่เสียหรือถูกแก้มา)
+  function cleanServers(list) {
+    if (!Array.isArray(list)) return [];
+    const seen = new Set();
+    return list.filter((x) => x && typeof x === 'object' && typeof x.address === 'string' && x.address.trim()).map((x) => {
+      let id = typeof x.id === 'string' && /^[a-z0-9]{4,40}$/i.test(x.id) ? x.id : uid();
+      if (seen.has(id)) id = uid();
+      seen.add(id);
+      const str = (v, n = 300) => (typeof v === 'string' ? v.slice(0, n) : '');
+      const img = (v) => (typeof v === 'string' && /^(https?:|data:image\/)/i.test(v) ? v : null);
+      return {
+        ...x, id,
+        address: str(x.address, 300).trim(), connect: str(x.connect || x.address, 300).trim(), display: str(x.display || x.address, 300),
+        name: str(x.name, 120) || str(x.address, 120), desc: str(x.desc), category: str(x.category, 30),
+        discord: str(x.discord), bannerUrl: str(x.bannerUrl, 2000), logoUrl: str(x.logoUrl, 2000),
+        logo: img(x.logo), banner: img(x.banner),
+        tone: isHex(x.tone) ? x.tone : 'auto', autoTone: isHex(x.autoTone) ? x.autoTone : null,
+        fav: !!x.fav, lastPlayed: Number(x.lastPlayed) || null, addedAt: Number(x.addedAt) || Date.now(),
+        status: x.status && typeof x.status === 'object' ? { online: !!x.status.online, players: Number(x.status.players) || 0, max: Number(x.status.max) || 0, ping: x.status.ping == null ? null : Number(x.status.ping) || 0 } : null,
+      };
+    });
+  }
   function toneStyle(hex) {
     const L = lum(hex);
     const ink = L > 0.45 ? '#1d1d21' : '#ffffff';
@@ -211,7 +234,7 @@
     return `<section class="hero" style="${toneStyle(t)}">
       <div style="min-width:0">
         <span class="badge soft">เซิร์ฟของคุณ ✦</span>
-        <h2 class="hero-title">${esc(s.name)}</h2>
+        <h2 class="hero-title" data-no-i18n>${esc(s.name)}</h2>
         <div class="hero-chips">
           <span class="js-st">${S.online ? '<span class="pill pill-ok">ออนไลน์</span>' : '<span class="pill pill-off">ออฟไลน์</span>'}</span>
           <span class="js-ping">${S.ping != null ? `<span class="pill pill-mono">${I.signal} ${S.ping}ms</span>` : ''}</span>
@@ -298,8 +321,8 @@
       </div>
       <div class="logo">${logo ? `<img src="${esc(logo)}" alt="">` : esc(initial(s.name))}</div>
       <div class="card-body">
-        <div class="card-name" title="${esc(s.name)}">${esc(s.name)}</div>
-        ${s.desc ? `<div class="card-sub desc" title="${esc(s.desc)}">${esc(s.desc)}</div>` : `<div class="card-sub">${esc(s.display || s.address)}</div>`}
+        <div class="card-name" title="${esc(s.name)}" data-no-i18n>${esc(s.name)}</div>
+        ${s.desc ? `<div class="card-sub desc" title="${esc(s.desc)}" data-no-i18n>${esc(s.desc)}</div>` : `<div class="card-sub" data-no-i18n>${esc(s.display || s.address)}</div>`}
         <div class="players"><span>${I.user}<b class="js-pl">${fmtNum(S.players)}</b> / <span class="js-max">${fmtNum(S.max)}</span> ผู้เล่น</span><span class="pct js-pct" style="color:${pctColor(p)}">${full ? 'เต็ม · ' : ''}${p}%</span></div>
         <div class="bar"><i class="js-bar" style="width:${p}%;--barc:${barColor(p)}"></i></div>
         <div class="chips">
@@ -369,14 +392,14 @@
     if (isCard) root.classList.toggle('offline', !S.online);
   }
   function patchAll() {
-    if (state.page === 'settings') return;
+    if (state.page === 'settings' || state.page === 'browse') return;
     const cards = $$('.card');
     const fav = state.page === 'favorites';
     const want = filtered(fav).map((s) => s.id).join(',');
     const have = cards.map((c) => c.dataset.id).join(',');
     const f = featured();
     const heroId = $('.hero [data-act="play"]')?.dataset.id || null;
-    if (want !== have || (f?.id || null) !== heroId) return updateHomeParts();
+    if (want !== have || (state.page === 'home' && (f?.id || null) !== heroId)) return updateHomeParts();
     if (cards.some((c) => { const s = byId(c.dataset.id); return s && c.dataset.bell !== `${bellKind(s)}|${state.watching[s.id] || ''}`; })) return updateHomeParts();
     cards.forEach((c) => patchStatus(c, byId(c.dataset.id), true));
     const hero = $('.hero');
@@ -435,7 +458,7 @@
     const added = inList(s);
     return `<div class="b-row" data-id="${esc(s.id)}">
       <div class="b-ic">${s.icon ? `<img src="${esc(s.icon)}" alt="" loading="lazy" onerror="this.remove()">` : ''}<span>${esc(initial(s.name))}</span></div>
-      <div class="b-main"><div class="b-name" title="${esc(s.name)}">${s.private ? '<span class="b-lock">🔒 ส่วนตัว</span>' : ''}${esc(s.name)}</div><div class="b-sub" title="${esc(sub)}">${esc(sub)}</div></div>
+      <div class="b-main"><div class="b-name" title="${esc(s.name)}">${s.private ? '<span class="b-lock">🔒 ส่วนตัว</span>' : ''}<span data-no-i18n>${esc(s.name)}</span></div><div class="b-sub" title="${esc(sub)}" data-no-i18n>${esc(sub)}</div></div>
       <div class="b-pl"><div><b>${fmtNum(s.players)}</b> / ${fmtNum(s.max)}</div><div class="bar"><i style="width:${p}%;--barc:${barColor(p)}"></i></div></div>
       <div class="b-act">
         ${s.private
@@ -745,7 +768,7 @@
         const d = await api.importData();
         if (!d) return;
         if (d.error || !Array.isArray(d.servers)) return toast('ไฟล์ไม่ถูกต้อง', 'err');
-        state.servers = d.servers;
+        state.servers = cleanServers(d.servers);
         state.settings = { ...DEFAULT_SETTINGS, ...(d.settings || {}) };
         applyPrefs(); persist(); render(); restartAuto(); refreshAll();
         toast(`นำเข้า ${d.servers.length} เซิร์ฟเวอร์แล้ว`);
@@ -1100,7 +1123,9 @@
     persist();
     toast(`กำลังเข้า ${s.name}`);
     try {
-      await api.launch(s.connect || s.address, state.settings.after);
+      // ถ้ามีเซิร์ฟที่รอแจ้งเตือนอยู่ จะย่อหน้าต่างแทนการปิดโปรแกรม (ไม่งั้นการแจ้งเตือนจะหายไป)
+      const after = state.settings.after === 'quit' && Object.keys(state.watching).length ? 'minimize' : state.settings.after;
+      await api.launch(s.connect || s.address, after);
     } catch {
       toast('เปิด FiveM ไม่สำเร็จ', 'err');
     }
@@ -1143,20 +1168,19 @@
   function showUpdateBar(r) {
     $('#updBar')?.remove();
     const el = document.createElement('div');
-    el.className = 'toast upd';
+    el.className = 'foot-upd';
     el.id = 'updBar';
-    el.innerHTML = `<span class="ti">${I.download}</span><span>มีเวอร์ชันใหม่ ${esc(r.version)}</span>
+    el.innerHTML = `<span class="fu-ic">${I.download}</span><span class="fu-t">มีเวอร์ชันใหม่ ${esc(r.version)}</span>
       <button class="btn btn-sm btn-dark" data-u="go">อัปเดตเลย</button><button class="btn btn-sm" data-u="later">ภายหลัง</button>`;
-    el.style.pointerEvents = 'auto';
-    $('#toasts').prepend(el);
+    $('.foot').insertBefore(el, $('#btnDiscord'));
     el.querySelector('[data-u="later"]').onclick = () => el.remove();
     el.querySelector('[data-u="go"]').onclick = async () => {
       el.querySelectorAll('button').forEach((b) => (b.disabled = true));
-      el.children[1].textContent = 'กำลังดาวน์โหลดอัปเดต...';
+      el.querySelector('.fu-t').textContent = 'กำลังดาวน์โหลดอัปเดต...';
       try {
         await api.installUpdate(r.url, r.version);
       } catch {
-        el.children[1].textContent = 'ดาวน์โหลดอัปเดตไม่สำเร็จ';
+        el.querySelector('.fu-t').textContent = 'ดาวน์โหลดอัปเดตไม่สำเร็จ';
         el.querySelectorAll('button').forEach((b) => (b.disabled = false));
       }
     };
@@ -1199,7 +1223,7 @@
   async function init() {
     const saved = await api.load();
     if (saved) {
-      state.servers = Array.isArray(saved.servers) ? saved.servers : [];
+      state.servers = cleanServers(saved.servers);
       state.settings = { ...DEFAULT_SETTINGS, ...(saved.settings || {}) };
     }
     applyPrefs();

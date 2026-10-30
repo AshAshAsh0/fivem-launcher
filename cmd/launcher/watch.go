@@ -141,6 +141,8 @@ func handleTrayMessage(msg, wp, lp uintptr) bool {
 			openViaExplorer("fivem://connect/" + hit.Connect)
 		}
 		cleanupTray()
+	case 0x0403, 0x0404: // NIN_BALLOONHIDE, NIN_BALLOONTIMEOUT: แจ้งเตือนหายไปแล้ว
+		cleanupTray()
 	case wmLButtonUp:
 		pShowWindow.Call(hwnd, swRestore)
 		pSetForeground.Call(hwnd)
