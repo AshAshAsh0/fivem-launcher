@@ -38,6 +38,8 @@
     upload: '<svg viewBox="0 0 24 24"><path d="M12 20V9M7 14l5-5 5 5M5 4h14"/></svg>',
     reset: '<svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.3-5.7"/><path d="M4 4v5h5"/></svg>',
     folder2: '<svg viewBox="0 0 24 24"><path d="M3.5 7.5A2 2 0 0 1 5.5 5.5h4l2 2h7a2 2 0 0 1 2 2v7.5a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2Z"/><path d="M12 11v5M9.5 13.5h5"/></svg>',
+    filter: '<svg viewBox="0 0 24 24"><path d="M4 6.5h16M7 12h10M10 17.5h4"/></svg>',
+    star: '<svg viewBox="0 0 24 24"><path d="m12 3.8 2.5 5.1 5.6.8-4 3.9 1 5.6-5.1-2.7-5 2.7 1-5.6-4.1-3.9 5.6-.8Z"/></svg>',
     chev: '<svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>',
     grip: '<svg viewBox="0 0 24 24"><circle cx="9" cy="6" r="1.2" fill="currentColor"/><circle cx="15" cy="6" r="1.2" fill="currentColor"/><circle cx="9" cy="12" r="1.2" fill="currentColor"/><circle cx="15" cy="12" r="1.2" fill="currentColor"/><circle cx="9" cy="18" r="1.2" fill="currentColor"/><circle cx="15" cy="18" r="1.2" fill="currentColor"/></svg>',
     sparkle: '<svg viewBox="0 0 24 24"><path d="M12 3c.6 4.6 2.4 6.4 7 7-4.6.6-6.4 2.4-7 7-.6-4.6-2.4-6.4-7-7 4.6-.6 6.4-2.4 7-7Z" fill="currentColor" stroke="none"/></svg>',
@@ -736,18 +738,13 @@
           <button data-r="th" class="${B.region === 'th' ? 'on' : ''}">เซิร์ฟไทย</button>
           <button data-r="all" class="${B.region === 'all' ? 'on' : ''}">ทั้งหมด</button>
         </div>
+        <button class="btn b-flt" id="bFilter" title="ตัวกรอง">${I.filter}<span>ตัวกรอง</span><i id="bFltN" data-no-i18n>${fltCount() || ''}</i></button>
         <button class="icon-btn ${B.loading ? 'spin' : ''}" id="bRefresh" title="โหลดรายชื่อใหม่">${I.refresh}</button>
       </div>
       ${state.fivem && state.fivem.found === false ? `<div class="fivem-miss">${I.x}<span><b>ไม่พบ FiveM ในเครื่องนี้</b><small>ต้องติดตั้ง FiveM ก่อนถึงจะเข้าเซิร์ฟได้ ถ้าติดตั้งไว้ที่อื่น เลือกไฟล์ FiveM.exe เองได้</small></span><button class="btn btn-sm btn-dark" data-act="dl-fivem2">${I.ext} ดาวน์โหลด FiveM</button><button class="btn btn-sm" data-act="pick-fivem2">${I.folder2} เลือกไฟล์</button></div>` : ''}
-      <div class="b-filters">
-        <div class="b-meta" id="bMeta"></div>
- <div class="b-fl"><label class="b-chk"><input type="checkbox" id="fPriv" ${state.settings.bHidePrivate ? 'checked' : ''}><span>ซ่อนเซิร์ฟส่วนตัว</span></label>
-        <label class="b-chk"><input type="checkbox" id="fFull" ${state.settings.bHideFull ? 'checked' : ''}><span>ซ่อนเซิร์ฟเต็ม</span></label>
-        <div class="seg sm" id="bSort"><button data-s="players" class="${state.settings.bSort !== 'name' ? 'on' : ''}">คนเยอะสุด</button><button data-s="name" class="${state.settings.bSort === 'name' ? 'on' : ''}">ชื่อ ก-ฮ</button></div></div>
-      </div>
       <div class="b-split ${B.sel ? 'open' : ''}" id="bSplit">
         <aside class="sv-side" id="svSide"></aside>
-        <div class="b-col"><div class="b-list" id="bList"></div><div class="b-more" id="bMore"></div></div>
+        <div class="b-panel"><div class="b-col"><div class="b-list" id="bList"></div><div class="b-more" id="bMore"></div></div></div>
       </div>`;
   }
 
@@ -758,11 +755,17 @@
       <div class="b-main"><div class="b-name" title="${esc(s.name)}" data-no-i18n>${esc(s.name)}</div><div class="b-sub" title="${esc(sub)}" data-no-i18n>${esc(sub)}</div></div>
       <div class="b-st">${stChip(true, s.players, s.max, s.private)}</div>
       <div class="b-pl">${plHTML(s.players, s.max, true)}</div>
-      <div class="b-act"></div>
-
     </div>`;
   }
 
+  const fltCount = () => (state.settings.bHidePrivate ? 1 : 0) + (state.settings.bHideFull ? 1 : 0) + (state.settings.bSort === 'name' ? 1 : 0);
+  // หัวข้อแบบเมนูในเกม: คำแรกขาว คำหลังฟ้า + บรรทัดรองจาง ๆ + กล่องไอคอน
+  function secHead(kind, sub, extra = '') {
+    const [a, b, ic] = kind === 'mine'
+      ? (isEN() ? ['My', 'servers', I.star] : ['เซิร์ฟ', 'ของฉัน', I.star])
+      : (isEN() ? ['Public', 'servers', I.globe] : ['เซิร์ฟ', 'สาธารณะ', I.globe]);
+    return `<div class="b-sec sec-${kind}"><div class="sh-ic">${ic}</div><div class="sh-t"><p data-no-i18n>${a}<span>${b}</span></p><small id="${kind === 'pub' ? 'bMeta' : 'mMeta'}">${sub}</small></div>${extra}</div>`;
+  }
   // สถานะเซิร์ฟแบบชัด ๆ: ออนไลน์ (เขียว) / ใกล้เต็ม (ส้ม) / เต็ม (แดง) / ออฟไลน์ (เทา) / ส่วนตัว (เหลือง)
   function stChip(online, players, max, priv) {
     const p = max ? players / max : 0;
@@ -870,7 +873,7 @@
     const t = String(q || '').trim().toLowerCase();
     const list = state.servers.filter((s) => !t || [s.name, s.address, s.display].join(' ').toLowerCase().includes(t));
     if (t && !list.length) return '';
-    const head = `<div class="b-sec mine-head"><span>เซิร์ฟของฉัน</span><button class="btn btn-sm" data-b="add-mine">${I.plus} เพิ่มเซิร์ฟ / IP</button></div>`;
+    const head = secHead('mine', state.servers.length ? `บันทึกไว้ ${state.servers.length} เซิร์ฟ · ดับเบิลคลิกเพื่อเข้า` : 'เซิร์ฟที่คุณบันทึกไว้', `<button class="btn btn-sm" data-b="add-mine">${I.plus} เพิ่มเซิร์ฟ / IP</button>`);
     if (!list.length) return head + `<button class="mine-empty" data-b="add-mine">${I.plus}<span><b>เพิ่มเซิร์ฟของคุณ</b><small>ใส่ IP หรือลิงก์ของเซิร์ฟ (รวมเซิร์ฟส่วนตัว) แล้วจะอยู่ตรงนี้ กดเข้าได้ทุกครั้ง</small></span></button>`;
     if (!state.groups.length) return head + list.map(mineRow).join('');
     const ids = new Set(state.groups.map((g) => g.id));
@@ -878,7 +881,7 @@
     const parts = state.groups.map((g) => {
       const items = list.filter((s) => s.group === g.id);
       if (t && !items.length) return '';
-      return grpHead(g, items.length) + (items.length ? items.map(mineRow).join('') : '<div class="mine-grp-empty">ยังไม่มีเซิร์ฟในกลุ่มนี้ — กด ⋯ ที่เซิร์ฟแล้วเลือกกลุ่ม</div>');
+      return grpHead(g, items.length) + (items.length ? items.map(mineRow).join('') : '<div class="mine-grp-empty">ยังไม่มีเซิร์ฟในกลุ่มนี้ — คลิกขวาที่เซิร์ฟแล้วเลือกกลุ่ม</div>');
     }).join('');
     const loose = list.filter((s) => !s.group || !ids.has(s.group));
     return head + parts + (loose.length ? `<div class="mine-grp"><span>ไม่ได้จัดกลุ่ม</span><i>${loose.length}</i></div>` + loose.map(mineRow).join('') : '');
@@ -890,7 +893,6 @@
       <div class="b-main"><div class="b-name" data-no-i18n>${esc(s.name)}</div><div class="b-sub" data-no-i18n>${esc(s.display || s.address)}${s.lastPlayed ? ` · ${esc(ago(s.lastPlayed))}` : ''}</div></div>
       <div class="b-st js-stc">${s.status ? stChip(S.online, S.players, S.max, false) : '<span class="stc stc-off"><i></i>…</span>'}</div>
       <div class="b-pl">${plHTML(S.players, S.max, S.online)}</div>
-      <div class="b-act"><button class="more-btn" data-act="more" data-id="${s.id}" title="เพิ่มเติม">${I.more}</button></div>
     </div>`;
   }
   function bindMine(root) {
@@ -901,8 +903,7 @@
       if (!s) return;
       row.onclick = (e) => { if (!e.target.closest('button') && state.browse.sel !== 'm:' + s.id) mineSide(s); };
       row.ondblclick = (e) => { if (!e.target.closest('button')) play(s.id); };
-      const more = row.querySelector('[data-act="more"]');
-      if (more) more.onclick = (e) => { e.stopPropagation(); openMenu(more, s); };
+      row.oncontextmenu = (e) => { e.preventDefault(); openMenu(atMouse(e), s); };
     });
   }
   // เปิดหน้าต่างเพิ่มเซิร์ฟ พร้อมใส่ที่อยู่ให้แล้วกดตรวจสอบเลย
@@ -946,6 +947,7 @@
         <div class="sv-links">
           ${bellHTML(s)}
           ${s.discord ? `<button class="btn btn-sm sv-discord" data-link="${esc(normUrl(s.discord))}">Discord</button>` : ''}
+          <button class="btn btn-sm" id="svGrp">${I.folder2} กลุ่ม</button>
           <button class="btn btn-sm" id="svDel" style="color:var(--danger)">${I.trash} ลบ</button>
         </div>
       </div>
@@ -953,6 +955,7 @@
     if (!side) return;
     $('#svPlay', side).onclick = () => play(s.id);
     $('#svDel', side).onclick = () => confirmDelete(s);
+    $('#svGrp', side).onclick = (e) => openMenu(e.currentTarget, s);
     $$('[data-link]', side).forEach((b) => (b.onclick = () => api.openExternal(b.dataset.link)));
     $$('[data-act="watch"]', side).forEach((b) => (b.onclick = () => toggleWatch(s)));
     $('#svCopy', side).onclick = () => { navigator.clipboard.writeText(s.connect || s.address).then(() => toast('คัดลอกที่อยู่แล้ว'), () => toast('คัดลอกไม่สำเร็จ', 'err')); };
@@ -988,7 +991,6 @@
     if (!list) return;
     $('#bRefresh')?.classList.toggle('spin', B.loading);
     if (B.error) {
-      $('#bMeta').textContent = '';
       list.innerHTML = `<div class="empty"><div><div class="em-mark">${I.x}</div><b>โหลดรายชื่อเซิร์ฟไม่สำเร็จ</b>${esc(B.error)}<div style="margin-top:16px"><button class="btn" id="bRetry">${I.refresh} ลองใหม่</button></div></div></div>`;
       $('#bMore').innerHTML = '';
       $('#bRetry').onclick = () => loadBrowse(true, true);
@@ -1001,15 +1003,15 @@
       list.querySelector('[data-b="direct-save"]')?.addEventListener('click', () => addServerWith(direct));
     };
     if (B.loading && !B.items.length) {
-      $('#bMeta').textContent = 'กำลังโหลดรายชื่อเซิร์ฟ... ครั้งแรกอาจใช้เวลาสักครู่';
-      list.innerHTML = (direct ? directRow(direct) : '') + browseSkeleton();
+      list.innerHTML = (direct ? directRow(direct) : '') + mineHTML(B.q) + secHead('pub', 'กำลังโหลดรายชื่อเซิร์ฟ... ครั้งแรกอาจใช้เวลาสักครู่') + browseSkeleton();
+      bindMine(list);
       bindDirect();
       $('#bMore').innerHTML = '';
       return;
     }
     const t = B.updated ? new Date(B.updated * 1000).toLocaleTimeString(isEN() ? 'en-GB' : 'th-TH', { hour: '2-digit', minute: '2-digit' }) : '';
-    $('#bMeta').textContent = `พบ ${fmtNum(B.total)} เซิร์ฟ · ผู้เล่นรวม ${fmtNum(B.players)} · อัปเดตเมื่อ ${t}`;
-    list.innerHTML = (direct ? directRow(direct) : '') + mineHTML(B.q) + (B.items.length ? '<div class="b-sec">เซิร์ฟสาธารณะ</div>' : '') + (B.items.length ? B.items.map(browseRow).join('') : direct ? '' : `<div class="empty"><div><div class="em-mark">${I.search}</div><b>ไม่พบเซิร์ฟที่ตรงกับคำค้น</b>ลองพิมพ์คำอื่น เปลี่ยนเป็น “ทั้งหมด” หรือวาง IP / ลิงก์ cfx.re ของเซิร์ฟ</div></div>`);
+    const meta = `พบ ${fmtNum(B.total)} เซิร์ฟ · ผู้เล่นรวม ${fmtNum(B.players)} · อัปเดตเมื่อ ${t}`;
+    list.innerHTML = (direct ? directRow(direct) : '') + mineHTML(B.q) + (B.items.length ? secHead('pub', meta) : '') + (B.items.length ? B.items.map(browseRow).join('') : direct ? '' : `<div class="empty"><div><div class="em-mark">${I.search}</div><b>ไม่พบเซิร์ฟที่ตรงกับคำค้น</b>ลองพิมพ์คำอื่น เปลี่ยนเป็น “ทั้งหมด” หรือวาง IP / ลิงก์ cfx.re ของเซิร์ฟ</div></div>`);
     bindDirect();
     bindMine(list);
     $('#bMore').innerHTML = B.items.length < B.total ? `<button class="btn" id="bMoreBtn" ${B.loading ? 'disabled' : ''}>แสดงเพิ่ม</button>` : '';
@@ -1116,13 +1118,7 @@
       loadBrowse(true);
     }));
     $('#bRefresh').addEventListener('click', () => loadBrowse(true, true));
-    $('#fPriv').addEventListener('change', (e) => { state.settings.bHidePrivate = e.target.checked; persist(); loadBrowse(true); });
-    $('#fFull').addEventListener('change', (e) => { state.settings.bHideFull = e.target.checked; persist(); loadBrowse(true); });
-    $$('#bSort button').forEach((b) => b.addEventListener('click', () => {
-      state.settings.bSort = b.dataset.s; persist();
-      $$('#bSort button').forEach((x) => x.classList.toggle('on', x === b));
-      loadBrowse(true);
-    }));
+    $('#bFilter').addEventListener('click', (e) => openFilter(e.currentTarget));
     $('[data-act="dl-fivem2"]')?.addEventListener('click', () => api.openExternal(CFG.fivemDownloadUrl));
     $('[data-act="pick-fivem2"]')?.addEventListener('click', async () => {
       const r = await api.pickFiveM();
@@ -1407,7 +1403,7 @@
 
   // ---------- menu ----------
   function closeMenu() { $('#menuLayer').innerHTML = ''; }
-  function showMenu(anchor, html, onPick) {
+  function showMenu(anchor, html, onPick, keep = false) {
     closeMenu();
     const r = anchor.getBoundingClientRect();
     const m = document.createElement('div');
@@ -1423,16 +1419,40 @@
     if (top + mh > innerHeight - 10) top = r.top - mh - 8;
     top = Math.max(minTop, Math.min(top, innerHeight - mh - 10));
     m.style.maxHeight = `${room}px`;
-    m.style.left = `${Math.max(10, Math.min(r.right - mw, innerWidth - mw - 10))}px`;
+    m.style.left = `${Math.max(10, Math.min(anchor.atX != null ? anchor.atX + 4 : r.right - mw, innerWidth - mw - 10))}px`;
     m.style.top = `${top}px`;
     m.addEventListener('click', (e) => {
       const b = e.target.closest('button');
       if (!b || b.disabled) return;
-      closeMenu();
-      onPick(b.dataset.m, b);
+      if (!keep) closeMenu();
+      onPick(b.dataset.m, b, m);
     });
   }
 
+  // จุดเมาส์ (คลิกขวา) ใช้แทนปุ่มสำหรับวางเมนู
+  const atMouse = (e) => ({ atX: e.clientX, getBoundingClientRect: () => ({ top: e.clientY - 8, bottom: e.clientY - 8, left: e.clientX, right: e.clientX }) });
+  // ตัวกรองรายชื่อ: เมนูเล็กค้างไว้ให้กดได้หลายอย่าง
+  function openFilter(anchor) {
+    const S = state.settings;
+    const box = (on) => `<i class="fk ${on ? 'on' : ''}"></i>`;
+    const html = () => `<div class="menu-label">ตัวกรอง</div>
+      <button data-m="priv">${box(S.bHidePrivate)} ซ่อนเซิร์ฟส่วนตัว</button>
+      <button data-m="full">${box(S.bHideFull)} ซ่อนเซิร์ฟเต็ม</button>
+      <hr><div class="menu-label">เรียงตาม</div>
+      <button data-m="players">${S.bSort !== 'name' ? I.check : '<i class="mk"></i>'} คนเยอะสุด</button>
+      <button data-m="name">${S.bSort === 'name' ? I.check : '<i class="mk"></i>'} ชื่อ ก-ฮ</button>`;
+    showMenu(anchor, html(), (k, b, m) => {
+      if (k === 'priv') S.bHidePrivate = !S.bHidePrivate;
+      if (k === 'full') S.bHideFull = !S.bHideFull;
+      if (k === 'players' || k === 'name') S.bSort = k;
+      persist();
+      m.innerHTML = html();
+      const n = $('#bFltN'); if (n) n.textContent = fltCount() || '';
+      $('#bFilter')?.classList.toggle('on', !!fltCount());
+      loadBrowse(true);
+    }, true);
+    $('.menu')?.classList.add('flt-menu');
+  }
   function openMenu(anchor, s) {
     const cur = s.group && groupById(s.group) ? s.group : '';
     const mark = (on) => (on ? I.check : '<i class="mk"></i>');
@@ -1450,7 +1470,7 @@
       if (k === 'newgrp') groupModal(null, s);
     });
   }
-  document.addEventListener('mousedown', (e) => { if (!e.target.closest('.menu, .more-btn, .grp-more')) closeMenu(); });
+  document.addEventListener('mousedown', (e) => { if (!e.target.closest('.menu, .more-btn, .grp-more, #bFilter, #svGrp')) closeMenu(); });
   document.getElementById('scroll').addEventListener('wheel', closeMenu, { passive: true });
   window.addEventListener('resize', closeMenu);
 
@@ -1736,7 +1756,8 @@
     $('.titlebar').addEventListener('dblclick', (e) => { if (!e.target.closest('button')) api.toggleMax(); });
     $('#btnDiscord').addEventListener('click', () => api.openExternal(CFG.discordUrl));
     $('#btnDiscord').hidden = !CFG.discordUrl;
-    $('#brandName').textContent = CFG.appName;
+    $('#brandName').innerHTML = `${esc(CFG.appName)}<span>${esc(CFG.appTag || 'launcher')}</span>`;
+    $('#brandName').setAttribute('data-no-i18n', '');
     $('#brandTag').firstChild.textContent = `${CFG.appTag} `;
     if (CFG.madeBy) $('#madeBy').textContent = CFG.madeBy;
     else $('.made').innerHTML = `<b>${esc(CFG.appName)} Launcher</b> <span style="opacity:.6">v${esc(state.version)}</span>`;

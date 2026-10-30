@@ -1407,3 +1407,98 @@ html[data-motion='full'] .stc-ok i { animation: stPulse 2s ease-in-out infinite;
 .b-split.open .b-row, .b-split.open .b-row.mine { grid-template-columns: 38px minmax(0, 1fr) 100px 96px 30px !important; }
 .stc b { font-weight: 400; font-size: 11px; margin-right: -2px; }
 .b-split.open .stc { padding: 0 7px; font-size: 11px; gap: 5px; }
+
+/* ================= v12: จัดวางแบบ C + ขัดธีม HUD ให้เหมือนเมนูในเกม ================= */
+/* แถบชื่อโปรแกรม: FIVEM ขาว + LAUNCHER ฟ้า แบบหัวเมนู */
+.brand-name { text-transform: uppercase; font-weight: 600 !important; }
+.brand-name span { color: var(--accent); margin-left: 5px; }
+.brand-sub { display: block; font: 400 10px 'Kanit', var(--font-body); letter-spacing: .08em; text-transform: uppercase; color: rgba(255, 255, 255, .45); margin-top: -2px; }
+.brand-txt { display: flex; flex-direction: column; line-height: 1.15; }
+[data-theme] .mark.sm { background: rgba(10, 174, 251, .1) !important; border-radius: 8px !important; box-shadow: 0 0 18px -6px rgba(10, 174, 251, .6) !important; }
+
+/* พื้นหลังหน้าต่าง: ฟ้าฟุ้งจาง ๆ มุมบน + ขอบมืด */
+[data-theme='hud'] .shell {
+  background-image:
+    radial-gradient(900px 480px at 85% -15%, rgba(10, 174, 251, .11), transparent 62%),
+    radial-gradient(700px 420px at -10% 110%, rgba(10, 174, 251, .05), transparent 60%),
+    linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px) !important;
+  background-size: auto, auto, 34px 34px, 34px 34px !important;
+}
+
+/* แถบเครื่องมือ: ปุ่มตัวกรอง */
+.b-flt { height: 42px !important; padding: 0 14px !important; gap: 8px !important; color: var(--ink-2) !important; font-size: 13px !important; }
+.b-flt svg { width: 16px; height: 16px; }
+.b-flt i { font-style: normal; font: 600 10.5px 'Kanit', var(--font-body); min-width: 17px; height: 17px; display: grid; place-items: center; border-radius: 5px; background: var(--accent); color: #04121c; padding: 0 4px; }
+.b-flt i:empty { display: none; }
+[data-theme='hud'] .b-flt.on::after, [data-theme='hud'] .b-flt:has(i:not(:empty))::after { border-image-source: var(--item-sel) !important; }
+.b-flt:has(i:not(:empty)) { color: #fff !important; }
+.flt-menu { min-width: 210px; }
+.menu .fk { width: 16px; height: 16px; flex: none; border-radius: 4px; background: rgba(57, 60, 65, .7); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .14); display: grid; place-items: center; }
+.menu .fk.on { background: rgba(10, 174, 251, .25); box-shadow: inset 0 0 0 1.5px var(--accent); }
+.menu .fk.on::after { content: ''; width: 8px; height: 8px; border-radius: 2px; background: var(--accent); }
+.menu-label { text-transform: uppercase; letter-spacing: .06em; font-size: 10.5px !important; color: rgba(255, 255, 255, .45) !important; font-weight: 500 !important; }
+
+/* รายชื่อทั้งหมดอยู่ในแผงกระจก 2 ชั้น (กรอบนอกโปร่ง + แผงในเข้ม) แบบเมนูในเกม */
+.b-panel { position: relative; isolation: isolate; min-width: 0; min-height: 0; display: flex; flex-direction: column; padding: 8px 6px 14px 8px; }
+.b-panel::before { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  border-style: solid; border-width: 20px 24px 24px 20px; border-image: var(--frame) 20 24 24 20 fill / 20px 24px 24px 20px stretch; }
+.scroll.split .b-panel .b-col { flex: 1; min-height: 0; padding: 6px 10px 10px 8px !important; margin: 0 !important; }
+.scroll.split .b-panel .b-col::-webkit-scrollbar { width: 4px; }
+.scroll.split .b-panel .b-col::-webkit-scrollbar-thumb { background: rgba(10, 174, 251, .35); }
+.scroll.split .b-split { padding-bottom: 6px; }
+
+/* หัวข้อแบบ "MENU LIST": กล่องไอคอนฟ้าจาง + คำแรกขาว คำหลังฟ้า + บรรทัดรองจาง */
+.b-sec { display: flex !important; align-items: center !important; justify-content: flex-start !important; gap: 12px !important; margin: 14px 2px 4px !important; text-transform: none !important; letter-spacing: 0 !important; }
+.b-sec:first-child { margin-top: 4px !important; }
+.b-sec .sh-ic { width: 36px; height: 36px; flex: none; border-radius: 8px; display: grid; place-items: center; background: rgba(10, 174, 251, .1); color: var(--accent); }
+.b-sec .sh-ic svg { width: 17px; height: 17px; filter: drop-shadow(0 0 5px rgba(10, 174, 251, .55)); }
+.b-sec .sh-t { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.b-sec .sh-t p { margin: 0; font: 500 14px/18px 'Kanit', var(--font-head); color: #fff; text-transform: uppercase; }
+.b-sec .sh-t p span { color: var(--accent); margin-left: 5px; }
+.b-sec .sh-t small { font: 400 10.5px/16px 'Kanit', var(--font-body); color: rgba(255, 255, 255, .5); text-transform: uppercase; letter-spacing: .02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.b-sec .btn { flex: none; height: 32px !important; font-size: 12px; }
+
+/* แถวเซิร์ฟ = ปุ่มเมนูในเกม: เทาจางมุมโค้ง ตัดเฉียงขวาล่าง / เลือกอยู่ = ฟ้า 20% + ขอบ + สามเหลี่ยม */
+.b-list { gap: 6px !important; }
+[data-theme='hud'] .b-row::before { border-width: 8px 16px 16px 8px !important; border-image: var(--item) 8 16 16 8 fill / 8px 16px 16px 8px stretch !important; }
+[data-theme='hud'] .b-row:hover::before { border-image-source: var(--item) !important; filter: brightness(1.6); }
+[data-theme='hud'] .b-row.sel::before { border-image-source: var(--item-sel) !important; filter: drop-shadow(0 0 10px rgba(10, 174, 251, .28)); }
+[data-theme='hud'] .b-row { border-radius: 6px; box-shadow: none !important; transition: transform .15s; }
+[data-theme='hud'] .b-row:active { transform: scale(.995); }
+.b-row, .b-row.mine { grid-template-columns: 40px minmax(0, 1fr) 100px 92px !important; gap: 14px !important; padding: 8px 16px 8px 10px !important; min-height: 56px; }
+.b-split.open .b-row, .b-split.open .b-row.mine { grid-template-columns: 36px minmax(0, 1fr) 92px 84px !important; gap: 10px !important; }
+.b-ic { width: 40px !important; height: 40px !important; border-radius: 8px !important; }
+.b-split.open .b-ic { width: 36px !important; height: 36px !important; }
+.b-row .bar, .b-row .b-act { display: none !important; }
+.b-row .pl-n { margin: 0; justify-content: flex-end; }
+.b-row .pl-n b { font-size: 14px; }
+.b-row.sel .b-name { color: #fff; }
+.b-name { font-family: 'Kanit', var(--font-head) !important; font-weight: 500 !important; font-size: 14px !important; text-transform: uppercase; }
+.b-sub { font-size: 11.5px !important; color: rgba(255, 255, 255, .5) !important; }
+.b-direct { grid-template-columns: 40px minmax(0, 1fr) auto !important; }
+.b-direct .b-act { display: flex !important; gap: 8px; }
+.b-direct .b-ic { background: rgba(10, 174, 251, .1) !important; color: var(--accent); }
+.b-direct .b-ic svg { width: 18px; height: 18px; }
+.mine-grp { margin: 8px 4px 0 !important; font: 500 11.5px 'Kanit', var(--font-head) !important; text-transform: uppercase; color: rgba(255, 255, 255, .6) !important; }
+.mine-empty { border-radius: 6px !important; }
+.b-more { padding: 10px 0 2px; display: flex; justify-content: center; }
+
+/* แผงรายละเอียดซ้าย: ปุ่มเล่นเรืองแสง */
+[data-theme='hud'] .sv-play { filter: drop-shadow(0 0 14px rgba(10, 174, 251, .3)); font-size: 15px !important; letter-spacing: .04em; text-transform: uppercase; }
+[data-theme='hud'] .sv-play:hover { filter: drop-shadow(0 0 20px rgba(10, 174, 251, .5)); }
+[data-theme='hud'] .sv-side .sv-title h2 { font-weight: 600; }
+[data-theme='hud'] .sv-stats .lbl { text-transform: uppercase; font-size: 10.5px; letter-spacing: .04em; color: rgba(255, 255, 255, .5); }
+.sv-foot { border-top: 0 !important; }
+
+/* เมนู/ตัวกรอง: แผง 2 ชั้นแบบเดียวกัน */
+[data-theme='hud'] .menu { background: rgba(20, 22, 25, .97) !important; box-shadow: 0 0 0 6px rgba(20, 22, 25, .55), 0 20px 40px -12px rgba(0, 0, 0, .8) !important; border-radius: 12px !important; clip-path: none !important; }
+[data-theme='hud'] .menu button { padding: 9px 12px; font-size: 12.5px; }
+/* v12: แถวแบบปุ่มเมนูในเกม — พื้นเทาจางไม่มีเส้นขอบ (เหมือน re-none.svg) */
+[data-theme='hud'] {
+  --row: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cpath d='M6 0H34A6 6 0 0 1 40 6V26L26 40H6A6 6 0 0 1 0 34V6A6 6 0 0 1 6 0Z' fill='rgba(57,60,65,.3)'/%3E%3C/svg%3E");
+  --row-hov: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cpath d='M6 0H34A6 6 0 0 1 40 6V26L26 40H6A6 6 0 0 1 0 34V6A6 6 0 0 1 6 0Z' fill='rgba(57,60,65,.55)'/%3E%3C/svg%3E");
+}
+[data-theme='hud'] .b-row::before { border-image-source: var(--row) !important; }
+[data-theme='hud'] .b-row:hover::before { border-image-source: var(--row-hov) !important; filter: none; }
+[data-theme='hud'] .b-row.sel::before, [data-theme='hud'] .b-row.sel:hover::before { border-image-source: var(--item-sel) !important; filter: drop-shadow(0 0 10px rgba(10, 174, 251, .28)); }
+[data-theme='hud'] .b-row.skel::before { border-image-source: var(--row) !important; }
