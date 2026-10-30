@@ -1450,7 +1450,7 @@
         <div class="pv-row">
           <div class="pv-logo ${logo ? 'has' : ''}">${logo ? `<img src="${esc(logo)}" alt="">` : '?'}</div>
           <div class="pv-info">
-            <b data-no-i18n>${esc(f?.name || d.name || 'ชื่อเซิร์ฟเวอร์')}</b>
+            ${f?.name || d.name ? `<b data-no-i18n>${esc(f?.name || d.name)}</b>` : '<b>ชื่อเซิร์ฟเวอร์</b>'}
             ${f ? (f.online ? `<span class="pill pill-ok" style="margin-top:4px">ออนไลน์ · ${fmtNum(f.players)}/${fmtNum(f.max)}</span>` : '<span class="pill pill-off" style="margin-top:4px">ออฟไลน์</span>') : '<span>กด “ตรวจสอบ” เพื่อดึงชื่อ โลโก้ และแบนเนอร์</span>'}
           </div>
         </div>`;
