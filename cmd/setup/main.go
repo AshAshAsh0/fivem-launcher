@@ -23,7 +23,7 @@ import (
 var appExeGz []byte
 
 // version ถูกแทนค่าตอน build ด้วย -ldflags "-X main.version=..."
-var version = "3.16.2"
+var version = "3.16.3"
 
 const (
 	appName   = "FiveM Launcher"

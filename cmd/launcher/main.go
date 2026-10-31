@@ -25,7 +25,7 @@ import (
 var webFS embed.FS
 
 // version ถูกแทนค่าตอน build ด้วย -ldflags "-X main.version=..."
-var version = "3.16.2"
+var version = "3.16.3"
 
 const (
 	appTitle = "FiveM Launcher"

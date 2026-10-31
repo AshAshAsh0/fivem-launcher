@@ -1632,3 +1632,12 @@ html:not([lang='en']) :is(.rp-sum, .rp-title, .rp-lbl) { letter-spacing: .02em; 
 [data-theme='hud'] .b-sec .sh-ic { width: 38px; height: 38px; }
 [data-theme='hud'] .rp-copy { width: 34px; height: 34px; }
 [data-theme='hud'] .set-tab.on .st-ic { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .06), 0 0 16px -4px var(--c) !important; }
+
+/* v22b: กรอบโลโก้ในแผงเซิร์ฟ = กรอบ 2 ชั้นแบบแจ้งเตือน สีขาว */
+[data-theme='hud'] .sx-logo { isolation: isolate; border-radius: 16px !important; background: rgba(52, 57, 64, .55) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .06), 0 0 22px -8px rgba(255, 255, 255, .45), 0 14px 30px -12px rgba(0, 0, 0, .9) !important; }
+[data-theme='hud'] .sx-logo::before { content: '' !important; position: absolute; inset: 4px !important; z-index: 0 !important; border-radius: 12px !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .14) 0%, rgba(255, 255, 255, .14) 30%, rgba(255, 255, 255, .92) 100%) !important; }
+[data-theme='hud'] .sx-logo::after { content: ''; position: absolute; inset: 5px; z-index: 0; border-radius: 11px; background: var(--tone, #1b2026); }
+[data-theme='hud'] .sx-logo img { inset: 5px !important; width: calc(100% - 10px) !important; height: calc(100% - 10px) !important; border-radius: 11px !important; z-index: 1; }
+[data-theme='hud'] .sx-logo span { position: relative; z-index: 1; }
