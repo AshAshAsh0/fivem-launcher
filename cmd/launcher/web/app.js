@@ -531,14 +531,13 @@
         ${s.private
           ? (mineOf
             ? `<p class="sv-note ok">บันทึกเซิร์ฟนี้ไว้ใน “เซิร์ฟของฉัน” แล้ว — กดเล่นจากรายการด้านบนได้เลย</p><button class="btn" id="svGoMine">★ ไปที่เซิร์ฟของฉัน</button>`
-            : `<p class="sv-note">เซิร์ฟนี้ตั้งเป็นส่วนตัว เข้าจากรายชื่อไม่ได้ — ขอ IP หรือลิงก์จาก Discord ของเซิร์ฟ แล้ววางด้านล่าง ระบบจะบันทึกไว้ใน “เซิร์ฟของฉัน” ให้กดเข้าได้ทุกครั้ง</p>
-              <div class="sv-ipbox"><input class="input" id="svIp" placeholder="เช่น 103.91.190.199:30120" spellcheck="false"><button class="btn btn-dark" id="svSave">${I.check} บันทึก</button></div>`)
+            : `<p class="sv-note">เซิร์ฟนี้ตั้งเป็นส่วนตัว เข้าจากรายชื่อไม่ได้ — ขอ IP หรือลิงก์จาก Discord ของเซิร์ฟ แล้ววางด้านล่าง ระบบจะบันทึกไว้ใน “เซิร์ฟของฉัน” ให้กดเข้าได้ทุกครั้ง</p>`)
           : addrBox(target)}
         ${s.discord || s.website ? `<div class="sv-links">
           ${s.discord ? `<button class="btn btn-sm sv-discord" data-link="${esc(s.discord)}">${I.discord} Discord</button>` : ''}
           ${s.website ? `<button class="btn btn-sm" data-link="${esc(s.website)}">${I.globe} เว็บไซต์</button>` : ''}
         </div>` : ''}`,
-      foot: s.private ? '' : playFoot('เล่นเลย', s.players, s.max),
+      foot: s.private ? (mineOf ? '' : `<div class="sv-foot"><div class="sv-ipbox"><input class="input" id="svIp" placeholder="เช่น 103.91.190.199:30120" spellcheck="false"><button class="btn btn-dark" id="svSave">${I.check} บันทึก</button></div></div>`) : playFoot('เล่นเลย'),
     }), s.id);
     if (!side) return;
     $('#svStar', side).onclick = async () => {
@@ -639,7 +638,7 @@
           ${bellHTML(s)}
           ${s.discord ? `<button class="btn btn-sm sv-discord" data-link="${esc(normUrl(s.discord))}">${I.discord} Discord</button>` : ''}
         </div>`,
-      foot: playFoot(S.online ? 'เล่นเลย' : 'ลองเข้า', S.online ? S.players : 0, S.max),
+      foot: playFoot(S.online ? 'เล่นเลย' : 'ลองเข้า'),
     }), 'm:' + s.id);
     if (!side) return;
     $('#svPlay', side).onclick = () => play(s.id);

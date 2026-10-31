@@ -1709,3 +1709,56 @@ html:not([lang='en']) :is(.rp-sum, .rp-title, .rp-lbl) { letter-spacing: .02em; 
 [data-theme] .wc-close::after { inset: 4px; border-radius: 5px; background: radial-gradient(120% 90% at 50% 100%, rgba(255, 150, 165, .6), transparent 75%), linear-gradient(180deg, #a52640, #861a30); }
 [data-theme] .wc-close:hover { background: rgba(52, 57, 64, .55) !important; color: #fff !important; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08), 0 0 20px -4px #f0506e !important; }
 [data-theme] .wc-close:hover::before, [data-theme] .wc-close:hover::after { opacity: 1; }
+
+/* ================= v24: หน้า loading ธีมใหม่ ================= */
+.sp-word { opacity: .035 !important; color: #fff !important; -webkit-text-stroke: 0 !important; }
+.sp-card { position: relative; isolation: isolate; width: 380px; display: flex; flex-direction: column; align-items: center; gap: 0; padding: 34px 34px 26px; margin-top: -10px;
+  border-radius: 17px; background: rgba(52, 57, 64, .5); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .06), 0 0 40px -14px rgba(46, 194, 255, .5), 0 30px 60px -20px rgba(0, 0, 0, .9);
+  animation: spIn .45s cubic-bezier(.2, .8, .2, 1); }
+@keyframes spIn { from { opacity: 0; transform: translateY(10px) scale(.98); } }
+/* ชั้นที่ 2: ขอบเทา→ฟ้าด้านล่าง ตัดมุมล่าง + สามเหลี่ยมในมุม */
+.sp-card::before { content: ''; position: absolute; inset: 6px; z-index: -2; border-radius: 12px 12px 0 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .1) 0%, rgba(255, 255, 255, .1) 40%, rgba(46, 194, 255, .55) 75%, #2ec2ff 100%);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 17px), calc(100% - 17px) 100%, 17px 100%, 0 calc(100% - 17px)); }
+.sp-card::after { content: ''; position: absolute; inset: 7px; z-index: -1; border-radius: 11px 11px 0 0;
+  background: radial-gradient(120% 45% at 50% 100%, rgba(46, 194, 255, .28), transparent 70%), linear-gradient(180deg, rgba(17, 19, 23, .97) 0%, rgba(17, 19, 23, .97) 60%, rgba(14, 34, 50, .97) 100%);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 16.6px), calc(100% - 16.6px) 100%, 16.6px 100%, 0 calc(100% - 16.6px)); }
+.sp-card { background-image: linear-gradient(45deg, #2ec2ff 50%, transparent 50%), linear-gradient(-45deg, #2ec2ff 50%, transparent 50%);
+  background-position: left 7px bottom 7px, right 7px bottom 7px; background-size: 11px 11px; background-repeat: no-repeat; }
+/* โลโก้: กรอบ 2 ชั้นสีขาว + แสงฟุ้ง */
+[data-theme] .sp-logo { width: 88px !important; height: 88px !important; border-radius: 16px !important; isolation: isolate; color: #fff !important;
+  background: rgba(52, 57, 64, .6) !important; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .06), 0 0 30px -6px rgba(46, 194, 255, .6) !important; animation: none !important; }
+[data-theme] .sp-logo::before { content: ''; position: absolute; inset: 4px; z-index: -2; border-radius: 12px; background: linear-gradient(180deg, rgba(255, 255, 255, .14) 30%, rgba(255, 255, 255, .92)); }
+[data-theme] .sp-logo::after { content: '' !important; position: absolute !important; inset: 5px !important; right: 5px !important; bottom: 5px !important; width: auto !important; height: auto !important;
+  z-index: -1; clip-path: none !important; border-radius: 11px; background: radial-gradient(110% 80% at 50% 100%, rgba(46, 194, 255, .45), transparent 72%), rgb(17, 19, 23) !important; }
+[data-theme] .sp-logo svg { width: 46px !important; height: 46px !important; filter: drop-shadow(0 0 8px rgba(46, 194, 255, .8)); color: #2ec2ff; }
+.sp-title { margin-top: 18px !important; font: 600 22px/1 'Kanit', var(--font-head) !important; letter-spacing: .04em !important; color: #fff; }
+.sp-title b { color: #2ec2ff !important; font-weight: 600 !important; }
+.sp-status { margin-top: 10px !important; font: 400 11.5px 'Kanit', var(--font-body) !important; letter-spacing: .06em !important; color: rgba(255, 255, 255, .55) !important; min-height: 16px; }
+/* หลอดโหลด: รางเข้มขอบบาง + แถบฟ้าทึบ */
+.splash .sp-bar { position: relative !important; left: auto; right: auto; bottom: auto; width: 100%; height: 12px !important; margin-top: 18px; padding: 2px; border-radius: 3px; box-sizing: border-box;
+  background: rgba(8, 10, 13, .85) !important; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .1); }
+.splash .sp-bar i { border-radius: 2px; background: #2ec2ff !important; box-shadow: 0 0 8px rgba(46, 194, 255, .6) !important; }
+.sp-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; width: 100%; margin-top: 10px; }
+.sp-row .sp-tip { font-size: 11px; color: rgba(255, 255, 255, .4); }
+.sp-row .sp-ver { font: 600 11px 'JetBrains Mono', 'Consolas', var(--font-mono); color: rgba(255, 255, 255, .35); }
+.sp-foot, .sp-ring, .sp-spark { display: none !important; }
+
+/* ================= v24: แก้ล้น ================= */
+/* ช่อง IP เซิร์ฟส่วนตัวอยู่ด้านล่างแผงแทนปุ่มเล่น (ไม่ล้นทับมุม) */
+.sv-foot .sv-ipbox { display: flex; gap: 8px; }
+.sv-foot .sv-ipbox .input { flex: 1; min-width: 0; height: 46px; }
+.sv-foot .sv-ipbox .btn { height: 46px; flex: none; }
+.sx-body .sv-note { font-size: 12px !important; line-height: 1.5 !important; padding: 9px 11px !important; }
+.sx-body .sv-desc { -webkit-line-clamp: 3 !important; }
+/* ซ่อนแถบเลื่อนในแผงเซิร์ฟ (ยังเลื่อนได้) */
+.sv-side .sv-body { scrollbar-width: none; }
+.sv-side .sv-body::-webkit-scrollbar { width: 0 !important; display: none; }
+/* ชื่อ/ข้อความยาวในแถว ตัดด้วย … ไม่ดันคอลัมน์ */
+.b-main { min-width: 0; overflow: hidden; }
+.b-row .pl-n { white-space: nowrap; }
+.b-row .b-st .stc { max-width: 100%; overflow: hidden; }
+.sx-name { overflow-wrap: anywhere; }
+/* หลอดที่ 0% ไม่ต้องแสดงแถบสี */
+.bar i { min-width: 0 !important; }
+.bar i[style*="width:0%"] { display: none !important; }
