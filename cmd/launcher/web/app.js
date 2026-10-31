@@ -461,6 +461,7 @@
       <div class="sx-hero" style="--tone:${o.tone || '#2ec2ff'}">
         ${o.bg ? `<img class="sx-bg ${o.blur ? 'blur' : ''}" src="${esc(o.bg)}" alt="">` : ''}
         <button class="x-btn sx-x" id="svClose" title="ปิด">${I.x}</button>
+        <button class="sx-star ${o.starred ? 'on' : ''}" id="svStar" title="${o.starred ? 'เอาออกจากเซิร์ฟของฉัน' : 'เพิ่มเข้าเซิร์ฟของฉัน'}">${I.star}</button>
         <div class="sx-logo"><span>${esc(initial(o.name))}</span>${o.logo ? `<img src="${esc(o.logo)}" alt="">` : ''}</div>
         <h2 class="sx-name" data-no-i18n title="${esc(o.name)}">${esc(o.name)}</h2>
         ${o.sub ? `<div class="sx-sub" data-no-i18n title="${esc(o.sub)}">${esc(o.sub)}</div>` : ''}
@@ -482,13 +483,46 @@
   const addrBox = (a) => `<div class="rp-addr"><span class="rp-lbl">ที่อยู่เซิร์ฟ</span><div class="sv-addr"><code data-no-i18n>${esc(a)}</code><button class="rp-copy" id="svCopy" title="คัดลอก">${I.copy}</button></div></div>`;
   // ปุ่มเล่นแบบ CONFIRM (สามเหลี่ยมสองข้าง)
   const playFoot = (label) => `<div class="sv-foot"><button class="rp-confirm sv-play" id="svPlay">${label}</button></div>`;
+  // ดาว = เซิร์ฟของฉัน: หาเซิร์ฟที่บันทึกไว้ของเซิร์ฟสาธารณะ / เพิ่ม / เอาออก
+  const normA = (x) => String(x || '').toLowerCase().replace(/^https?:\/\//, '').replace(/:30120$/, '').replace(/\/+$/, '');
+  const mineOfPub = (s) => state.servers.find((x) => x.cfxId === s.id || [x.connect, x.address].map(normA).includes(normA(targetOf(s))));
+  const adding = new Set();
+  async function addFromBrowse(s) {
+    if (mineOfPub(s) || adding.has(s.id)) return;
+    adding.add(s.id);
+    const t = targetOf(s);
+    const rec = {
+      id: uid(), address: t, connect: t, display: t.replace(/^https?:\/\//, ''), cfxId: s.id,
+      name: s.name, category: '', desc: s.desc || '', bannerUrl: '', logoUrl: '', discord: s.discord || '',
+      tone: 'auto', autoTone: null, logo: null, banner: s.banner || null, group: null,
+      addedAt: Date.now(), lastPlayed: null,
+      status: { online: true, players: s.players, max: s.max, ping: null, checkedAt: Date.now() },
+    };
+    if (s.icon) {
+      try { rec.logo = (await api.fetchImage(s.icon)) || null; } catch {}
+      if (rec.logo) rec.autoTone = await dominantColor(rec.logo);
+    }
+    state.servers.push(rec);
+    adding.delete(s.id);
+    persist();
+    toast(`เพิ่ม ${s.name} เข้าเซิร์ฟของฉันแล้ว`);
+    updateHomeParts();
+    refreshOne(rec, true).then(() => { persist(); patchAll(); }).catch(() => {});
+  }
+  function unstar(m) {
+    state.servers = state.servers.filter((x) => x.id !== m.id);
+    if (state.watching[m.id]) { api.watchStop(m.id); delete state.watching[m.id]; }
+    persist();
+    toast(`เอา ${m.name} ออกจากเซิร์ฟของฉันแล้ว`, 'info');
+    updateHomeParts();
+  }
   function serverPopup(s) {
     state.browse.selItem = s;
     const tags = s.tags.split(',').map((t) => t.trim()).filter(Boolean).slice(0, 8);
     const target = targetOf(s);
-    const mineOf = state.servers.find((x) => x.cfxId === s.id);
+    const mineOf = mineOfPub(s);
     const side = openSide(sideTpl({
-      name: s.name, online: true, players: s.players, max: s.max, priv: s.private, ping: s.private ? '—' : '…',
+      name: s.name, online: true, players: s.players, max: s.max, priv: s.private, ping: s.private ? '—' : '…', starred: !!mineOf,
       bg: s.banner ? imgSrc(s.banner) : s.icon ? imgSrc(s.icon) : '', blur: !s.banner, logo: s.icon ? imgSrc(s.icon) : '',
       badgeSub: s.locale ? esc(s.locale.replace('_', '-').toUpperCase()) : '',
       sub: tags.slice(0, 4).join(' · '),
@@ -507,6 +541,12 @@
       foot: s.private ? '' : playFoot('เล่นเลย', s.players, s.max),
     }), s.id);
     if (!side) return;
+    $('#svStar', side).onclick = async () => {
+      const m = mineOfPub(s);
+      if (m) { unstar(m); serverPopup(s); return; }
+      if (s.private) { toast('เซิร์ฟส่วนตัวต้องใส่ IP ก่อน แล้วกดบันทึก', 'warn'); $('#svIp', side)?.focus(); return; }
+      await addFromBrowse(s); serverPopup(s);
+    };
     $('#svSave', side)?.addEventListener('click', () => savePrivate(s, $('#svIp', side).value));
     $('#svIp', side)?.addEventListener('keydown', (e) => { if (e.key === 'Enter') savePrivate(s, e.target.value); });
     $('#svGoMine', side)?.addEventListener('click', () => { if (mineOf) { $('#bq').value = ''; state.browse.q = ''; drawBrowse(); mineSide(mineOf); $('#bList').closest('.b-col').scrollTop = 0; } });
@@ -587,7 +627,7 @@
   function mineSide(s) {
     const S = st(s), p = loadPct(s), logo = logoOf(s), banner = bannerOf(s), t = toneOf(s);
     state.browse.selItem = null;
-    const side = openSide(sideTpl({
+    const side = openSide(sideTpl({ starred: true,
       name: s.name, online: S.online, players: S.players, max: S.max, priv: false, tone: t,
       ping: S.ping != null ? `${S.ping}<small>ms</small>` : '—',
       bg: banner || logo || '', blur: !banner, logo,
@@ -598,15 +638,12 @@
         <div class="sv-links">
           ${bellHTML(s)}
           ${s.discord ? `<button class="btn btn-sm sv-discord" data-link="${esc(normUrl(s.discord))}">${I.discord} Discord</button>` : ''}
-          <button class="btn btn-sm" id="svGrp">${I.folder2} กลุ่ม</button>
-          <button class="btn btn-sm btn-danger" id="svDel">${I.trash} ลบ</button>
         </div>`,
       foot: playFoot(S.online ? 'เล่นเลย' : 'ลองเข้า', S.online ? S.players : 0, S.max),
     }), 'm:' + s.id);
     if (!side) return;
     $('#svPlay', side).onclick = () => play(s.id);
-    $('#svDel', side).onclick = () => confirmDelete(s);
-    $('#svGrp', side).onclick = (e) => openMenu(e.currentTarget, s);
+    $('#svStar', side).onclick = () => { unstar(s); closeServer(); };
     $$('[data-link]', side).forEach((b) => (b.onclick = () => api.openExternal(b.dataset.link)));
     $$('[data-act="watch"]', side).forEach((b) => (b.onclick = () => toggleWatch(s)));
     $('#svCopy', side).onclick = () => { navigator.clipboard.writeText(s.connect || s.address).then(() => toast('คัดลอกที่อยู่แล้ว'), () => toast('คัดลอกไม่สำเร็จ', 'err')); };
@@ -1023,7 +1060,7 @@
       if (k === 'newgrp') groupModal(null, s);
     });
   }
-  document.addEventListener('mousedown', (e) => { if (!e.target.closest('.menu, .more-btn, .grp-more, #bFilter, #svGrp')) closeMenu(); });
+  document.addEventListener('mousedown', (e) => { if (!e.target.closest('.menu, .more-btn, .grp-more, #bFilter')) closeMenu(); });
   document.getElementById('scroll').addEventListener('wheel', closeMenu, { passive: true });
   window.addEventListener('resize', closeMenu);
 
