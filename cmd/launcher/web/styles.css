@@ -1371,3 +1371,10 @@ html[data-motion='reduced'] .set-body .sect { animation: none !important; }
 .b-split.open { grid-template-columns: minmax(0, 1fr) 316px !important; }
 .b-split .sv-side { order: 2; }
 @keyframes svIn { from { transform: translateX(24px); opacity: 0; } }
+
+/* v17: ช่องค้นหา — ไอคอนสีขาว + กรอบตอนกดเป็นเส้นขาวบาง ตัดมุมขวาล่าง */
+[data-theme='hud'] {
+  --item-focus-w: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cpath d='M6 0H34A6 6 0 0 1 40 6V26L26 40H6A6 6 0 0 1 0 34V6A6 6 0 0 1 6 0Z' fill='rgba(57,60,65,.5)'/%3E%3Cpath d='M6 .75H34A5.25 5.25 0 0 1 39.25 6V25.7L25.7 39.25H6A5.25 5.25 0 0 1 .75 34V6A5.25 5.25 0 0 1 6 .75Z' fill='none' stroke='rgba(255,255,255,.8)' stroke-width='1.5'/%3E%3C/svg%3E");
+}
+[data-theme='hud'] .search svg { color: #fff !important; filter: drop-shadow(0 0 4px rgba(255, 255, 255, .35)) !important; }
+[data-theme='hud'] .search:focus-within::after { border-image-source: var(--item-focus-w) !important; filter: drop-shadow(0 0 6px rgba(255, 255, 255, .18)); }
