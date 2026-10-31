@@ -4,14 +4,29 @@ package main
 
 import (
 	_ "embed"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	webview2 "github.com/jchv/go-webview2"
 )
+
+//go:embed fonts/Kanit-Regular.woff
+var fontRegular []byte
+
+//go:embed fonts/Kanit-SemiBold.woff
+var fontSemiBold []byte
+
+// ใส่ฟอนต์ Kanit ลงในหน้า (SetHtml โหลดไฟล์ภายนอกไม่ได้)
+func withFonts(h string) string {
+	css := "@font-face{font-family:'Kanit';font-weight:400;src:url(data:font/woff;base64," + base64.StdEncoding.EncodeToString(fontRegular) + ") format('woff')}" +
+		"@font-face{font-family:'Kanit';font-weight:500 700;src:url(data:font/woff;base64," + base64.StdEncoding.EncodeToString(fontSemiBold) + ") format('woff')}"
+	return strings.Replace(h, "/*FONTS*/", css, 1)
+}
 
 //go:embed ui.html
 var uiHTML string
@@ -156,7 +171,7 @@ func runUI(uninst bool, selfDir string) (ok bool) {
 			eval(fmt.Sprintf("window.__goResolve(%d,%v,%s)", id, ok, payload))
 		}()
 	})
-	wv.SetHtml(uiHTML)
+	wv.SetHtml(withFonts(uiHTML))
 	wv.Run()
 	if uninstDone {
 		removeInstallDir(selfDir)

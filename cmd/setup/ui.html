@@ -84,12 +84,84 @@
   .btn.gap { margin-left: 8px; }
   .btn[hidden] { display: none; }
 </style>
+
+<style>
+/*FONTS*/
+/* ================= ธีม HUD ให้ตรงกับ Launcher ================= */
+:root { --font: 'Kanit', 'Leelawadee UI', 'Segoe UI', sans-serif; --accent: #2ec2ff; --green: #34d399; --red: #f0506e;
+  --text: #fff; --sub: rgba(255,255,255,.6); --muted: rgba(255,255,255,.4); --line: rgba(255,255,255,.08); --line2: rgba(255,255,255,.12); }
+body { color: var(--text); font: 13px/1.55 var(--font);
+  background: radial-gradient(520px 300px at 92% -10%, rgba(46,194,255,.14), transparent 62%), radial-gradient(420px 260px at -10% 110%, rgba(46,194,255,.08), transparent 60%),
+    linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px) 0 0/30px 30px, linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px) 0 0/30px 30px, #0b0c0e; }
+::-webkit-scrollbar { width: 5px; } ::-webkit-scrollbar-thumb { background: rgba(46,194,255,.35); border-radius: 9px; }
+.page.side { background: transparent; grid-template-columns: 176px 1fr; }
+/* แผงซ้าย: กรอบ 2 ชั้น + โลโก้ในกรอบขาว */
+.art { margin: 14px 0 0 14px; border-radius: 14px; background: rgba(52,57,64,.5); padding-top: 34px; isolation: isolate; box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 0 30px -14px rgba(46,194,255,.6); }
+.art::before { inset: 5px; border-radius: 10px; z-index: -1; background: radial-gradient(120% 45% at 50% 100%, rgba(46,194,255,.28), transparent 70%), #111317; background-size: auto; box-shadow: inset 0 0 0 1px rgba(255,255,255,.08); }
+.art::after { display: none; }
+.art .logo { width: 72px; height: 72px; border-radius: 15px; background: rgba(52,57,64,.6); isolation: isolate; box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 0 26px -6px rgba(46,194,255,.7); }
+.art .logo::before { content: ''; position: absolute; inset: 4px; z-index: -2; border-radius: 11px; background: linear-gradient(180deg, rgba(255,255,255,.14) 30%, rgba(255,255,255,.92)); }
+.art .logo::after { content: ''; position: absolute; inset: 5px; z-index: -1; border-radius: 10px; background: radial-gradient(110% 80% at 50% 100%, rgba(46,194,255,.45), transparent 72%), #111317; }
+.art .logo svg { filter: drop-shadow(0 0 6px rgba(46,194,255,.8)); }
+.art .nm { font-weight: 600; font-size: 15px; letter-spacing: .04em; text-transform: uppercase; }
+.art .nm::first-line { color: #fff; }
+.art .vr { color: var(--muted); font-family: 'Consolas', monospace; }
+.side .content { padding: 26px 26px 10px 24px; }
+h1 { font-weight: 600; font-size: 19px; color: #fff; }
+.content { color: rgba(255,255,255,.75); }
+/* หัวหน้า: โปร่ง หัวข้อขาว + กล่องไอคอน 2 ชั้นสีฟ้า */
+.head { background: transparent; border-bottom: 1px solid var(--line); padding: 12px 18px 12px 24px; }
+.head b { font-weight: 600; font-size: 14px; color: #fff; text-transform: uppercase; letter-spacing: .03em; }
+.head span { color: var(--sub); padding-left: 0; }
+.head .ic { width: 40px; height: 40px; border-radius: 10px; position: relative; isolation: isolate; background: rgba(52,57,64,.55); box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 0 16px -8px var(--accent); }
+.head .ic::before { content: ''; position: absolute; inset: 3px; z-index: -2; border-radius: 7px; background: linear-gradient(180deg, rgba(255,255,255,.12) 30%, rgba(46,194,255,.9)); }
+.head .ic::after { content: ''; position: absolute; inset: 4px; z-index: -1; border-radius: 6px; background: radial-gradient(110% 80% at 50% 100%, rgba(46,194,255,.3), transparent 72%), #111317; }
+.head .ic svg { width: 20px; height: 20px; }
+/* กล่องข้อความ */
+.license, .summary, .log, .checks { background: rgba(8,10,13,.6); border: 1px solid var(--line2); border-radius: 8px; color: rgba(255,255,255,.72); }
+.summary b { color: #fff; }
+fieldset { border: 1px solid var(--line2); border-radius: 8px; }
+legend { color: var(--sub); font-size: 12px; }
+.input { height: 32px; background: rgba(8,10,13,.6); border: 1px solid var(--line2); border-radius: 6px; color: #fff; font: 12.5px 'Consolas', monospace; }
+.input:focus { border: 1px solid rgba(255,255,255,.8); box-shadow: 0 0 10px -2px rgba(255,255,255,.18); }
+#uDir { background: rgba(8,10,13,.6) !important; }
+.space { color: var(--sub); }
+input[type=radio], input[type=checkbox] { accent-color: var(--accent); }
+.err { color: #ff7a90; }
+/* หลอดความคืบหน้า: รางเข้มขอบบาง + แถบฟ้าทึบ */
+progress { height: 12px; padding: 2px; border: 0; border-radius: 3px; background: rgba(8,10,13,.85); box-shadow: inset 0 0 0 1px rgba(255,255,255,.1); }
+progress::-webkit-progress-bar { background: transparent; }
+progress::-webkit-progress-value { background: var(--accent); border-radius: 2px; box-shadow: 0 0 8px rgba(46,194,255,.6); }
+.status { color: #fff; }
+/* ส่วนล่าง + ปุ่ม */
+.foot { background: transparent; border-top: 1px solid var(--line); padding: 10px 16px 14px; }
+.brandline { color: var(--muted); }
+.brandline::after { border-top-color: var(--line); }
+.btn { position: relative; isolation: isolate; min-width: 96px; height: 34px; font: 500 13px var(--font); color: #fff; background: rgba(57,60,65,.5); border: 1px solid rgba(255,255,255,.08); border-radius: 8px; cursor: pointer; transition: background .15s, box-shadow .15s; }
+.btn:hover { background: rgba(57,60,65,.8); }
+.btn:active { background: rgba(57,60,65,.6); color: #fff; transform: translateY(1px); }
+.btn:disabled, .btn:disabled:hover { background: rgba(57,60,65,.25); color: rgba(255,255,255,.3); border-color: rgba(255,255,255,.04); cursor: default; transform: none; }
+/* ปุ่มหลัก (ถัดไป/ติดตั้ง/เสร็จสิ้น) = ปุ่มเขียวแบบปุ่มเล่นใน Launcher */
+.btn.primary { border: 0; background: rgba(52,57,64,.55); box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 0 20px -6px var(--green); font-weight: 600; }
+.btn.primary::before { content: ''; position: absolute; inset: 3px; z-index: -2; border-radius: 6px; background: linear-gradient(180deg, rgba(120,240,190,.55), var(--green)); }
+.btn.primary::after { content: ''; position: absolute; inset: 4px; z-index: -1; border-radius: 5px; background: radial-gradient(120% 90% at 50% 100%, rgba(110,240,180,.55), transparent 75%), linear-gradient(180deg, #11734f, #0b5a3d); }
+.btn.primary:hover { background: rgba(52,57,64,.55); box-shadow: inset 0 0 0 1px rgba(255,255,255,.12), 0 0 28px -4px var(--green); }
+.btn.primary:hover::after { background: radial-gradient(120% 100% at 50% 100%, rgba(140,255,200,.7), transparent 78%), linear-gradient(180deg, #179064, #0f744f); }
+.btn.primary:disabled { box-shadow: none; opacity: .4; }
+.btn.primary:disabled::after { background: #1c2a24; }
+button:focus { outline: none; }
+.btn:not(.primary):focus-visible { box-shadow: 0 0 0 1px rgba(255,255,255,.6); }
+/* ถอนการติดตั้ง = ปุ่มแดง */
+.uninst .btn.primary { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 0 20px -6px var(--red); }
+.uninst .btn.primary::before { background: linear-gradient(180deg, rgba(255,150,165,.55), var(--red)); }
+.uninst .btn.primary::after { background: radial-gradient(120% 90% at 50% 100%, rgba(255,120,140,.5), transparent 75%), linear-gradient(180deg, #8a1f33, #6b1426); }
+</style>
 </head>
 <body>
 <main>
   <!-- 1 welcome -->
   <section class="page side" id="pWelcome">
-    <div class="art"><div class="logo" id="logoA"></div><div class="nm">FiveM<br>Launcher</div><div class="vr" data-ver></div></div>
+    <div class="art"><div class="logo" id="logoA"></div><div class="nm">FiveM<br><span style="color:#2ec2ff">Launcher</span></div><div class="vr" data-ver></div></div>
     <div class="content">
       <h1>ยินดีต้อนรับสู่ตัวช่วยติดตั้ง FiveM Launcher</h1>
       <p>ตัวช่วยนี้จะติดตั้ง FiveM Launcher เวอร์ชัน <span data-ver></span> ลงในคอมพิวเตอร์ของคุณ</p>
@@ -157,7 +229,7 @@
 
   <!-- 7 finish -->
   <section class="page side" id="pFinish">
-    <div class="art"><div class="logo" data-logo></div><div class="nm">FiveM<br>Launcher</div><div class="vr" data-ver></div></div>
+    <div class="art"><div class="logo" data-logo></div><div class="nm">FiveM<br><span style="color:#2ec2ff">Launcher</span></div><div class="vr" data-ver></div></div>
     <div class="content">
       <h1 id="finTitle">การติดตั้ง FiveM Launcher เสร็จสมบูรณ์</h1>
       <p id="finText">ตัวช่วยได้ติดตั้ง FiveM Launcher ลงในคอมพิวเตอร์ของคุณเรียบร้อยแล้ว สามารถเปิดใช้งานได้จากทางลัดที่สร้างไว้</p>
@@ -168,7 +240,7 @@
 
   <!-- error -->
   <section class="page side" id="pError">
-    <div class="art"><div class="logo" data-logo></div><div class="nm">FiveM<br>Launcher</div><div class="vr" data-ver></div></div>
+    <div class="art"><div class="logo" data-logo></div><div class="nm">FiveM<br><span style="color:#2ec2ff">Launcher</span></div><div class="vr" data-ver></div></div>
     <div class="content">
       <h1>การติดตั้งไม่สำเร็จ</h1>
       <p class="err" id="errText"></p>
@@ -208,7 +280,7 @@
 
   const MARK = (c, s) => `<svg viewBox="0 0 40 40" width="${s}" height="${s}" fill="none" stroke="${c}" stroke-linecap="round" stroke-linejoin="round"><path d="M13 30 21.2 9.5c.5-1.3 2.3-1.3 2.8 0L32 30" stroke-width="4.4"/><path d="M8 30h7.5" stroke-width="4.4"/><path d="M22.6 21.5v8.5" stroke-width="3.2"/></svg>`;
   document.querySelectorAll('[data-icon]').forEach((e) => (e.innerHTML = MARK('#fff', 26)));
-  document.querySelectorAll('.art .logo').forEach((e) => (e.innerHTML = MARK('#1d1d21', 44)));
+  document.querySelectorAll('.art .logo').forEach((e) => (e.innerHTML = MARK('#2ec2ff', 40)));
 
   const LICENSE = `ข้อตกลงการใช้งานซอฟต์แวร์ FiveM Launcher
 
@@ -338,6 +410,7 @@ You can uninstall the software at any time from Windows Settings > Apps.`;
     if (id === 'pFinish') { B.hidden = true; C.hidden = true; N.textContent = 'เสร็จสิ้น'; }
     if (id === 'pError') { N.textContent = 'ลองอีกครั้ง'; }
     if (id === 'pUninst') { B.hidden = true; N.textContent = 'ถอนการติดตั้ง'; }
+    document.body.classList.toggle('uninst', id === 'pUninst');
     setTimeout(() => N.focus(), 0);
   }
 

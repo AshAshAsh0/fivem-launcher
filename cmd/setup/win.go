@@ -151,6 +151,13 @@ func placeWindow(h uintptr, w, ht int) {
 	if pDwmSetWindowAttr.Find() == nil {
 		pref := uint32(2)
 		pDwmSetWindowAttr.Call(h, 33, uintptr(unsafe.Pointer(&pref)), 4)
+		// แถบชื่อหน้าต่างสีเข้มให้เข้ากับธีม (Windows 10 20H1+ / 11)
+		dark := uint32(1)
+		pDwmSetWindowAttr.Call(h, 20, uintptr(unsafe.Pointer(&dark)), 4)
+		cap := uint32(0x000E0C0B) // COLORREF = 0x00BBGGRR → #0B0C0E
+		pDwmSetWindowAttr.Call(h, 35, uintptr(unsafe.Pointer(&cap)), 4)
+		txt := uint32(0x00FFFFFF)
+		pDwmSetWindowAttr.Call(h, 36, uintptr(unsafe.Pointer(&txt)), 4)
 	}
 }
 
