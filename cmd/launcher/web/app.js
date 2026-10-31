@@ -480,8 +480,8 @@
   }
   // ช่องที่อยู่เซิร์ฟแบบ "YOUR CODE INVITE": ป้ายเล็กด้านบน + กล่องที่อยู่ + ปุ่มคัดลอกสี่เหลี่ยม
   const addrBox = (a) => `<div class="rp-addr"><span class="rp-lbl">ที่อยู่เซิร์ฟ</span><div class="sv-addr"><code data-no-i18n>${esc(a)}</code><button class="rp-copy" id="svCopy" title="คัดลอก">${I.copy}</button></div></div>`;
-  // ปุ่มเล่นแบบ CONFIRM (สามเหลี่ยมสองข้าง) + บรรทัดสรุปผู้เล่นด้านล่าง
-  const playFoot = (label, players, max) => `<div class="sv-foot"><button class="rp-confirm sv-play" id="svPlay">${label}</button><div class="rp-sum"><span>ผู้เล่นตอนนี้</span> <b data-no-i18n>${fmtNum(players)}</b> <i data-no-i18n>/ ${fmtNum(max)}</i></div></div>`;
+  // ปุ่มเล่นแบบ CONFIRM (สามเหลี่ยมสองข้าง)
+  const playFoot = (label) => `<div class="sv-foot"><button class="rp-confirm sv-play" id="svPlay">${label}</button></div>`;
   function serverPopup(s) {
     state.browse.selItem = s;
     const tags = s.tags.split(',').map((t) => t.trim()).filter(Boolean).slice(0, 8);
@@ -1048,6 +1048,7 @@
     const o = document.createElement('div');
     o.className = 'overlay';
     o.innerHTML = html;
+    o.querySelector('.modal')?.classList.add('rp'); // ทุกหน้าต่างใช้กรอบ 2 ชั้นแบบเดียวกัน
     o.addEventListener('mousedown', (e) => { if (e.target === o) closeModal(); });
     o.querySelectorAll('[data-close]').forEach((b) => b.addEventListener('click', closeModal));
     $('#modalRoot').appendChild(o);

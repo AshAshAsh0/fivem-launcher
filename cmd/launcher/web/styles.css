@@ -1512,15 +1512,24 @@ html:not([lang='en']) :is(.rp-sum, .rp-title, .rp-lbl) { letter-spacing: .02em; 
 
 /* ================= v19: หน้าต่างเพิ่มเซิร์ฟ = เนื้อหาแบบเดิม ในกรอบแบบใหม่ · หลอดสถานะแบบแถบทึบ ================= */
 [data-theme='hud'] .modal.add-pop.rp { width: min(560px, calc(100vw - 60px)) !important; }
-[data-theme='hud'] .modal.add-pop.rp .modal-head { padding: 24px 28px 10px !important; }
-[data-theme='hud'] .modal.add-pop.rp .modal-head h2::before { display: none; }
-[data-theme='hud'] .modal.add-pop.rp .modal-head h2 { font: 600 22px 'Kanit', var(--font-head) !important; text-transform: none; letter-spacing: 0; text-shadow: none; }
-[data-theme='hud'] .modal.add-pop.rp .modal-body { padding: 4px 28px 16px !important; }
-[data-theme='hud'] .modal.add-pop.rp .field > label { font: 600 13.5px 'Kanit', var(--font-head); text-transform: none; letter-spacing: 0; color: #fff; }
-[data-theme='hud'] .modal.add-pop.rp .modal-foot { border-top: 0 !important; padding: 6px 28px 30px !important; }
-[data-theme='hud'] .modal.add-pop.rp .x-btn { width: 34px; height: 34px; }
+[data-theme='hud'] .modal.rp .modal-head { padding: 24px 28px 10px !important; }
+[data-theme='hud'] .modal.rp .modal-head h2::before { display: none; }
+[data-theme='hud'] .modal.rp .modal-head h2 { font: 600 22px 'Kanit', var(--font-head) !important; text-transform: none; letter-spacing: 0; text-shadow: none; }
+[data-theme='hud'] .modal.rp .modal-body { padding: 4px 28px 16px !important; }
+[data-theme='hud'] .modal.rp .field > label { font: 600 13.5px 'Kanit', var(--font-head); text-transform: none; letter-spacing: 0; color: #fff; }
+[data-theme='hud'] .modal.rp .modal-foot { border-top: 0 !important; padding: 6px 28px 30px !important; }
+[data-theme='hud'] .modal.rp .x-btn { width: 34px; height: 34px; }
 
 /* หลอดความจุ: แถบทึบต่อเนื่อง — รางเข้มขอบบาง + สีฟ้าด้านในเว้นขอบเล็กน้อย */
 [data-theme='hud'] .sx-bar { height: 12px !important; padding: 2px; border-radius: 3px !important; -webkit-mask-image: none !important; mask-image: none !important;
   background: rgba(8, 10, 13, .85) !important; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .1), 0 0 0 1px rgba(0, 0, 0, .4) !important; box-sizing: border-box; }
 [data-theme='hud'] .sx-bar i { border-radius: 2px !important; background: #2ec2ff !important; box-shadow: 0 0 8px rgba(46, 194, 255, .55) !important; }
+
+/* v19b: หน้าต่างอื่น ๆ (ลบ/รีเซ็ต/กลุ่ม/กู้คืน/ล้างแคช) ใช้กรอบและเนื้อหาแบบเดียวกับหน้าต่างเพิ่มเซิร์ฟ */
+[data-theme='hud'] .modal.rp { overflow: hidden; }
+[data-theme='hud'] .modal.sm.rp { width: min(480px, calc(100vw - 80px)) !important; }
+[data-theme='hud'] .modal.rp .modal-head { padding-top: 26px !important; }
+[data-theme='hud'] .modal.rp .modal-head h2 { font-size: 20px !important; }
+[data-theme='hud'] .modal.rp .confirm-text { color: rgba(255, 255, 255, .7); }
+[data-theme='hud'] .modal.rp .modal-foot .btn { min-width: 120px; }
+.sv-foot { padding-bottom: 26px !important; }
