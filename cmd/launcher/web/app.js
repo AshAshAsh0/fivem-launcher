@@ -1063,15 +1063,16 @@
       : { address: '', name: '', logo: null, banner: null, autoTone: null, tone: 'auto', fetched: null };
     const m = modal(`
       <div class="modal add-pop rp">
-        <div class="rp-title"><i></i><i></i><i></i><span>${existing ? 'แก้ไขที่อยู่เซิร์ฟ' : 'เพิ่มเซิร์ฟเวอร์'}</span></div>
-        <button class="x-btn rp-x" data-close>${I.x}</button>
-        <div class="rp-hero" id="fPreview"></div>
-        <div class="rp-body">
-          <p class="hint rp-desc" id="fHint">ใส่ IP:พอร์ต, โดเมน หรือลิงก์ cfx.re/join แล้วกด “ตรวจสอบ”</p>
-          <div class="row"><input class="input" id="fAddr" placeholder="เช่น 103.91.190.199:30120 หรือ cfx.re/join/abc123" value="${esc(d.address)}" spellcheck="false"><button class="btn" id="fCheck">${I.bolt} ตรวจสอบ</button></div>
-          <button class="rp-confirm" id="fSave">บันทึก</button>
-          <div class="rp-sum" id="fSum"><span>รองรับ IP:พอร์ต · โดเมน · cfx.re/join</span></div>
+        <div class="modal-head"><h2>${existing ? 'แก้ไขที่อยู่เซิร์ฟ' : 'เพิ่มเซิร์ฟเวอร์'}</h2><button class="x-btn" data-close>${I.x}</button></div>
+        <div class="modal-body">
+          <div class="field" style="margin-bottom:12px">
+            <label>ที่อยู่เซิร์ฟเวอร์</label>
+            <div class="row"><input class="input" id="fAddr" placeholder="เช่น 103.91.190.199:30120 หรือ cfx.re/join/abc123" value="${esc(d.address)}" spellcheck="false"><button class="btn" id="fCheck">${I.bolt} ตรวจสอบ</button></div>
+            <div class="hint" id="fHint">ใส่ IP:พอร์ต, โดเมน หรือลิงก์ cfx.re/join แล้วกด “ตรวจสอบ”</div>
+          </div>
+          <div class="preview" id="fPreview"></div>
         </div>
+        <div class="modal-foot"><button class="btn" data-close>ยกเลิก</button><button class="btn btn-dark" id="fSave">${I.check} บันทึก</button></div>
       </div>`);
     const el = (id) => $(`#${id}`, m);
 
@@ -1080,13 +1081,14 @@
       const t = d.tone && d.tone !== 'auto' ? d.tone : d.autoTone || '#2c2c3a';
       el('fPreview').setAttribute('style', toneStyle(t));
       el('fPreview').innerHTML = `
-        ${banner ? `<img class="sx-bg" src="${esc(banner)}" alt="">` : logo ? `<img class="sx-bg blur" src="${esc(logo)}" alt="">` : ''}
-        <div class="sx-logo" style="--tone:${t}">${logo ? `<img src="${esc(logo)}" alt="">` : '<span>?</span>'}</div>
-        ${f?.name || d.name ? `<h2 class="sx-name" data-no-i18n>${esc(f?.name || d.name)}</h2>` : '<h2 class="sx-name">ชื่อเซิร์ฟเวอร์</h2>'}
-        <div class="sx-st">${f ? stChip(f.online, f.players || 0, f.max || 0, false) : '<span class="sx-tag">ยังไม่ได้ตรวจสอบ</span>'}</div>`;
-      el('fSum').innerHTML = f && f.online
-        ? `<span>ผู้เล่นตอนนี้</span> <b data-no-i18n>${fmtNum(f.players)}</b> <i data-no-i18n>/ ${fmtNum(f.max)}</i>`
-        : '<span>รองรับ IP:พอร์ต · โดเมน · cfx.re/join</span>';
+        <div class="pv-banner" style="${banner || logo ? `background:${t}` : ''}">${banner ? `<img src="${esc(banner)}" alt="">` : logo ? `<img class="blur-logo" src="${esc(logo)}" alt="">` : ''}</div>
+        <div class="pv-row">
+          <div class="pv-logo ${logo ? 'has' : ''}">${logo ? `<img src="${esc(logo)}" alt="">` : '?'}</div>
+          <div class="pv-info">
+            ${f?.name || d.name ? `<b data-no-i18n>${esc(f?.name || d.name)}</b>` : '<b>ชื่อเซิร์ฟเวอร์</b>'}
+            ${f ? (f.online ? `<span class="pill pill-ok" style="margin-top:4px">ออนไลน์ · ${fmtNum(f.players)}/${fmtNum(f.max)}</span>` : '<span class="pill pill-off" style="margin-top:4px">ออฟไลน์</span>') : '<span>กด “ตรวจสอบ” เพื่อดึงชื่อ โลโก้ และแบนเนอร์</span>'}
+          </div>
+        </div>`;
     }
 
     async function check() {
@@ -1100,7 +1102,7 @@
       btn.disabled = false;
       btn.innerHTML = `${I.bolt} ตรวจสอบ`;
       const hint = el('fHint');
-      if (!r.ok) { hint.className = 'hint rp-desc err'; hint.textContent = r.error || 'ตรวจสอบไม่สำเร็จ'; return; }
+      if (!r.ok) { hint.className = 'hint err'; hint.textContent = r.error || 'ตรวจสอบไม่สำเร็จ'; return; }
       d.fetched = r; d.connect = r.connect; d.display = r.display; d.checkedAddr = addr;
       if (r.online) {
         if (r.logo) d.logo = r.logo;
@@ -1108,10 +1110,10 @@
         if (r.name) d.name = r.name;
         if (r.desc && !d.desc) d.desc = r.desc.slice(0, 300);
         if (d.logo) d.autoTone = await dominantColor(d.logo);
-        hint.className = 'hint rp-desc ok';
+        hint.className = 'hint ok';
         hint.textContent = `ออนไลน์ · ${fmtNum(r.players)}/${fmtNum(r.max)} ผู้เล่น · ${r.ping} ms`;
       } else {
-        hint.className = 'hint rp-desc err';
+        hint.className = 'hint err';
         hint.textContent = 'ออฟไลน์ หรือเชื่อมต่อไม่ได้ (ยังบันทึกได้)';
       }
       renderPreview();
@@ -1121,7 +1123,7 @@
     el('fAddr').addEventListener('keydown', (e) => { if (e.key === 'Enter') check(); });
     el('fSave').addEventListener('click', async () => {
       const address = el('fAddr').value.trim();
-      if (!address) { el('fAddr').focus(); el('fHint').className = 'hint rp-desc err'; el('fHint').textContent = 'กรุณาใส่ที่อยู่เซิร์ฟเวอร์'; return; }
+      if (!address) { el('fAddr').focus(); el('fHint').className = 'hint err'; el('fHint').textContent = 'กรุณาใส่ที่อยู่เซิร์ฟเวอร์'; return; }
       const checked = d.fetched && d.checkedAddr === address;
       const changed = !existing || address !== existing.address;
       const rec = {
