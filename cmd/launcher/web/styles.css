@@ -1641,3 +1641,11 @@ html:not([lang='en']) :is(.rp-sum, .rp-title, .rp-lbl) { letter-spacing: .02em; 
 [data-theme='hud'] .sx-logo::after { content: ''; position: absolute; inset: 5px; z-index: 0; border-radius: 11px; background: var(--tone, #1b2026); }
 [data-theme='hud'] .sx-logo img { inset: 5px !important; width: calc(100% - 10px) !important; height: calc(100% - 10px) !important; border-radius: 11px !important; z-index: 1; }
 [data-theme='hud'] .sx-logo span { position: relative; z-index: 1; }
+
+/* v22c: ปุ่มเล่น/บันทึก เขียวทั้งปุ่ม (กรอบ 2 ชั้นเดิม) · ชี้แล้วสว่าง + เรืองแสงขึ้น */
+[data-theme='hud'] :is(.sv-play, #fSave, #svSave, #gSave)::before { background: linear-gradient(180deg, rgba(120, 240, 190, .55), #34d399) !important; }
+[data-theme='hud'] :is(.sv-play, #fSave, #svSave, #gSave)::after { background: radial-gradient(120% 90% at 50% 100%, rgba(110, 240, 180, .55), transparent 75%), linear-gradient(180deg, #11734f, #0b5a3d) !important; transition: filter .15s; }
+[data-theme='hud'] :is(.sv-play, #fSave, #svSave, #gSave) { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .06), 0 0 22px -6px #34d399 !important; text-shadow: 0 1px 2px rgba(0, 0, 0, .35) !important; transition: box-shadow .15s, transform .1s; }
+[data-theme='hud'] :is(.sv-play, #fSave, #svSave, #gSave):hover { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .12), 0 0 30px -4px #34d399 !important; }
+[data-theme='hud'] :is(.sv-play, #fSave, #svSave, #gSave):hover::after { background: radial-gradient(120% 100% at 50% 100%, rgba(140, 255, 200, .7), transparent 78%), linear-gradient(180deg, #179064, #0f744f) !important; }
+[data-theme='hud'] :is(.sv-play, #fSave, #svSave, #gSave):active { transform: translateY(1px); }
