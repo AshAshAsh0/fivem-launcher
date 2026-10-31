@@ -537,7 +537,7 @@
           ${s.discord ? `<button class="btn btn-sm sv-discord" data-link="${esc(s.discord)}">${I.discord} Discord</button>` : ''}
           ${s.website ? `<button class="btn btn-sm" data-link="${esc(s.website)}">${I.globe} เว็บไซต์</button>` : ''}
         </div>` : ''}`,
-      foot: s.private ? (mineOf ? '' : `<div class="sv-foot"><div class="sv-ipbox"><input class="input" id="svIp" placeholder="เช่น 103.91.190.199:30120" spellcheck="false"><button class="btn btn-dark" id="svSave">${I.check} บันทึก</button></div></div>`) : playFoot('เล่นเลย'),
+      foot: s.private ? (mineOf ? '' : `<div class="sv-foot"><div class="sv-ipbox"><input class="input" id="svIp" placeholder="วาง IP:พอร์ต หรือลิงก์" spellcheck="false"><button class="btn btn-dark" id="svSave">${I.check} บันทึก</button></div></div>`) : playFoot('เล่นเลย'),
     }), s.id);
     if (!side) return;
     $('#svStar', side).onclick = async () => {
@@ -1104,7 +1104,7 @@
         <div class="modal-body">
           <div class="field" style="margin-bottom:12px">
             <label>ที่อยู่เซิร์ฟเวอร์</label>
-            <div class="row"><input class="input" id="fAddr" placeholder="เช่น 103.91.190.199:30120 หรือ cfx.re/join/abc123" value="${esc(d.address)}" spellcheck="false"><button class="btn" id="fCheck">${I.bolt} ตรวจสอบ</button></div>
+            <div class="row"><input class="input" id="fAddr" placeholder="IP:พอร์ต หรือ cfx.re/join/..." value="${esc(d.address)}" spellcheck="false"><button class="btn" id="fCheck">${I.bolt} ตรวจสอบ</button></div>
             <div class="hint" id="fHint">ใส่ IP:พอร์ต, โดเมน หรือลิงก์ cfx.re/join แล้วกด “ตรวจสอบ”</div>
           </div>
           <div class="preview" id="fPreview"></div>
