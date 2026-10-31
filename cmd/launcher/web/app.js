@@ -599,7 +599,7 @@
           ${bellHTML(s)}
           ${s.discord ? `<button class="btn btn-sm sv-discord" data-link="${esc(normUrl(s.discord))}">${I.discord} Discord</button>` : ''}
           <button class="btn btn-sm" id="svGrp">${I.folder2} กลุ่ม</button>
-          <button class="btn btn-sm" id="svDel" style="color:var(--danger)">${I.trash} ลบ</button>
+          <button class="btn btn-sm btn-danger" id="svDel">${I.trash} ลบ</button>
         </div>`,
       foot: playFoot(S.online ? 'เล่นเลย' : 'ลองเข้า', S.online ? S.players : 0, S.max),
     }), 'm:' + s.id);

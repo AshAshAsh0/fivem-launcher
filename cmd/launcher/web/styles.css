@@ -1649,3 +1649,25 @@ html:not([lang='en']) :is(.rp-sum, .rp-title, .rp-lbl) { letter-spacing: .02em; 
 [data-theme='hud'] :is(.sv-play, #fSave, #svSave, #gSave):hover { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .12), 0 0 30px -4px #34d399 !important; }
 [data-theme='hud'] :is(.sv-play, #fSave, #svSave, #gSave):hover::after { background: radial-gradient(120% 100% at 50% 100%, rgba(140, 255, 200, .7), transparent 78%), linear-gradient(180deg, #179064, #0f744f) !important; }
 [data-theme='hud'] :is(.sv-play, #fSave, #svSave, #gSave):active { transform: translateY(1px); }
+
+/* v22d: ปุ่มอันตราย (รีเซ็ต/ลบ/ล้างแคช) + ปุ่มปิด ✕ = แบบปุ่มเล่น แต่สีแดง */
+[data-theme='hud'] :is(.btn-danger, .x-btn):not(#_) {
+  position: relative; isolation: isolate; color: #fff !important; text-shadow: 0 1px 2px rgba(0, 0, 0, .35) !important; filter: none !important;
+  background: rgba(52, 57, 64, .55) !important; border-radius: 10px !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .06), 0 0 18px -6px #f0506e !important; transition: box-shadow .15s, transform .1s;
+}
+[data-theme='hud'] :is(.btn-danger, .x-btn):not(#_)::before {
+  content: '' !important; position: absolute !important; inset: 3px !important; z-index: -2 !important; border: 0 !important; border-image: none !important;
+  clip-path: none !important; transform: none !important; filter: none !important; opacity: 1 !important; border-radius: 7px !important;
+  background: linear-gradient(180deg, rgba(255, 150, 165, .55), #f0506e) !important;
+}
+[data-theme='hud'] :is(.btn-danger, .x-btn):not(#_)::after {
+  content: '' !important; position: absolute !important; inset: 4px !important; z-index: -1 !important; border: 0 !important; border-image: none !important;
+  clip-path: none !important; transform: none !important; filter: none !important; opacity: 1 !important; border-radius: 6px !important;
+  background: radial-gradient(120% 90% at 50% 100%, rgba(255, 120, 140, .5), transparent 75%), linear-gradient(180deg, #8a1f33, #6b1426) !important;
+}
+[data-theme='hud'] :is(.btn-danger, .x-btn):not(#_):hover { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .12), 0 0 26px -4px #f0506e !important; }
+[data-theme='hud'] :is(.btn-danger, .x-btn):not(#_):hover::after { background: radial-gradient(120% 100% at 50% 100%, rgba(255, 150, 165, .65), transparent 78%), linear-gradient(180deg, #a52640, #861a30) !important; }
+[data-theme='hud'] :is(.btn-danger, .x-btn):not(#_):active { transform: translateY(1px); }
+[data-theme='hud'] :is(.btn-danger, .x-btn):not(#_) svg { color: #fff !important; stroke: #fff; }
+[data-theme='hud'] .btn-danger:disabled:not(#_) { opacity: .45; }
