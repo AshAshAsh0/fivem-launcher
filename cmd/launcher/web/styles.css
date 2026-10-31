@@ -1533,3 +1533,42 @@ html:not([lang='en']) :is(.rp-sum, .rp-title, .rp-lbl) { letter-spacing: .02em; 
 [data-theme='hud'] .modal.rp .confirm-text { color: rgba(255, 255, 255, .7); }
 [data-theme='hud'] .modal.rp .modal-foot .btn { min-width: 120px; }
 .sv-foot { padding-bottom: 26px !important; }
+
+/* ================= v20: แจ้งเตือนแบบการ์ด HUD (ด้านบนกลาง) · เอาเวอร์ชันท้ายจอออก · ปุ่มเปิด FiveM สีเขียว ================= */
+.toasts { position: fixed !important; top: 62px !important; bottom: auto !important; left: 50% !important; right: auto !important; transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 8px; z-index: 120; pointer-events: none; width: 380px; }
+[data-theme] .toast {
+  --tc: #2ec2ff; position: relative; display: flex; align-items: center; gap: 14px; width: 100%; min-width: 0; max-width: none;
+  padding: 12px 22px 12px 12px; border-radius: 8px; pointer-events: auto;
+  background: linear-gradient(90deg, rgba(26, 29, 34, .96), rgba(20, 22, 26, .96)) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .09), 0 14px 30px -12px rgba(0, 0, 0, .85) !important;
+  backdrop-filter: blur(6px); animation: toastIn .25s cubic-bezier(.2, .8, .2, 1);
+}
+.toast.ok { --tc: #34d399; } .toast.err { --tc: #f0506e; } .toast.info { --tc: #2ec2ff; } .toast.warn { --tc: #f5a524; }
+@keyframes toastIn { from { opacity: 0; transform: translateY(-10px); } }
+.toast.out { opacity: 0; transform: translateY(-8px); transition: opacity .3s, transform .3s; }
+/* ไอคอนวงกลม: วงแหวนสีตามประเภท + แสงฟุ้ง */
+[data-theme] .toast .ti { flex: none; width: 38px; height: 38px; margin: 0; border-radius: 50%; transform: none; display: grid; place-items: center;
+  background: radial-gradient(circle, rgba(30, 33, 38, 1) 55%, color-mix(in srgb, var(--tc) 18%, rgba(30, 33, 38, 1)));
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--tc) 85%, transparent), 0 0 14px -2px var(--tc), inset 0 0 8px color-mix(in srgb, var(--tc) 30%, transparent); color: #fff; }
+[data-theme] .toast .ti svg { transform: none; width: 18px; height: 18px; stroke: #fff; stroke-width: 2.8; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.toast.warn .ti svg { stroke-width: 0; }
+.toast .tx { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.toast .tx b { font: 600 12.5px 'Kanit', var(--font-head) !important; letter-spacing: .04em !important; text-transform: uppercase; color: var(--tc) !important; line-height: 1.35; }
+.toast .tx span { font: 500 13px/1.45 'Kanit', var(--font-body) !important; color: #fff !important; }
+/* แถบสีเล็กด้านขวา */
+.toast .tbar { position: absolute; right: 10px; top: 50%; width: 3px; height: 22px; transform: translateY(-50%); border-radius: 2px; background: var(--tc); box-shadow: 0 0 8px var(--tc); }
+
+/* ท้ายจอ: ไม่แสดงเวอร์ชัน (ดูได้ในหน้าตั้งค่า) — ใช้พื้นที่ด้านล่างให้เนื้อหา; แถบอัปเดตลอยด้านล่างเมื่อมีเวอร์ชันใหม่ */
+.foot .made { display: none !important; }
+[data-theme] .foot { position: absolute !important; left: 50%; bottom: 14px; transform: translateX(-50%); padding: 0 !important; z-index: 60; pointer-events: none; }
+.foot > * { pointer-events: auto; }
+.foot .discord[hidden] { display: none !important; }
+.main { position: relative; }
+.scroll.split { padding-bottom: 14px !important; }
+[data-theme] .foot-upd { box-shadow: inset 0 0 0 1.5px rgba(46, 194, 255, .85), 0 0 20px -6px #2ec2ff, 0 14px 30px -10px rgba(0, 0, 0, .9) !important; background: linear-gradient(90deg, rgba(20, 60, 90, .97), rgba(16, 28, 40, .97)) !important; }
+
+/* ปุ่มเปิด FiveM: สีเขียวแบบชิป "ออนไลน์" */
+[data-theme] .wc-fivem { color: #34d399 !important; background: rgba(52, 211, 153, .13) !important; box-shadow: inset 0 0 0 1px rgba(52, 211, 153, .45) !important; }
+[data-theme] .wc-fivem svg { filter: drop-shadow(0 0 4px rgba(52, 211, 153, .7)) !important; }
+[data-theme] .wc-fivem:hover { background: rgba(52, 211, 153, .22) !important; box-shadow: inset 0 0 0 1.5px rgba(52, 211, 153, .75), 0 0 12px -2px rgba(52, 211, 153, .7) !important; }

@@ -197,16 +197,16 @@
   // ---------- toast ----------
   // แจ้งเตือนแบบ HUD: ok = สำเร็จ (เขียว), err = ผิดพลาด (แดง), info = ข้อมูล (ฟ้า), warn = คำเตือน (ส้ม)
   const TOAST = {
-    ok: { cls: 'ok', t: 'สำเร็จ', ic: '<svg viewBox="0 0 24 24"><path d="m6 12.5 4 4 8-9"/></svg>' },
-    err: { cls: 'err', t: 'ผิดพลาด', ic: '<svg viewBox="0 0 24 24"><path d="M12 6.5v7M12 17.5v.01"/></svg>' },
-    info: { cls: 'info', t: 'ข้อมูล', ic: '<svg viewBox="0 0 24 24"><path d="M12 10.5v7M12 6.5v.01"/></svg>' },
-    warn: { cls: 'warn', t: 'คำเตือน', ic: '<svg viewBox="0 0 24 24"><path d="M12 6.5v7M12 17.5v.01"/></svg>' },
+    ok: { cls: 'ok', t: 'สำเร็จ', ic: '<svg viewBox="0 0 24 24"><path d="m6.5 12.5 3.8 3.8 7.2-8"/></svg>' },
+    err: { cls: 'err', t: 'ผิดพลาด', ic: '<svg viewBox="0 0 24 24"><path d="m7.5 7.5 9 9M16.5 7.5l-9 9"/></svg>' },
+    info: { cls: 'info', t: 'ข้อมูล', ic: '<svg viewBox="0 0 24 24"><path d="M12.6 10.5 11 17.5M13 6.6v.01"/></svg>' },
+    warn: { cls: 'warn', t: 'คำเตือน', ic: '<svg viewBox="0 0 24 24"><path d="M12 4.5 21 19.5H3Z" fill="currentColor" stroke="none"/><path d="M12 10v4.5M12 17v.01" stroke="#1a1c20" stroke-width="2.2"/></svg>' },
   };
   function toast(msg, type = 'ok') {
     const k = TOAST[type] || TOAST.ok;
     const el = document.createElement('div');
     el.className = `toast ${k.cls}`;
-    el.innerHTML = `<span class="ti">${k.ic}</span><span class="tx"><b>${k.t}</b><span>${esc(msg)}</span></span>`;
+    el.innerHTML = `<span class="ti">${k.ic}</span><span class="tx"><b>${k.t}</b><span>${esc(msg)}</span></span><i class="tbar"></i>`;
     $('#toasts').appendChild(el);
     while ($('#toasts').children.length > 4) $('#toasts').firstChild.remove();
     setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 320); }, type === 'err' || type === 'warn' ? 4200 : 2800);
