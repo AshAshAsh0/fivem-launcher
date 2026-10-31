@@ -1378,3 +1378,73 @@ html[data-motion='reduced'] .set-body .sect { animation: none !important; }
 }
 [data-theme='hud'] .search svg { color: #fff !important; filter: drop-shadow(0 0 4px rgba(255, 255, 255, .35)) !important; }
 [data-theme='hud'] .search:focus-within::after { border-image-source: var(--item-focus-w) !important; filter: drop-shadow(0 0 6px rgba(255, 255, 255, .18)); }
+
+/* ================= v18: แผงเลือกเซิร์ฟ + หน้าต่างเพิ่มเซิร์ฟ แบบหน้ารางวัล ================= */
+/* แผง: ไล่สีเข้ม→ฟ้าด้านล่าง · เส้นขอบบางสีฟ้า · สามเหลี่ยมทึบที่มุมล่างซ้าย/ขวา */
+[data-theme='hud'] :is(.sv-side, .modal.rp) {
+  background: linear-gradient(180deg, rgba(14, 17, 22, .96) 0%, rgba(13, 24, 34, .95) 55%, rgba(12, 44, 66, .94) 100%) !important;
+  box-shadow: inset 0 0 0 1px rgba(46, 194, 255, .55), 0 0 34px -12px rgba(46, 194, 255, .55) !important;
+  border-radius: 12px !important;
+}
+[data-theme='hud'] :is(.sv-side, .modal.rp)::before {
+  border: 0 !important; border-image: none !important; inset: 7px !important; z-index: 0 !important;
+  background:
+    linear-gradient(45deg, #2ec2ff 50%, transparent 50%) left bottom / 13px 13px no-repeat,
+    linear-gradient(-45deg, #2ec2ff 50%, transparent 50%) right bottom / 13px 13px no-repeat !important;
+  filter: drop-shadow(0 0 5px rgba(46, 194, 255, .8));
+}
+.sv-side > *, .modal.rp > * { position: relative; z-index: 1; }
+
+/* ปุ่มแบบ CONFIRM: พื้นฟ้าไล่สี ขอบฟ้า ตัวหนังสือห่าง + สามเหลี่ยมชี้เข้าทั้งสองข้าง */
+.rp-confirm { position: relative; display: flex; align-items: center; justify-content: center; width: 100%; height: 48px; border-radius: 6px; cursor: pointer;
+  font: 600 14px 'Kanit', var(--font-head); letter-spacing: .16em; text-transform: uppercase; color: #fff; text-shadow: 0 0 8px rgba(46, 194, 255, .8);
+  background: linear-gradient(180deg, rgba(46, 194, 255, .55), rgba(20, 120, 180, .45)) !important;
+  box-shadow: inset 0 0 0 1px rgba(120, 220, 255, .9), 0 0 20px -4px rgba(46, 194, 255, .7) !important; filter: none !important; transition: box-shadow .15s, transform .1s; }
+.rp-confirm::before, .rp-confirm::after { content: '' !important; position: absolute !important; top: 50% !important; width: 7px !important; height: 13px !important; inset: auto !important;
+  border: 0 !important; border-image: none !important; animation: none !important; opacity: 1 !important; transform: translateY(-50%) !important; background: #bfeeff !important; z-index: 1 !important; }
+.rp-confirm::before { left: 10px !important; top: 50% !important; clip-path: polygon(0 0, 100% 50%, 0 100%); }
+.rp-confirm::after { right: 10px !important; top: 50% !important; clip-path: polygon(100% 0, 0 50%, 100% 100%); }
+.rp-confirm:hover { box-shadow: inset 0 0 0 1px #bfeeff, 0 0 28px -2px rgba(46, 194, 255, .9) !important; }
+.rp-confirm:active { transform: translateY(1px); }
+[data-theme='hud'] .sv-play.rp-confirm { height: 48px !important; }
+/* บรรทัดสรุปด้านล่าง: "ผู้เล่นตอนนี้ 468 / 2,048" */
+.rp-sum { margin-top: 10px; text-align: center; font: 500 11px 'Kanit', var(--font-body); letter-spacing: .12em; text-transform: uppercase; color: rgba(255, 255, 255, .55); }
+.rp-sum b { color: var(--accent); font: 700 12.5px 'JetBrains Mono', 'Consolas', var(--font-mono); letter-spacing: .04em; text-shadow: 0 0 8px rgba(46, 194, 255, .6); }
+.rp-sum i { font: 600 12.5px 'JetBrains Mono', 'Consolas', var(--font-mono); font-style: normal; color: #fff; letter-spacing: .04em; }
+/* ที่อยู่แบบ YOUR CODE INVITE */
+.rp-addr { display: flex; flex-direction: column; align-items: stretch; gap: 5px; }
+.rp-lbl { align-self: flex-end; font: 500 10px 'Kanit', var(--font-body); letter-spacing: .1em; text-transform: uppercase; color: rgba(255, 255, 255, .5); }
+[data-theme='hud'] .rp-addr .sv-addr { background: rgba(8, 12, 16, .6) !important; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .12) !important; border-radius: 6px; padding: 5px 5px 5px 12px !important; }
+.rp-addr code { font: 600 13px 'JetBrains Mono', 'Consolas', var(--font-mono) !important; color: #fff !important; letter-spacing: .03em; }
+.rp-copy { flex: none; width: 32px; height: 32px; border-radius: 5px; display: grid; place-items: center; color: #fff; background: linear-gradient(180deg, #4fd0ff, #1597d6); box-shadow: 0 0 12px -2px rgba(46, 194, 255, .8); }
+.rp-copy svg { width: 16px; height: 16px; }
+.rp-copy:hover { filter: brightness(1.15); }
+/* กล่องสถิติ = การ์ดไอเทม: ขอบฟ้าบาง พื้นไล่สีจาง */
+[data-theme='hud'] .sx-box { background: linear-gradient(180deg, rgba(46, 194, 255, .1), rgba(46, 194, 255, .02)) !important; box-shadow: inset 0 0 0 1px rgba(46, 194, 255, .4) !important; border-radius: 6px !important; }
+/* แถบความจุแบบแคปซูลเรืองแสง */
+[data-theme='hud'] .sx-bar { height: 8px !important; border-radius: 99px !important; background: rgba(46, 194, 255, .14) !important; }
+[data-theme='hud'] .sx-bar i { border-radius: 99px !important; box-shadow: 0 0 10px var(--barc) !important; }
+.sv-foot { border-top: 0 !important; padding: 8px 16px 18px !important; }
+
+/* ===== หน้าต่างเพิ่มเซิร์ฟ ===== */
+.modal.rp { width: min(480px, calc(100vw - 60px)) !important; padding: 0 !important; overflow: hidden; display: block !important; }
+.rp-title { display: flex; align-items: center; gap: 6px; padding: 18px 22px 0; font: 600 12px 'Kanit', var(--font-head); letter-spacing: .1em; text-transform: uppercase; color: rgba(255, 255, 255, .85); }
+.rp-title i { width: 7px; height: 7px; background: #fff; transform: rotate(45deg); border-radius: 1px; }
+.rp-title i:first-child { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
+.rp-title span { margin-left: 8px; }
+.rp-x { position: absolute !important; top: 12px; right: 12px; z-index: 3 !important; width: 30px; height: 30px; }
+.rp-hero { position: relative; isolation: isolate; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 6px 24px 4px; overflow: hidden; }
+.rp-hero .sx-bg { inset: -20px 0 0; height: calc(100% + 20px); }
+.rp-hero .sx-logo { margin: 8px 0 10px !important; }
+.rp-hero .sx-logo span { font: 700 30px 'Kanit', var(--font-head); color: rgba(255, 255, 255, .6); }
+.rp-body { padding: 4px 26px 20px; display: flex; flex-direction: column; gap: 12px; }
+.rp-desc { margin: 2px 0 0 !important; text-align: center; font-size: 12.5px !important; color: rgba(255, 255, 255, .7); }
+.rp-desc.ok { color: #4be39a !important; } .rp-desc.err { color: #ff8c8c !important; }
+.rp-body .row { display: flex; gap: 8px; }
+[data-theme='hud'] .rp-body .input { flex: 1; min-width: 0; height: 44px; text-align: center; font: 500 13px 'JetBrains Mono', 'Consolas', var(--font-mono); background: rgba(8, 12, 16, .55) !important; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .14) !important; }
+[data-theme='hud'] .rp-body .input:focus { box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, .7) !important; }
+.rp-body #fCheck { height: 44px; flex: none; }
+.rp-body .rp-sum { margin-top: 0; }
+/* ตัวหนังสือภาษาไทยไม่เว้นระยะตัวอักษร (ระยะห่างใช้เฉพาะภาษาอังกฤษ) */
+html:not([lang='en']) .rp-confirm { letter-spacing: .02em; font-size: 15px; }
+html:not([lang='en']) :is(.rp-sum, .rp-title, .rp-lbl) { letter-spacing: .02em; }
